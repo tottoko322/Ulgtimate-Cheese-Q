@@ -67,6 +67,6 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "Ultimate Cheese Q.slnx",
+    "dotnet.defaultSolution": "Ulgtimate-Cheese-Q.slnx",
     "dotnet.enableWorkspaceBasedDevelopment": false
 }
