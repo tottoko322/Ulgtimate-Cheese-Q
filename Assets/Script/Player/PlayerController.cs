@@ -4,10 +4,17 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 15f;
-    [SerializeField] private float jumpPower = 5f; 
+    [SerializeField] private float jumpPower = 10f; 
+
+    enum JumpState
+    {
+        ground,
+        jump,
+        doubleJump
+    }
+    private JumpState jumpState = JumpState.ground;
 
     private Rigidbody2D rb;
-    private int playerState = 5;
     private bool isGrounded; 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -15,6 +22,10 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
     }
 
+    void Update()
+    {
+        Jump();
+    }
     // Update is called once per frame
     void FixedUpdate()
     {
@@ -53,6 +64,27 @@ public class PlayerController : MonoBehaviour
             case 6:
             rb.linearVelocity = new Vector2(Mathf.MoveTowards(rb.linearVelocity.x, moveSpeed, 25*Time.deltaTime), rb.linearVelocity.y);
             break;
+        }
+    }
+
+    private void Jump()
+    {
+        if (Keyboard.current.wKey.wasPressedThisFrame)
+        {
+            switch(jumpState)
+            {
+                case JumpState.ground:
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpPower);
+                jumpState = JumpState.jump;
+                break;
+            }
+        }
+    }
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            jumpState = JumpState.ground;
         }
     }
 }
