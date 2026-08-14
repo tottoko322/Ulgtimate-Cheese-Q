@@ -41,27 +41,17 @@ public class PlayerController : MonoBehaviour
         {
             playerState -= 1;
         }
-        if (Keyboard.current.sKey.isPressed)
-        {
-            playerState -= 3;
-        }
 
         switch(playerState)
         {
-            case 1:
-            break;
-            case 2:
-            break;
-            case 3:
-            break;
             case 4:
-            rb.linearVelocity = new Vector2(Mathf.MoveTowards(rb.linearVelocity.x, -moveSpeed, 25*Time.deltaTime), rb.linearVelocity.y);
+            rb.linearVelocity = new Vector2(-moveSpeed, rb.linearVelocity.y);
             break;
             case 5:
             rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
             break;
             case 6:
-            rb.linearVelocity = new Vector2(Mathf.MoveTowards(rb.linearVelocity.x, moveSpeed, 25*Time.deltaTime), rb.linearVelocity.y);
+            rb.linearVelocity = new Vector2(moveSpeed, rb.linearVelocity.y);
             break;
         }
     }
