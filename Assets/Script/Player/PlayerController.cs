@@ -13,12 +13,15 @@ public class PlayerController : MonoBehaviour
     private LocomotionState jumpState = LocomotionState.Grounded;
     public LocomotionState CurrentLocomotionState { get; private set; } 
 
+    [Header("Ground Movement")] 
     [SerializeField] private float groundMoveSpeed = 10f;
 
+    [Header("Jump")]
     [SerializeField] private float jumpPower = 5f; 
     [SerializeField] private float airJumpPower = 5f;
     [SerializeField] private float maxJumpHoldTime = 0.2f;
     private float jumpHoldTimer = 0f;
+
     private bool jumpPressed = false;
 
     [SerializeField] private LayerMask Ground;
