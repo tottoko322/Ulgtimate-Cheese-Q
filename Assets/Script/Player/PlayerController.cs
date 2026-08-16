@@ -6,6 +6,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float moveSpeed = 15f;
     [SerializeField] private float jumpPower = 10f; 
     [SerializeField] private LayerMask Ground;
+    private float jumpHoldTimer = 0f;
+    public float MaxJumpHoldTime = 0.2f;
 
     enum JumpState
     {
@@ -16,6 +18,7 @@ public class PlayerController : MonoBehaviour
     private JumpState jumpState = JumpState.ground;
     private Rigidbody2D rb;
     private bool isGrounded;
+    private bool isJumpHold = false;
 
     void Start()
     {
@@ -73,18 +76,36 @@ public class PlayerController : MonoBehaviour
                 case JumpState.ground:
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpPower);
                 jumpState = JumpState.jump;
+                isJumpHold = true;
                 break;
 
                 case JumpState.jump:
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpPower);
                 jumpState = JumpState.doubleJump;
+                isJumpHold = true;
                 break;
 
                 case JumpState.doubleJump:
                 break;
             }
         }
+
+        if (Keyboard.current.wKey.wasReleasedThisFrame)
+        {
+            isJumpHold = false;
+            if (rb.linearVelocity.y > 0)
+            {
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * 0.4f);
+            }
+        }
+
+        if (isJumpHold && Keyboard.current.wKey.isPressed && jumpHoldTimer < MaxJumpHoldTime)
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpPower);
+            jumpHoldTimer += Time.fixedDeltaTime;
+        }
     }
+
     void OnDrawGizmos()
     {
         Vector2 rayOrigin = new Vector2(transform.position.x, transform.position.y -0.5f);
