@@ -5,6 +5,7 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 15f;
     [SerializeField] private float jumpPower = 10f; 
+    [SerializeField] private LayerMask Ground;
 
     enum JumpState
     {
@@ -14,7 +15,7 @@ public class PlayerController : MonoBehaviour
     }
     private JumpState jumpState = JumpState.ground;
     private Rigidbody2D rb;
-    private bool isGrounded; 
+    private bool isGrounded;
 
     void Start()
     {
@@ -58,6 +59,13 @@ public class PlayerController : MonoBehaviour
 
     private void Jump()
     {
+        Vector2 rayOrigin = new Vector2(transform.position.x, transform.position.y -0.5f);
+        RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.down, 0.1f, Ground);
+        if (hit.collider != null && rb.linearVelocity.y <= 0)
+        {
+            jumpState = JumpState.ground;
+        }
+
         if (Keyboard.current.wKey.wasPressedThisFrame)
         {
             switch(jumpState)
@@ -66,14 +74,21 @@ public class PlayerController : MonoBehaviour
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpPower);
                 jumpState = JumpState.jump;
                 break;
+
+                case JumpState.jump:
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpPower);
+                jumpState = JumpState.doubleJump;
+                break;
+
+                case JumpState.doubleJump:
+                break;
             }
         }
     }
-    private void OnCollisionEnter2D(Collision2D collision)
+    void OnDrawGizmos()
     {
-        if (collision.gameObject.CompareTag("Ground"))
-        {
-            jumpState = JumpState.ground;
-        }
+        Vector2 rayOrigin = new Vector2(transform.position.x, transform.position.y -0.5f);
+        Gizmos.color = Color.red;
+        Gizmos.DrawRay(rayOrigin, new Vector2(0, -0.1f));
     }
 }
