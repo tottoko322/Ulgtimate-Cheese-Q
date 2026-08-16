@@ -3,22 +3,26 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private float moveSpeed = 15f;
-    [SerializeField] private float jumpPower = 10f; 
-    [SerializeField] private LayerMask Ground;
-    private float jumpHoldTimer = 0f;
-    public float MaxJumpHoldTime = 0.2f;
+    public enum LocomotionState 
+    { 
+        Grounded,
+        Airborne,
+        DoubleJump,
+        WallCling
+    } 
+    private LocomotionState jumpState = LocomotionState.Grounded;
+    public LocomotionState CurrentLocomotionState { get; private set; } 
 
-    enum JumpState
-    {
-        ground,
-        jump,
-        doubleJump
-    }
-    private JumpState jumpState = JumpState.ground;
+    [SerializeField] private float groundMoveSpeed = 10f;
+
+    [SerializeField] private float jumpPower = 5f; 
+    [SerializeField] private float airJumpPower = 5f;
+    [SerializeField] private float maxJumpHoldTime = 0.2f;
+    private float jumpHoldTimer = 0f;
+    private bool jumpPressed = false;
+
+    [SerializeField] private LayerMask Ground;
     private Rigidbody2D rb;
-    private bool isGrounded;
-    private bool isJumpHold = false;
 
     void Start()
     {
@@ -32,9 +36,10 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        Move();
+        HandleGroundedMovement();
     }
-    private void Move()
+
+    private void HandleGroundedMovement()
     {
         int playerState = 5;
         if (Keyboard.current.dKey.isPressed)
@@ -49,13 +54,13 @@ public class PlayerController : MonoBehaviour
         switch(playerState)
         {
             case 4:
-            rb.linearVelocity = new Vector2(-moveSpeed, rb.linearVelocity.y);
+            rb.linearVelocity = new Vector2(-groundMoveSpeed, rb.linearVelocity.y);
             break;
             case 5:
             rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
             break;
             case 6:
-            rb.linearVelocity = new Vector2(moveSpeed, rb.linearVelocity.y);
+            rb.linearVelocity = new Vector2(groundMoveSpeed, rb.linearVelocity.y);
             break;
         }
     }
@@ -66,50 +71,43 @@ public class PlayerController : MonoBehaviour
         RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.down, 0.1f, Ground);
         if (hit.collider != null && rb.linearVelocity.y <= 0)
         {
-            jumpState = JumpState.ground;
+            jumpState = LocomotionState.Grounded;
         }
 
         if (Keyboard.current.wKey.wasPressedThisFrame)
         {
             switch(jumpState)
             {
-                case JumpState.ground:
+                case LocomotionState.Grounded:
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpPower);
-                jumpState = JumpState.jump;
-                isJumpHold = true;
+                jumpState = LocomotionState.Airborne;
+                jumpPressed = true;
                 break;
 
-                case JumpState.jump:
-                rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpPower);
-                jumpState = JumpState.doubleJump;
-                isJumpHold = true;
+                case LocomotionState.Airborne:
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, airJumpPower);
+                jumpState = LocomotionState.DoubleJump;
+                jumpPressed = true;
                 break;
 
-                case JumpState.doubleJump:
+                case LocomotionState.DoubleJump:
                 break;
             }
         }
 
         if (Keyboard.current.wKey.wasReleasedThisFrame)
         {
-            isJumpHold = false;
+            jumpPressed = false;
             if (rb.linearVelocity.y > 0)
             {
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * 0.4f);
             }
         }
 
-        if (isJumpHold && Keyboard.current.wKey.isPressed && jumpHoldTimer < MaxJumpHoldTime)
+        if (jumpPressed && Keyboard.current.wKey.isPressed && jumpHoldTimer < maxJumpHoldTime)
         {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpPower);
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, airJumpPower);
             jumpHoldTimer += Time.fixedDeltaTime;
         }
-    }
-
-    void OnDrawGizmos()
-    {
-        Vector2 rayOrigin = new Vector2(transform.position.x, transform.position.y -0.5f);
-        Gizmos.color = Color.red;
-        Gizmos.DrawRay(rayOrigin, new Vector2(0, -0.1f));
     }
 }
