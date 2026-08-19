@@ -1,4 +1,3 @@
-using Unity.XR.GoogleVr;
 using UnityEngine;
 
 public class EnemyController : MonoBehaviour
@@ -7,6 +6,9 @@ public class EnemyController : MonoBehaviour
     [SerializeField] Transform playertransform;
     private bool isInSearchRange;
     private bool isInChaseRange;
+    private float distanceX;
+    private float distanceY;
+
     void Start()
     {
         isInSearchRange = false;
@@ -16,14 +18,18 @@ public class EnemyController : MonoBehaviour
     {
         //索敵範囲内かの判定
         CheckDistance();
+        if(isInChaseRange)
+        {
+            ChasePlayer();
+        }
     }
     void CheckDistance()
     {
         if(!isInSearchRange)
         {
-            dataofenemy.distanceX = playertransform.position.x - transform.position.x;
-            dataofenemy.distanceY = playertransform.position.y - transform.position.y;
-            if(dataofenemy.distanceX*dataofenemy.distanceX + dataofenemy.distanceY*dataofenemy.distanceY < dataofenemy.enemySearchRange*dataofenemy.enemySearchRange)
+            distanceX = playertransform.position.x - transform.position.x;
+            distanceY = playertransform.position.y - transform.position.y;
+            if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemySearchRange*dataofenemy.enemySearchRange)
             {
                 isInSearchRange = true;
                 isInChaseRange = true;
@@ -31,13 +37,17 @@ public class EnemyController : MonoBehaviour
         }
         else
         {
-            dataofenemy.distanceX = playertransform.position.x - transform.position.x;
-            dataofenemy.distanceY = playertransform.position.y - transform.position.y;
-            if(dataofenemy.distanceX*dataofenemy.distanceX + dataofenemy.distanceY*dataofenemy.distanceY < dataofenemy.enemySearchRange*dataofenemy.enemySearchRange)
+            distanceX = playertransform.position.x - transform.position.x;
+            distanceY = playertransform.position.y - transform.position.y;
+            if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemySearchRange*dataofenemy.enemySearchRange)
             {
                 isInSearchRange = false;
                 isInChaseRange = false;
             }
         }
+    }
+    void ChasePlayer()
+    {
+        
     }
 }
