@@ -6,7 +6,6 @@ public class EnemyController : MonoBehaviour
     [SerializeField] Transform playertransform;
     private bool isInSearchRange;
     private bool isInChaseRange;
-    private bool isWalking;
     private float distanceX;
     private float distanceY;
     private int viewMoveSpriteNumber;
@@ -46,9 +45,13 @@ public class EnemyController : MonoBehaviour
             isInSearchRange = false;
             isInChaseRange = false;
         }
-        //追跡処理及びそのアニメーション処理
-        ChasePlayer();
-        ChangeSprite();
+        //追跡処理
+        if (isInChaseRange)
+        {
+            ChasePlayer();
+        }
+        //アニメーション処理
+        ChangeSprite(); 
     }
     void ChasePlayer()
     {
@@ -63,7 +66,7 @@ public class EnemyController : MonoBehaviour
     }
     void ChangeSprite()
     {
-        if(isWalking)
+        if(isInChaseRange)
         {
             if(viewMoveSpriteNumber == dataofenemy.moveAnimationSprites.Length)
             {
@@ -83,7 +86,7 @@ public class EnemyController : MonoBehaviour
                 sr.flipX = false;//右向き素材前提
             }
         }
-        else if(!isWalking)
+        else if(!isInChaseRange)
         {
             if(viewStaySpriteNumber == dataofenemy.stayAnimationSprites.Length)
             {
