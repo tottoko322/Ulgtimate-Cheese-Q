@@ -11,17 +11,8 @@ public class EnemyData : MonoBehaviour
     public float enemyChaseRange;
     public float enemyAttackRange;
     public float enemyCooltime;
-    public bool isInSearchRange;
-    public bool isInChaseRange;
     public float distanceX;
     public float distanceY;
     public Sprite[] moveAnimationSprites;
     public Sprite[] attackAnimationSprites;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        isInSearchRange = false;
-        isInChaseRange = false;
-    }
-
 }
