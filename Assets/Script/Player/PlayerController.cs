@@ -14,19 +14,19 @@ public class PlayerController : MonoBehaviour
     private LocomotionState jumpState = LocomotionState.Grounded;
     public LocomotionState CurrentLocomotionState { get; private set; } 
 
-    [Header("Ground Movement")] 
+    [Header("Ground Movement")]
     [SerializeField] private float groundMoveSpeed = 8f;
 
     [Header("Jump")]
     [SerializeField] private float jumpPower = 5f; 
     [SerializeField] private float airJumpPower = 5f;
     [SerializeField] private float maxJumpHoldTime = 0.2f;
+    [SerializeField] private float jumpHoldForce = 5f;
     private float jumpHoldTimer = 0f;
 
     [Header("Air Movement")]
     [SerializeField] private float airMoveSpeed = 8f; 
     [SerializeField] private float airAcceleration = 3f; 
-    [SerializeField] private float airDeceleration; 
 
     [Header("Fast Fall")]
     [SerializeField] private float fastFallSpeed = 8f;
@@ -161,7 +161,7 @@ public class PlayerController : MonoBehaviour
 
         if (jumpPressed && Keyboard.current.wKey.isPressed && jumpHoldTimer < maxJumpHoldTime)
         {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, airJumpPower);
+            rb.AddForce(Vector2.up * jumpHoldForce, ForceMode2D.Force);
             jumpHoldTimer += Time.fixedDeltaTime;
         }
     }
