@@ -31,7 +31,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float fastFallSpeed = 8f;
 
     private int moveInput;
+    private int airMoveInput;
     private bool jumpPressed = false;
+    private bool jumpReleased = false;
+    private bool jumpHeld = false;
     private bool hasUsedAirJump = false;
     private bool isFastFalling = false;
 
@@ -46,50 +49,58 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         ReadInput();
-        Jump();
     }
 
     void FixedUpdate()
     {
+        UpdateGroundState();
         HandleGroundedMovement();
         HandleAirMovement();
         StartFastFall();
+        Jump();
     }
 
     private void ReadInput()
     {
         //左右移動の入力
-        if (CurrentLocomotionState == LocomotionState.Grounded)
+        moveInput = 0;
+        if (Keyboard.current.dKey.isPressed)
         {
-            moveInput = 0;
-            if (Keyboard.current.dKey.isPressed)
-            {
-                moveInput += 1;
-            }
-            if (Keyboard.current.aKey.isPressed)
-            {
-                moveInput -= 1;
-            }
+            moveInput += 1;
         }
-
-        //空中移動の入力
-        if (CurrentLocomotionState == LocomotionState.Airborne)
+        if (Keyboard.current.aKey.isPressed)
         {
-            moveInput = 5;
-            if (Keyboard.current.dKey.isPressed)
-            {
-                moveInput += 1;
-            }
-            if (Keyboard.current.aKey.isPressed)
-            {
-                moveInput -= 1;
-            }
+            moveInput -= 1;
         }
         
         //急降下の入力
-        if (Keyboard.current.sKey.wasPressedThisFrame && CurrentLocomotionState == LocomotionState.Airborne)
+        if (Keyboard.current.sKey.wasPressedThisFrame)
         {
             isFastFalling = true;
+        }
+
+        //ジャンプの入力
+        if (Keyboard.current.wKey.wasPressedThisFrame)
+        {
+            jumpPressed = true;
+        }
+        if (Keyboard.current.wKey.wasReleasedThisFrame)
+        {
+            jumpReleased = true;
+        }
+
+        jumpHeld = Keyboard.current.wKey.isPressed;
+    }
+
+    private void UpdateGroundState() //接地判定
+    {
+        Vector2 rayOrigin = new Vector2(transform.position.x, transform.position.y -0.5f);
+        RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.down, 0.1f, Ground);
+        if (hit.collider != null && rb.linearVelocity.y <= 0)
+        {
+            CurrentLocomotionState = LocomotionState.Grounded;
+            hasUsedAirJump = false;
+            isFastFalling = false;
         }
     }
 
@@ -105,7 +116,8 @@ public class PlayerController : MonoBehaviour
     {
         if (CurrentLocomotionState == LocomotionState.Airborne)
         {
-            switch(moveInput)
+            airMoveInput = moveInput + 5;
+            switch(airMoveInput)
             {
                 case 4:
                 rb.linearVelocity = new Vector2(Mathf.MoveTowards(rb.linearVelocity.x, -airMoveSpeed, airAcceleration * Time.fixedDeltaTime), rb.linearVelocity.y);
@@ -124,57 +136,51 @@ public class PlayerController : MonoBehaviour
 
     private void StartFastFall() //急降下
     {
-        if (isFastFalling)
+        if (isFastFalling && CurrentLocomotionState == LocomotionState.Airborne)
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Min(rb.linearVelocity.y, -fastFallSpeed));
     }
 
-    private void Jump()
+    private void Jump() //ジャンプ
     {
-        Vector2 rayOrigin = new Vector2(transform.position.x, transform.position.y -0.5f);
-        RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.down, 0.1f, Ground);
-        if (hit.collider != null && rb.linearVelocity.y <= 0)
-        {
-            CurrentLocomotionState = LocomotionState.Grounded;
-            hasUsedAirJump = false;
-            isFastFalling = false;
-        }
-
-        if (Keyboard.current.wKey.wasPressedThisFrame)
+        if (jumpPressed)
         {
             switch(CurrentLocomotionState)
             {
-                case LocomotionState.Grounded:
+                case LocomotionState.Grounded: //一回目のジャンプ
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpPower);
                 CurrentLocomotionState = LocomotionState.Airborne;
-                jumpPressed = true;
+                jumpHoldTimer = 0f;
+                jumpPressed = false;
                 break;
 
                 case LocomotionState.Airborne:
-                if (hasUsedAirJump != true)
+                if (hasUsedAirJump == false) //二回目のジャンプ
                     {
                         rb.linearVelocity = new Vector2(rb.linearVelocity.x, airJumpPower);
+                        jumpHoldTimer = 0f;
+                        jumpPressed = false;
                         hasUsedAirJump = true;
-                        jumpPressed = true;
                         break;
                     }
-                else
+                else //それ以降
                     {
+                        jumpPressed = false;
                         break;
                     }
             }
         }
 
-        if (Keyboard.current.wKey.wasReleasedThisFrame)
+        if (jumpReleased)
         {
-            jumpPressed = false;
-            jumpHoldTimer = 0f;
+            jumpHoldTimer = 0;
             if (rb.linearVelocity.y > 0)
             {
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * 0.4f);
             }
+            jumpReleased = false;
         }
 
-        if (jumpPressed && Keyboard.current.wKey.isPressed && jumpHoldTimer < maxJumpHoldTime)
+        if (jumpHeld && jumpHoldTimer < maxJumpHoldTime)
         {
             rb.AddForce(Vector2.up * jumpHoldForce, ForceMode2D.Force);
             jumpHoldTimer += Time.fixedDeltaTime;
