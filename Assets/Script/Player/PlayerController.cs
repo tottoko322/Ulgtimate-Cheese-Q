@@ -24,8 +24,8 @@ public class PlayerController : MonoBehaviour
 
     [Header("Air Movement")]
     [SerializeField] private float airMoveSpeed = 8f; 
-    [SerializeField] private float airAcceleration = 3f;
-    [SerializeField] private float airDeceleration = 1.5f;
+    [SerializeField] private float airAcceleration = 15f;
+    [SerializeField] private float airDeceleration = 3f;
 
     [Header("Fast Fall")]
     [SerializeField] private float fastFallSpeed = 8f;
@@ -33,6 +33,7 @@ public class PlayerController : MonoBehaviour
     private int moveInput;
     private bool jumpPressed = false;
     private bool hasUsedAirJump = false;
+    private bool isFastFalling = false;
 
     [SerializeField] private LayerMask Ground;
     private Rigidbody2D rb;
@@ -46,17 +47,18 @@ public class PlayerController : MonoBehaviour
     {
         ReadInput();
         Jump();
-        HandleAirMovement();
-        StartFastFall();
     }
 
     void FixedUpdate()
     {
         HandleGroundedMovement();
+        HandleAirMovement();
+        StartFastFall();
     }
 
     private void ReadInput()
     {
+        //左右移動の入力
         if (CurrentLocomotionState == LocomotionState.Grounded)
         {
             moveInput = 0;
@@ -70,6 +72,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+        //空中移動の入力
         if (CurrentLocomotionState == LocomotionState.Airborne)
         {
             moveInput = 5;
@@ -82,9 +85,15 @@ public class PlayerController : MonoBehaviour
                 moveInput -= 1;
             }
         }
+        
+        //急降下の入力
+        if (Keyboard.current.sKey.wasPressedThisFrame && CurrentLocomotionState == LocomotionState.Airborne)
+        {
+            isFastFalling = true;
+        }
     }
 
-    private void HandleGroundedMovement()
+    private void HandleGroundedMovement() //地面での左右移動
     {
         if (CurrentLocomotionState == LocomotionState.Grounded)
         {
@@ -92,30 +101,30 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void HandleAirMovement()
+    private void HandleAirMovement() //空中での左右移動
     {
         if (CurrentLocomotionState == LocomotionState.Airborne)
         {
             switch(moveInput)
             {
                 case 4:
-                rb.linearVelocity = new Vector2(Mathf.MoveTowards(rb.linearVelocity.x, -airMoveSpeed, airAcceleration*Time.fixedDeltaTime), rb.linearVelocity.y);
+                rb.linearVelocity = new Vector2(Mathf.MoveTowards(rb.linearVelocity.x, -airMoveSpeed, airAcceleration * Time.fixedDeltaTime), rb.linearVelocity.y);
                 break;
 
                 case 5:
-                rb.linearVelocity = new Vector2(Mathf.MoveTowards(rb.linearVelocity.x, 0f, airDeceleration*Time.fixedDeltaTime), rb.linearVelocity.y);
+                rb.linearVelocity = new Vector2(Mathf.MoveTowards(rb.linearVelocity.x, 0f, airDeceleration * Time.fixedDeltaTime), rb.linearVelocity.y);
                 break;
 
                 case 6:
-                rb.linearVelocity = new Vector2(Mathf.MoveTowards(rb.linearVelocity.x, airMoveSpeed, airAcceleration*Time.fixedDeltaTime), rb.linearVelocity.y);
+                rb.linearVelocity = new Vector2(Mathf.MoveTowards(rb.linearVelocity.x, airMoveSpeed, airAcceleration * Time.fixedDeltaTime), rb.linearVelocity.y);
                 break;
             }
         }
     }
 
-    private void StartFastFall()
+    private void StartFastFall() //急降下
     {
-        if (Keyboard.current.sKey.wasPressedThisFrame && CurrentLocomotionState == LocomotionState.Airborne )
+        if (isFastFalling)
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Min(rb.linearVelocity.y, -fastFallSpeed));
     }
 
@@ -127,6 +136,7 @@ public class PlayerController : MonoBehaviour
         {
             CurrentLocomotionState = LocomotionState.Grounded;
             hasUsedAirJump = false;
+            isFastFalling = false;
         }
 
         if (Keyboard.current.wKey.wasPressedThisFrame)
