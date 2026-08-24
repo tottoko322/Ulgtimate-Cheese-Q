@@ -30,6 +30,7 @@ public class PlayerController : MonoBehaviour
     [Header("Fast Fall")]
     [SerializeField] private float fastFallSpeed = 8f;
 
+    private int moveInput;
     private bool jumpPressed = false;
     private bool hasUsedAirJump = false;
 
@@ -43,6 +44,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        ReadInput();
         Jump();
         HandleAirMovement();
         StartFastFall();
@@ -53,34 +55,40 @@ public class PlayerController : MonoBehaviour
         HandleGroundedMovement();
     }
 
+    private void ReadInput()
+    {
+        if (CurrentLocomotionState == LocomotionState.Grounded)
+        {
+            moveInput = 0;
+            if (Keyboard.current.dKey.isPressed)
+            {
+                moveInput += 1;
+            }
+            if (Keyboard.current.aKey.isPressed)
+            {
+                moveInput -= 1;
+            }
+        }
+
+        if (CurrentLocomotionState == LocomotionState.Airborne)
+        {
+            moveInput = 5;
+            if (Keyboard.current.dKey.isPressed)
+            {
+                moveInput += 1;
+            }
+            if (Keyboard.current.aKey.isPressed)
+            {
+                moveInput -= 1;
+            }
+        }
+    }
+
     private void HandleGroundedMovement()
     {
         if (CurrentLocomotionState == LocomotionState.Grounded)
         {
-            int playerState = 5;
-            if (Keyboard.current.dKey.isPressed)
-            {
-                playerState += 1;
-            }
-            if (Keyboard.current.aKey.isPressed)
-            {
-                playerState -= 1;
-            }
-
-            switch(playerState)
-            {
-                case 4:
-                rb.linearVelocity = new Vector2(-groundMoveSpeed, rb.linearVelocity.y);
-                break;
-
-                case 5:
-                rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
-                break;
-
-                case 6:
-                rb.linearVelocity = new Vector2(groundMoveSpeed, rb.linearVelocity.y);
-                break;
-            }
+            rb.linearVelocity = new Vector2(groundMoveSpeed * moveInput, rb.linearVelocity.y);
         }
     }
 
@@ -88,16 +96,7 @@ public class PlayerController : MonoBehaviour
     {
         if (CurrentLocomotionState == LocomotionState.Airborne)
         {
-            int playerAirState = 5;
-            if (Keyboard.current.dKey.isPressed)
-            {
-                playerAirState += 1;
-            }
-            if (Keyboard.current.aKey.isPressed)
-            {
-                playerAirState -= 1;
-            }
-            switch(playerAirState)
+            switch(moveInput)
             {
                 case 4:
                 rb.linearVelocity = new Vector2(Mathf.MoveTowards(rb.linearVelocity.x, -airMoveSpeed, airAcceleration*Time.fixedDeltaTime), rb.linearVelocity.y);
