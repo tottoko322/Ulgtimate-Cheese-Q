@@ -396,7 +396,8 @@ MonoBehaviour:
   maxJumpHoldTime: 0.2
   jumpHoldForce: 0
   airMoveSpeed: 8
-  airAcceleration: 3
+  airAcceleration: 15
+  airDeceleration: 3
   fastFallSpeed: 8
   Ground:
     serializedVersion: 2
