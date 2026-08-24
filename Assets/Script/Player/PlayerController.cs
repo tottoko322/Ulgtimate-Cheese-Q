@@ -7,12 +7,10 @@ public class PlayerController : MonoBehaviour
     { 
         Grounded,
         Airborne,
-        DoubleJump,
         WallCling
     } 
 
-    private LocomotionState jumpState = LocomotionState.Grounded;
-    public LocomotionState CurrentLocomotionState { get; private set; } 
+    public LocomotionState CurrentLocomotionState { get; private set; } = LocomotionState.Grounded;
 
     [Header("Ground Movement")]
     [SerializeField] private float groundMoveSpeed = 8f;
@@ -26,12 +24,14 @@ public class PlayerController : MonoBehaviour
 
     [Header("Air Movement")]
     [SerializeField] private float airMoveSpeed = 8f; 
-    [SerializeField] private float airAcceleration = 3f; 
+    [SerializeField] private float airAcceleration = 3f;
+    [SerializeField] private float airDeceleration = 1.5f;
 
     [Header("Fast Fall")]
     [SerializeField] private float fastFallSpeed = 8f;
 
     private bool jumpPressed = false;
+    private bool hasUsedAirJump = false;
 
     [SerializeField] private LayerMask Ground;
     private Rigidbody2D rb;
@@ -55,7 +55,7 @@ public class PlayerController : MonoBehaviour
 
     private void HandleGroundedMovement()
     {
-        if (jumpState == LocomotionState.Grounded)
+        if (CurrentLocomotionState == LocomotionState.Grounded)
         {
             int playerState = 5;
             if (Keyboard.current.dKey.isPressed)
@@ -86,7 +86,7 @@ public class PlayerController : MonoBehaviour
 
     private void HandleAirMovement()
     {
-        if (jumpState == LocomotionState.Airborne || jumpState == LocomotionState.DoubleJump)
+        if (CurrentLocomotionState == LocomotionState.Airborne)
         {
             int playerAirState = 5;
             if (Keyboard.current.dKey.isPressed)
@@ -104,7 +104,7 @@ public class PlayerController : MonoBehaviour
                 break;
 
                 case 5:
-                rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+                rb.linearVelocity = new Vector2(Mathf.MoveTowards(rb.linearVelocity.x, 0f, airDeceleration*Time.fixedDeltaTime), rb.linearVelocity.y);
                 break;
 
                 case 6:
@@ -116,7 +116,7 @@ public class PlayerController : MonoBehaviour
 
     private void StartFastFall()
     {
-        if (Keyboard.current.sKey.wasPressedThisFrame && (jumpState == LocomotionState.Airborne || jumpState == LocomotionState.DoubleJump))
+        if (Keyboard.current.sKey.wasPressedThisFrame && CurrentLocomotionState == LocomotionState.Airborne )
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Min(rb.linearVelocity.y, -fastFallSpeed));
     }
 
@@ -126,33 +126,39 @@ public class PlayerController : MonoBehaviour
         RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.down, 0.1f, Ground);
         if (hit.collider != null && rb.linearVelocity.y <= 0)
         {
-            jumpState = LocomotionState.Grounded;
+            CurrentLocomotionState = LocomotionState.Grounded;
+            hasUsedAirJump = false;
         }
 
         if (Keyboard.current.wKey.wasPressedThisFrame)
         {
-            switch(jumpState)
+            switch(CurrentLocomotionState)
             {
                 case LocomotionState.Grounded:
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpPower);
-                jumpState = LocomotionState.Airborne;
+                CurrentLocomotionState = LocomotionState.Airborne;
                 jumpPressed = true;
                 break;
 
                 case LocomotionState.Airborne:
-                rb.linearVelocity = new Vector2(rb.linearVelocity.x, airJumpPower);
-                jumpState = LocomotionState.DoubleJump;
-                jumpPressed = true;
-                break;
-
-                case LocomotionState.DoubleJump:
-                break;
+                if (hasUsedAirJump != true)
+                    {
+                        rb.linearVelocity = new Vector2(rb.linearVelocity.x, airJumpPower);
+                        hasUsedAirJump = true;
+                        jumpPressed = true;
+                        break;
+                    }
+                else
+                    {
+                        break;
+                    }
             }
         }
 
         if (Keyboard.current.wKey.wasReleasedThisFrame)
         {
             jumpPressed = false;
+            jumpHoldTimer = 0f;
             if (rb.linearVelocity.y > 0)
             {
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * 0.4f);
