@@ -2,15 +2,20 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
-    EnemyData dataofenemy;
-    [SerializeField] Transform playertransform;
+    //Data取得
+    [SerializeField] EnemyData dataofenemy;
+    //索敵用
     private bool isInSearchRange;
     private bool isInChaseRange;
     private float distanceX;
     private float distanceY;
+    //移動用
+    [SerializeField] Transform playertransform;
+    //アニメーション用
     private int viewMoveSpriteNumber;
     private int viewStaySpriteNumber;
     private SpriteRenderer sr;
+    //処理
     void Start()
     {
         isInSearchRange = false;
@@ -22,14 +27,19 @@ public class EnemyController : MonoBehaviour
     {
         //索敵範囲内かの判定
         CheckDistance();
-        if(isInChaseRange)
+        //追跡処理
+        if(isInChaseRange)//おそらく&&!isAttackRangeにする？今は考慮しないで良い
         {
             ChasePlayer();
         }
+        //攻撃処理
+        //被弾、死亡処理
+        //アニメーション処理
+        ChangeSprite(); 
     }
+    //関数
     void CheckDistance()
     {
-        //索敵処理
         distanceX = playertransform.position.x - transform.position.x;
         distanceY = playertransform.position.y - transform.position.y;
         if(!isInSearchRange)
@@ -40,18 +50,11 @@ public class EnemyController : MonoBehaviour
                 isInChaseRange = true;
             }
         }
-        else if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemySearchRange*dataofenemy.enemySearchRange)
+        else if(distanceX*distanceX + distanceY*distanceY > dataofenemy.enemyChaseRange*dataofenemy.enemyChaseRange)
         {
             isInSearchRange = false;
             isInChaseRange = false;
         }
-        //追跡処理
-        if (isInChaseRange)
-        {
-            ChasePlayer();
-        }
-        //アニメーション処理
-        ChangeSprite(); 
     }
     void ChasePlayer()
     {
