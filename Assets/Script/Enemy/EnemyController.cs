@@ -42,7 +42,7 @@ public class EnemyController : MonoBehaviour
     {
         distanceX = playertransform.position.x - transform.position.x;
         distanceY = playertransform.position.y - transform.position.y;
-        if(!isInSearchRange)
+        if(!isInSearchRange)//索敵範囲内か
         {
             if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemySearchRange*dataofenemy.enemySearchRange)
             {
@@ -50,11 +50,12 @@ public class EnemyController : MonoBehaviour
                 isInChaseRange = true;
             }
         }
-        else if(distanceX*distanceX + distanceY*distanceY > dataofenemy.enemyChaseRange*dataofenemy.enemyChaseRange)
+        else if(distanceX*distanceX + distanceY*distanceY > dataofenemy.enemyChaseRange*dataofenemy.enemyChaseRange)//追跡範囲内か
         {
             isInSearchRange = false;
             isInChaseRange = false;
         }
+        //AttackRangeの判定
     }
     void ChasePlayer()
     {
@@ -69,7 +70,7 @@ public class EnemyController : MonoBehaviour
     }
     void ChangeSprite()
     {
-        if(isInChaseRange)
+        if(isInChaseRange)//追跡アニメーション。攻撃条件追加予定
         {
             if(viewMoveSpriteNumber == dataofenemy.moveAnimationSprites.Length)
             {
@@ -89,7 +90,8 @@ public class EnemyController : MonoBehaviour
                 sr.flipX = false;//右向き素材前提
             }
         }
-        else if(!isInChaseRange)
+        //攻撃アニメーション
+        else if(!isInChaseRange)//待機アニメーション
         {
             if(viewStaySpriteNumber == dataofenemy.stayAnimationSprites.Length)
             {
