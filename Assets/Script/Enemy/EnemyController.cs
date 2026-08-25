@@ -60,11 +60,11 @@ public class EnemyController : MonoBehaviour
     {
         if(distanceX < 0f)
         {
-            transform.position -= dataofenemy.enemySpeed*Time.deltaTime;
+            transform.Translate(Vector3.left*dataofenemy.enemySpeed*Time.deltaTime);
         }
         else if(distanceX > 0f)
         {
-            transform.position += dataofenemy.enemySpeed*Time.deltaTime;
+            transform.Translate(Vector3.right*dataofenemy.enemySpeed*Time.deltaTime);
         }
     }
     void ChangeSprite()
