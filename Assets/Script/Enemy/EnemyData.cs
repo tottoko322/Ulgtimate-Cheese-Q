@@ -11,7 +11,10 @@ public class EnemyData : MonoBehaviour
     public float enemyAttackRange;
     public float enemyCooltime;
     //アニメーション設定
-    public Sprite[] moveAnimationSprites;
-    public Sprite[] attackAnimationSprites;
-    public Sprite[] stayAnimationSprites;
+    public float enemyChangeMoveSpritesInterval;
+    public float enemyChangeAttackSpritesInterval;
+    public float enemyChangeStaySpritesInterval;
+    public Sprite[] enemyMoveAnimationSprites;
+    public Sprite[] enemyAttackAnimationSprites;
+    public Sprite[] enemyStayAnimationSprites;
 }

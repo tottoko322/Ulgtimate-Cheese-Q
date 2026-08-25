@@ -14,6 +14,9 @@ public class EnemyController : MonoBehaviour
     //アニメーション用
     private int viewMoveSpriteNumber;
     private int viewStaySpriteNumber;
+    private float viewTimeMoveSprite;
+    private float viewTimeAttackSprite;
+    private float viewTimeStaySprite;
     private SpriteRenderer sr;
     //処理
     void Start()
@@ -21,7 +24,7 @@ public class EnemyController : MonoBehaviour
         isInSearchRange = false;
         isInChaseRange = false;
         sr = GetComponent<SpriteRenderer>();
-        sr.sprite = dataofenemy.stayAnimationSprites[0];
+        sr.sprite = dataofenemy.enemyStayAnimationSprites[0];
     }
     void Update()
     {
@@ -72,36 +75,52 @@ public class EnemyController : MonoBehaviour
     {
         if(isInChaseRange)//追跡アニメーション。攻撃条件追加予定
         {
-            if(viewMoveSpriteNumber == dataofenemy.moveAnimationSprites.Length)
+            if(viewTimeMoveSprite >= dataofenemy.enemyChangeMoveSpritesInterval)
             {
-                viewMoveSpriteNumber = 0;
+                if(viewMoveSpriteNumber == dataofenemy.enemyMoveAnimationSprites.Length)
+                {
+                    viewMoveSpriteNumber = 0;
+                }
+                else
+                {
+                    viewMoveSpriteNumber ++;
+                }
+                sr.sprite = dataofenemy.enemyMoveAnimationSprites[viewMoveSpriteNumber];
+                if(distanceX < 0f)
+                {
+                    sr.flipX = true;//右向き素材想定。左向きのときfalse
+                }
+                else
+                {
+                    sr.flipX = false;//右向き素材前提
+                }
+                viewTimeMoveSprite = 0f;
             }
             else
             {
-                viewMoveSpriteNumber ++;
-            }
-            sr.sprite = dataofenemy.moveAnimationSprites[viewMoveSpriteNumber];
-            if(distanceX < 0f)
-            {
-                sr.flipX = true;//右向き素材想定。左向きのときfalse
-            }
-            else
-            {
-                sr.flipX = false;//右向き素材前提
+                viewTimeMoveSprite += Time.deltaTime;
             }
         }
         //攻撃アニメーション
         else if(!isInChaseRange)//待機アニメーション
         {
-            if(viewStaySpriteNumber == dataofenemy.stayAnimationSprites.Length)
+            if(viewTimeStaySprite >= dataofenemy.enemyChangeStaySpritesInterval)
             {
-                viewStaySpriteNumber = 0;
+                if(viewStaySpriteNumber == dataofenemy.enemyStayAnimationSprites.Length)
+                {
+                    viewStaySpriteNumber = 0;
+                }
+                else
+                {
+                    viewStaySpriteNumber ++;
+                }
+                sr.sprite = dataofenemy.enemyStayAnimationSprites[viewStaySpriteNumber];
+                viewTimeStaySprite = 0f;
             }
             else
             {
-                viewStaySpriteNumber ++;
+                viewTimeStaySprite += Time.deltaTime;
             }
-            sr.sprite = dataofenemy.stayAnimationSprites[viewStaySpriteNumber];
         }
     }
 }
