@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour
     public LocomotionState CurrentLocomotionState { get; private set; } = LocomotionState.Grounded;
 
     [Header("Ground Movement")]
-    [SerializeField] private float groundMoveSpeed = 8f;
+    [SerializeField] private float groundMoveSpeed = 6f;
 
     [Header("Jump")]
     [SerializeField] private float jumpPower = 5f; 
@@ -23,12 +23,12 @@ public class PlayerController : MonoBehaviour
     private float jumpHoldTimer = 0f;
 
     [Header("Air Movement")]
-    [SerializeField] private float airMoveSpeed = 8f; 
-    [SerializeField] private float airAcceleration = 15f;
-    [SerializeField] private float airDeceleration = 3f;
+    [SerializeField] private float airMoveSpeed = 6f; 
+    [SerializeField] private float airAcceleration = 30f;
+    [SerializeField] private float airDeceleration = 5f;
 
     [Header("Fast Fall")]
-    [SerializeField] private float fastFallSpeed = 8f;
+    [SerializeField] private float fastFallSpeed = 6f;
 
     private int moveInput;
     private int airMoveInput;
@@ -94,13 +94,21 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateGroundState() //接地判定
     {
-        Vector2 rayOrigin = new Vector2(transform.position.x, transform.position.y -0.5f);
-        RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.down, 0.1f, Ground);
-        if (hit.collider != null && rb.linearVelocity.y <= 0)
+        Vector2 leftRayOrigin = new Vector2(transform.position.x -0.5f, transform.position.y -0.5f);
+        Vector2 rightRayOrigin = new Vector2(transform.position.x +0.5f, transform.position.y -0.5f);//rayを2本作る
+
+        RaycastHit2D leftHit = Physics2D.Raycast(leftRayOrigin, Vector2.down, 0.1f, Ground);
+        RaycastHit2D rightHit = Physics2D.Raycast(rightRayOrigin, Vector2.down, 0.1f, Ground);
+
+        if ((leftHit.collider != null || rightHit.collider != null) && rb.linearVelocity.y <= 0)
         {
             CurrentLocomotionState = LocomotionState.Grounded;
             hasUsedAirJump = false;
             isFastFalling = false;
+        }
+        else
+        {
+            CurrentLocomotionState = LocomotionState.Airborne;
         }
     }
 
@@ -116,18 +124,17 @@ public class PlayerController : MonoBehaviour
     {
         if (CurrentLocomotionState == LocomotionState.Airborne)
         {
-            airMoveInput = moveInput + 5;
-            switch(airMoveInput)
+            switch(moveInput)
             {
-                case 4:
+                case -1:
                 rb.linearVelocity = new Vector2(Mathf.MoveTowards(rb.linearVelocity.x, -airMoveSpeed, airAcceleration * Time.fixedDeltaTime), rb.linearVelocity.y);
                 break;
 
-                case 5:
+                case 0:
                 rb.linearVelocity = new Vector2(Mathf.MoveTowards(rb.linearVelocity.x, 0f, airDeceleration * Time.fixedDeltaTime), rb.linearVelocity.y);
                 break;
 
-                case 6:
+                case 1:
                 rb.linearVelocity = new Vector2(Mathf.MoveTowards(rb.linearVelocity.x, airMoveSpeed, airAcceleration * Time.fixedDeltaTime), rb.linearVelocity.y);
                 break;
             }
@@ -137,7 +144,9 @@ public class PlayerController : MonoBehaviour
     private void StartFastFall() //急降下
     {
         if (isFastFalling && CurrentLocomotionState == LocomotionState.Airborne)
-        rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Min(rb.linearVelocity.y, -fastFallSpeed));
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Min(rb.linearVelocity.y, -fastFallSpeed));
+        }
     }
 
     private void Jump() //ジャンプ
@@ -172,7 +181,6 @@ public class PlayerController : MonoBehaviour
 
         if (jumpReleased)
         {
-            jumpHoldTimer = 0;
             if (rb.linearVelocity.y > 0)
             {
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * 0.4f);
