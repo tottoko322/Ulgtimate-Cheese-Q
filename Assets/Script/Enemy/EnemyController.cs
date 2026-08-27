@@ -73,7 +73,7 @@ public class EnemyController : MonoBehaviour
         {
             if(viewTimeMoveSprite >= dataofenemy.enemyChangeMoveSpritesInterval)
             {
-                if(viewMoveSpriteNumber == dataofenemy.enemyMoveAnimationSprites.Length)
+                if(viewMoveSpriteNumber == dataofenemy.enemyMoveAnimationSprites.Length - 1)
                 {
                     viewMoveSpriteNumber = 0;
                 }
@@ -102,7 +102,7 @@ public class EnemyController : MonoBehaviour
         {
             if(viewTimeStaySprite >= dataofenemy.enemyChangeStaySpritesInterval)
             {
-                if(viewStaySpriteNumber == dataofenemy.enemyStayAnimationSprites.Length)
+                if(viewStaySpriteNumber == dataofenemy.enemyStayAnimationSprites.Length - 1)
                 {
                     viewStaySpriteNumber = 0;
                 }
