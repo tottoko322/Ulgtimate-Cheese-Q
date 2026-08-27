@@ -5,7 +5,6 @@ public class EnemyController : MonoBehaviour
     //Data取得
     [SerializeField] EnemyData dataofenemy;
     //索敵用
-    private bool isInSearchRange;
     private bool isInChaseRange;
     private float distanceX;
     private float distanceY;
@@ -21,7 +20,6 @@ public class EnemyController : MonoBehaviour
     //処理
     void Start()
     {
-        isInSearchRange = false;
         isInChaseRange = false;
         sr = GetComponent<SpriteRenderer>();
         sr.sprite = dataofenemy.enemyStayAnimationSprites[0];
@@ -45,17 +43,15 @@ public class EnemyController : MonoBehaviour
     {
         distanceX = playertransform.position.x - transform.position.x;
         distanceY = playertransform.position.y - transform.position.y;
-        if(!isInSearchRange)//索敵範囲内か
+        if(!isInChaseRange)//索敵範囲内か
         {
             if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemySearchRange*dataofenemy.enemySearchRange)
             {
-                isInSearchRange = true;
                 isInChaseRange = true;
             }
         }
         else if(distanceX*distanceX + distanceY*distanceY > dataofenemy.enemyChaseRange*dataofenemy.enemyChaseRange)//追跡範囲内か
         {
-            isInSearchRange = false;
             isInChaseRange = false;
         }
         //AttackRangeの判定
