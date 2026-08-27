@@ -106,6 +106,7 @@ public class PlayerController : MonoBehaviour
             hasUsedAirJump = false;
             isFastFalling = false;
         }
+
         else
         {
             CurrentLocomotionState = LocomotionState.Airborne;
@@ -146,6 +147,7 @@ public class PlayerController : MonoBehaviour
         if (isFastFalling && CurrentLocomotionState == LocomotionState.Airborne)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Min(rb.linearVelocity.y, -fastFallSpeed));
+            hasUsedAirJump = true;//急降下中のジャンプを無くす
         }
     }
 
