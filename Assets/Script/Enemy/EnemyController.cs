@@ -1,3 +1,4 @@
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class EnemyController : MonoBehaviour
@@ -8,10 +9,10 @@ public class EnemyController : MonoBehaviour
         Stay,
         Chase,
         Attack,
-        Damaged,
-        Died
+        Hurt,
+        Dead
     }
-    private EnemyStatusBox EnemyCurrentStatus {get; set; } = EnemyStatusBox.Stay;
+    private EnemyStatusBox EnemyCurrentStatus = EnemyStatusBox.Stay;
     //Data取得
     [SerializeField] EnemyData dataofenemy;
     //索敵用
@@ -21,11 +22,14 @@ public class EnemyController : MonoBehaviour
     [SerializeField] Transform playertransform;
     //アニメーション用
     private int viewMoveSpriteNumber;
+    private int viewAttackSpriteNumber;
     private int viewStaySpriteNumber;
     private float viewTimeMoveSprite;
     private float viewTimeAttackSprite;
     private float viewTimeStaySprite;
     private SpriteRenderer sr;
+    //攻撃用
+    private float coolTimePass;
     //処理
     void Start()
     {
@@ -56,6 +60,13 @@ public class EnemyController : MonoBehaviour
             if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemySearchRange*dataofenemy.enemySearchRange)
             {
                 EnemyCurrentStatus = EnemyStatusBox.Chase;
+            }
+        }
+        else if(EnemyCurrentStatus == EnemyStatusBox.Chase)
+        {
+            if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemyCooltime*dataofenemy.enemyCooltime)
+            {
+                EnemyCurrentStatus = EnemyStatusBox.Attack;
             }
         }
         else if(distanceX*distanceX + distanceY*distanceY > dataofenemy.enemyChaseRange*dataofenemy.enemyChaseRange)//追跡範囲内か
@@ -105,7 +116,22 @@ public class EnemyController : MonoBehaviour
                 viewTimeMoveSprite += Time.deltaTime;
             }
         }
-        //攻撃アニメーション
+        else if(EnemyCurrentStatus == EnemyStatusBox.Attack)
+        {
+            if(viewTimeAttackSprite >= dataofenemy.enemyChangeAttackSpritesInterval)
+            {
+                if(viewAttackSpriteNumber < dataofenemy.enemyAttackAnimationSprites.Length)
+                {
+                    viewAttackSpriteNumber ++;
+                    sr.sprite = dataofenemy.enemyAttackAnimationSprites[viewAttackSpriteNumber];
+                    viewTimeAttackSprite = 0f;
+                }
+            }
+            else
+            {
+                viewTimeAttackSprite += Time.deltaTime;
+            }
+        }
         else if(EnemyCurrentStatus == EnemyStatusBox.Stay)//待機アニメーション
         {
             if(viewTimeStaySprite >= dataofenemy.enemyChangeStaySpritesInterval)
