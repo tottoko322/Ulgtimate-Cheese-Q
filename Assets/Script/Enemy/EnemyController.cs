@@ -2,6 +2,16 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
+    //状態保存用
+    public enum EnemyStatusBox
+    {
+        Stay,
+        Chase,
+        Attack,
+        Damaged,
+        Died
+    }
+    public EnemyStatusBox EnemyCurrentStatus {get; private set; } = EnemyStatusBox.Stay;
     //Data取得
     [SerializeField] EnemyData dataofenemy;
     //索敵用
