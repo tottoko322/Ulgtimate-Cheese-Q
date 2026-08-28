@@ -3,7 +3,7 @@ using UnityEngine;
 public class EnemyController : MonoBehaviour
 {
     //状態保存用
-    public enum EnemyStatusBox
+    private enum EnemyStatusBox
     {
         Stay,
         Chase,
@@ -11,11 +11,10 @@ public class EnemyController : MonoBehaviour
         Damaged,
         Died
     }
-    public EnemyStatusBox EnemyCurrentStatus {get; private set; } = EnemyStatusBox.Stay;
+    private EnemyStatusBox EnemyCurrentStatus {get; set; } = EnemyStatusBox.Stay;
     //Data取得
     [SerializeField] EnemyData dataofenemy;
     //索敵用
-    private bool isInChaseRange;
     private float distanceX;
     private float distanceY;
     //移動用
@@ -30,7 +29,6 @@ public class EnemyController : MonoBehaviour
     //処理
     void Start()
     {
-        isInChaseRange = false;
         sr = GetComponent<SpriteRenderer>();
         sr.sprite = dataofenemy.enemyStayAnimationSprites[0];
     }
@@ -39,7 +37,7 @@ public class EnemyController : MonoBehaviour
         //索敵範囲内かの判定
         CheckDistance();
         //追跡処理
-        if(isInChaseRange)//おそらく&&!isAttackRangeにする？今は考慮しないで良い
+        if(EnemyCurrentStatus == EnemyStatusBox.Chase)//おそらく&&!isAttackRangeにする？今は考慮しないで良い
         {
             ChasePlayer();
         }
@@ -53,16 +51,16 @@ public class EnemyController : MonoBehaviour
     {
         distanceX = playertransform.position.x - transform.position.x;
         distanceY = playertransform.position.y - transform.position.y;
-        if(!isInChaseRange)//索敵範囲内か
+        if(EnemyCurrentStatus == EnemyStatusBox.Stay)//索敵範囲内か
         {
             if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemySearchRange*dataofenemy.enemySearchRange)
             {
-                isInChaseRange = true;
+                EnemyCurrentStatus = EnemyStatusBox.Chase;
             }
         }
         else if(distanceX*distanceX + distanceY*distanceY > dataofenemy.enemyChaseRange*dataofenemy.enemyChaseRange)//追跡範囲内か
         {
-            isInChaseRange = false;
+            EnemyCurrentStatus = EnemyStatusBox.Stay;
         }
         //AttackRangeの判定
     }
@@ -79,7 +77,7 @@ public class EnemyController : MonoBehaviour
     }
     void ChangeSprite()
     {
-        if(isInChaseRange)//追跡アニメーション。攻撃条件追加予定
+        if(EnemyCurrentStatus == EnemyStatusBox.Chase)//追跡アニメーション。攻撃条件追加予定
         {
             if(viewTimeMoveSprite >= dataofenemy.enemyChangeMoveSpritesInterval)
             {
@@ -108,7 +106,7 @@ public class EnemyController : MonoBehaviour
             }
         }
         //攻撃アニメーション
-        else if(!isInChaseRange)//待機アニメーション
+        else if(EnemyCurrentStatus == EnemyStatusBox.Stay)//待機アニメーション
         {
             if(viewTimeStaySprite >= dataofenemy.enemyChangeStaySpritesInterval)
             {
