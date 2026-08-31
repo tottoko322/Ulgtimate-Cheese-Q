@@ -29,7 +29,9 @@ public class EnemyController : MonoBehaviour
     private float viewTimeStaySprite;
     private SpriteRenderer sr;
     //攻撃用
-    private float coolTimePass;
+    private bool isInCoolTime;
+    private float passTimeAfterAttack;
+    private float passFixedTime;
     //処理
     void Start()
     {
@@ -41,7 +43,7 @@ public class EnemyController : MonoBehaviour
         //索敵範囲内かの判定
         CheckDistance();
         //追跡処理
-        if(EnemyCurrentStatus == EnemyStatusBox.Chase)//おそらく&&!isAttackRangeにする？今は考慮しないで良い
+        if(EnemyCurrentStatus == EnemyStatusBox.Chase)
         {
             ChasePlayer();
         }
@@ -62,11 +64,12 @@ public class EnemyController : MonoBehaviour
                 EnemyCurrentStatus = EnemyStatusBox.Chase;
             }
         }
-        else if(EnemyCurrentStatus == EnemyStatusBox.Chase)
+        else if(EnemyCurrentStatus == EnemyStatusBox.Chase && !isInCoolTime)
         {
             if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemyCooltime*dataofenemy.enemyCooltime)
             {
                 EnemyCurrentStatus = EnemyStatusBox.Attack;
+                isInCoolTime = true;
             }
         }
         else if(distanceX*distanceX + distanceY*distanceY > dataofenemy.enemyChaseRange*dataofenemy.enemyChaseRange)//追跡範囲内か
@@ -74,6 +77,30 @@ public class EnemyController : MonoBehaviour
             EnemyCurrentStatus = EnemyStatusBox.Stay;
         }
         //AttackRangeの判定
+    }
+    void CheckTime()
+    {
+        if(EnemyCurrentStatus == EnemyStatusBox.Attack)
+        {
+            
+            if(passFixedTime < dataofenemy.enemyFixedTime)
+            {
+                passFixedTime += Time.deltaTime;
+            }
+            else
+            {
+                EnemyCurrentStatus = EnemyStatusBox.Chase;
+                passFixedTime = 0f;
+            }
+        }
+        if(isInCoolTime)
+        {
+            passTimeAfterAttack += Time.deltaTime;
+            if(passTimeAfterAttack >= dataofenemy.enemyCooltime)
+            {
+                isInCoolTime = false;
+            }
+        }
     }
     void ChasePlayer()
     {

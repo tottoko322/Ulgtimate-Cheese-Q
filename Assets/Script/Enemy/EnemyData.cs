@@ -5,11 +5,12 @@ public class EnemyData : MonoBehaviour
     //能力値
     public float enemyHp;
     public float enemyAttack;
-    public float enemySpeed;//yとzは0
+    public float enemySpeed;
     public float enemySearchRange;
     public float enemyChaseRange;
     public float enemyAttackRange;
     public float enemyCooltime;
+    public float enemyFixedTime;
     //アニメーション設定
     public float enemyChangeMoveSpritesInterval;
     public float enemyChangeAttackSpritesInterval;
