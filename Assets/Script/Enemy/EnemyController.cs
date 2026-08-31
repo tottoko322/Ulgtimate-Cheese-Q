@@ -76,7 +76,6 @@ public class EnemyController : MonoBehaviour
         {
             EnemyCurrentStatus = EnemyStatusBox.Stay;
         }
-        //AttackRangeの判定
     }
     void CheckTime()
     {
@@ -115,7 +114,7 @@ public class EnemyController : MonoBehaviour
     }
     void ChangeSprite()
     {
-        if(EnemyCurrentStatus == EnemyStatusBox.Chase)//追跡アニメーション。攻撃条件追加予定
+        if(EnemyCurrentStatus == EnemyStatusBox.Chase)//追跡アニメーション
         {
             if(viewTimeMoveSprite >= dataofenemy.enemyChangeMoveSpritesInterval)
             {
