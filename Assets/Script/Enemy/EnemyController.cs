@@ -50,7 +50,8 @@ public class EnemyController : MonoBehaviour
         //攻撃処理
         //被弾、死亡処理
         //アニメーション処理
-        ChangeSprite(); 
+        ChangeSprite();
+        CheckTime();
     }
     //関数
     void CheckDistance()
@@ -64,17 +65,24 @@ public class EnemyController : MonoBehaviour
                 EnemyCurrentStatus = EnemyStatusBox.Chase;
             }
         }
-        else if(EnemyCurrentStatus == EnemyStatusBox.Chase && !isInCoolTime)
-        {
-            if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemyCooltime*dataofenemy.enemyCooltime)
-            {
-                EnemyCurrentStatus = EnemyStatusBox.Attack;
-                isInCoolTime = true;
-            }
-        }
         else if(distanceX*distanceX + distanceY*distanceY > dataofenemy.enemyChaseRange*dataofenemy.enemyChaseRange)//追跡範囲内か
         {
             EnemyCurrentStatus = EnemyStatusBox.Stay;
+        }
+        if(EnemyCurrentStatus == EnemyStatusBox.Chase)
+        {
+            if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemyCooltime*dataofenemy.enemyCooltime)
+            {
+                if(!isInCoolTime)
+                {
+                    EnemyCurrentStatus = EnemyStatusBox.Attack;
+                    isInCoolTime = true;
+                }
+                else
+                {
+                    EnemyCurrentStatus = EnemyStatusBox.Stay;
+                }
+            }
         }
     }
     void CheckTime()
@@ -103,13 +111,16 @@ public class EnemyController : MonoBehaviour
     }
     void ChasePlayer()
     {
-        if(distanceX < 0f)
+        if(EnemyCurrentStatus == EnemyStatusBox.Chase)
         {
-            transform.Translate(Vector3.left*dataofenemy.enemySpeed*Time.deltaTime);
-        }
-        else if(distanceX > 0f)
-        {
-            transform.Translate(Vector3.right*dataofenemy.enemySpeed*Time.deltaTime);
+            if(distanceX < 0f)
+            {
+                transform.Translate(Vector3.left*dataofenemy.enemySpeed*Time.deltaTime);
+            }
+            else if(distanceX > 0f)
+            {
+                transform.Translate(Vector3.right*dataofenemy.enemySpeed*Time.deltaTime);
+            }
         }
     }
     void ChangeSprite()
