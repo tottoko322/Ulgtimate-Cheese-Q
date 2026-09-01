@@ -32,4 +32,8 @@ public class GameFlowManager : MonoBehaviour
     {
         SceneManager.LoadScene("Title");
     }
+    public void GoToStageSelect()
+    {
+        SceneManager.LoadScene("StageSelect");
+    }
 }
