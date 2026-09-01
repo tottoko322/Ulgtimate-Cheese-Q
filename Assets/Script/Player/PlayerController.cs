@@ -31,7 +31,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float fastFallSpeed = 6f;
 
     [Header("Wall")]
-    [SerializeField] private float wallMoveSpeed;
+    [SerializeField] private float wallMoveSpeed = 6f;
     [SerializeField] private float wallDetachForce;
     [SerializeField] private LayerMask climbableWallLayer;
 
@@ -43,7 +43,7 @@ public class PlayerController : MonoBehaviour
     private bool hasUsedAirJump = false;
     private bool isFastFalling = false;
 
-    [SerializeField] private LayerMask Ground;
+    [SerializeField] private LayerMask groundLayer;
     private Rigidbody2D rb;
 
     void Start()
@@ -59,11 +59,12 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate()
     {
         UpdateGroundState();
+        UpdateWallState();
+
         HandleGroundedMovement();
         HandleAirMovement();
         Jump();
         StartFastFall();
-        EnterWallCling();
         HandleWallMovement();
     }
 
@@ -109,11 +110,16 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateGroundState() //接地判定
     {
+        if (CurrentLocomotionState == LocomotionState.WallCling)
+        {
+            return;
+        }
+
         Vector2 leftRayOrigin = new Vector2(transform.position.x -0.5f, transform.position.y -0.5f);
         Vector2 rightRayOrigin = new Vector2(transform.position.x +0.5f, transform.position.y -0.5f);//rayを2本作る
 
-        RaycastHit2D leftHit = Physics2D.Raycast(leftRayOrigin, Vector2.down, 0.1f, Ground);
-        RaycastHit2D rightHit = Physics2D.Raycast(rightRayOrigin, Vector2.down, 0.1f, Ground);
+        RaycastHit2D leftHit = Physics2D.Raycast(leftRayOrigin, Vector2.down, 0.1f, groundLayer);
+        RaycastHit2D rightHit = Physics2D.Raycast(rightRayOrigin, Vector2.down, 0.1f, groundLayer);
 
         if ((leftHit.collider != null || rightHit.collider != null) && rb.linearVelocity.y <= 0)
         {
@@ -121,10 +127,23 @@ public class PlayerController : MonoBehaviour
             hasUsedAirJump = false;
             isFastFalling = false;
         }
-
         else
         {
             CurrentLocomotionState = LocomotionState.Airborne;
+        }
+    }
+
+    private void UpdateWallState()
+    {
+        Vector2 topLeftRayOrigin = new Vector2(transform.position.x -0.5f, transform.position.y +0.5f);
+        Vector2 bottomLeftRayOrigin = new Vector2(transform.position.x -0.5f, transform.position.y -0.5f); //左上と左下に1本ずつのray
+
+        RaycastHit2D topLeftHit = Physics2D.Raycast(topLeftRayOrigin, Vector2.left, 0.1f, climbableWallLayer);
+        RaycastHit2D bottomLeftHit = Physics2D.Raycast(bottomLeftRayOrigin, Vector2.left, 0.1f, climbableWallLayer); //左方向
+
+        if (CurrentLocomotionState == LocomotionState.Airborne && topLeftHit.collider != null && bottomLeftHit.collider != null)
+        {
+            CurrentLocomotionState = LocomotionState.WallCling;
         }
     }
 
@@ -159,19 +178,21 @@ public class PlayerController : MonoBehaviour
 
     private void Jump() //ジャンプ
     {
-        if (jumpPressed ())
+        if (CurrentLocomotionState == LocomotionState.Grounded || CurrentLocomotionState == LocomotionState.Airborne)
         {
-            switch(CurrentLocomotionState)
+            if (jumpPressed)
             {
-                case LocomotionState.Grounded: //一回目のジャンプ
-                rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpPower);
-                CurrentLocomotionState = LocomotionState.Airborne;
-                jumpHoldTimer = 0f;
-                jumpPressed = false;
-                break;
+                switch(CurrentLocomotionState)
+                {
+                    case LocomotionState.Grounded: //一回目のジャンプ
+                    rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpPower);
+                    CurrentLocomotionState = LocomotionState.Airborne;
+                    jumpHoldTimer = 0f;
+                    jumpPressed = false;
+                    break;
 
-                case LocomotionState.Airborne:
-                if (hasUsedAirJump == false) //二回目のジャンプ
+                    case LocomotionState.Airborne:
+                    if (hasUsedAirJump == false) //二回目のジャンプ
                     {
                         rb.linearVelocity = new Vector2(rb.linearVelocity.x, airJumpPower);
                         jumpHoldTimer = 0f;
@@ -179,27 +200,28 @@ public class PlayerController : MonoBehaviour
                         hasUsedAirJump = true;
                         break;
                     }
-                else //それ以降
+                    else //それ以降
                     {
                         jumpPressed = false;
                         break;
                     }
+                }
             }
-        }
 
-        if (jumpReleased)
-        {
-            if (rb.linearVelocity.y > 0)
+            if (jumpReleased)
             {
-                rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * 0.4f);
+                if (rb.linearVelocity.y > 0)
+                {
+                    rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * 0.4f);
+                }
+                jumpReleased = false;
             }
-            jumpReleased = false;
-        }
 
-        if (jumpHeld && jumpHoldTimer < maxJumpHoldTime)
-        {
-            rb.AddForce(Vector2.up * jumpHoldForce, ForceMode2D.Force);
-            jumpHoldTimer += Time.fixedDeltaTime;
+            if (jumpHeld && jumpHoldTimer < maxJumpHoldTime)
+            {
+                rb.AddForce(Vector2.up * jumpHoldForce, ForceMode2D.Force);
+                jumpHoldTimer += Time.fixedDeltaTime;
+            }
         }
     }
 
@@ -212,25 +234,10 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void EnterWallCling() //壁への接触判定
-    {
-        Vector2 topLeftRayOrigin = new Vector2(transform.position.x -0.5f, transform.position.y +0.5f);
-        Vector2 bottomLeftRayOrigin = new Vector2(transform.position.x -0.5f, transform.position.y -0.5f); //左上と左下に1本ずつのray
-
-        RaycastHit2D topLeftHit = Physics2D.Raycast(topLeftRayOrigin, Vector2.left, 0.1f, climbableWallLayer);
-        RaycastHit2D bottomLeftHit = Physics2D.Raycast(bottomLeftRayOrigin, Vector2.left, 0.1f, climbableWallLayer); //左方向
-
-        if (CurrentLocomotionState == LocomotionState.Airborne && topLeftHit.collider != null && bottomLeftHit.collider != null)
-        {
-            CurrentLocomotionState = LocomotionState.WallCling;
-        }
-    }
-
     private void HandleWallMovement() //壁での上下移動
     {
         if (CurrentLocomotionState == LocomotionState.WallCling)
         {
-
             float velocityY = moveInput.y * wallMoveSpeed;
             rb.linearVelocity = new Vector2(0f, velocityY);
         }
