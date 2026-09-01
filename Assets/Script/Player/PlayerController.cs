@@ -110,18 +110,13 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateGroundState() //接地判定
     {
-        if (CurrentLocomotionState == LocomotionState.WallCling)
-        {
-            return;
-        }
-
         Vector2 leftRayOrigin = new Vector2(transform.position.x -0.5f, transform.position.y -0.5f);
         Vector2 rightRayOrigin = new Vector2(transform.position.x +0.5f, transform.position.y -0.5f);//rayを2本作る
 
         RaycastHit2D leftHit = Physics2D.Raycast(leftRayOrigin, Vector2.down, 0.1f, groundLayer);
         RaycastHit2D rightHit = Physics2D.Raycast(rightRayOrigin, Vector2.down, 0.1f, groundLayer);
 
-        if ((leftHit.collider != null || rightHit.collider != null) && rb.linearVelocity.y <= 0)
+        if (leftHit.collider != null || rightHit.collider != null)
         {
             CurrentLocomotionState = LocomotionState.Grounded;
             hasUsedAirJump = false;
@@ -133,18 +128,23 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void UpdateWallState()
+    private void UpdateWallState() //壁の接触判定
     {
-        Vector2 topLeftRayOrigin = new Vector2(transform.position.x -0.5f, transform.position.y +0.5f);
-        Vector2 bottomLeftRayOrigin = new Vector2(transform.position.x -0.5f, transform.position.y -0.5f); //左上と左下に1本ずつのray
+        Vector2 topLeftRayOrigin = new Vector2(transform.position.x -0.5f, transform.position.y +0.5f); //左上
+        Vector2 topRightRayOrigin = new Vector2(transform.position.x +0.5f, transform.position.y +0.5f); //右上
+        Vector2 bottomLeftRayOrigin = new Vector2(transform.position.x -0.5f, transform.position.y -0.5f); //左下
+        Vector2 bottomRightRayOrigin = new Vector2(transform.position.x +0.5f, transform.position.y -0.5f); //右下
 
-        RaycastHit2D topLeftHit = Physics2D.Raycast(topLeftRayOrigin, Vector2.left, 0.1f, climbableWallLayer);
-        RaycastHit2D bottomLeftHit = Physics2D.Raycast(bottomLeftRayOrigin, Vector2.left, 0.1f, climbableWallLayer); //左方向
+        RaycastHit2D topLeftHit = Physics2D.Raycast(topLeftRayOrigin, Vector2.left, 0.1f, climbableWallLayer); //左上から左へ
+        RaycastHit2D topRightHit = Physics2D.Raycast(topRightRayOrigin, Vector2.right, 0.1f, climbableWallLayer); //右上から右へ
+        RaycastHit2D bottomLeftHit = Physics2D.Raycast(bottomLeftRayOrigin, Vector2.left, 0.1f, climbableWallLayer); //左下から左へ
+        RaycastHit2D bottomRightHit = Physics2D.Raycast(bottomRightRayOrigin, Vector2.right, 0.1f, climbableWallLayer); //右下から右へ
 
-        if (CurrentLocomotionState == LocomotionState.Airborne && topLeftHit.collider != null && bottomLeftHit.collider != null)
+        if()
         {
-            CurrentLocomotionState = LocomotionState.WallCling;
+            
         }
+
     }
 
     private void HandleGroundedMovement() //地面での左右移動
@@ -238,8 +238,14 @@ public class PlayerController : MonoBehaviour
     {
         if (CurrentLocomotionState == LocomotionState.WallCling)
         {
+            rb.gravityScale = 0f;
+
             float velocityY = moveInput.y * wallMoveSpeed;
             rb.linearVelocity = new Vector2(0f, velocityY);
+        }
+        else
+        {
+            rb.gravityScale = 1f;
         }
     }
 }
