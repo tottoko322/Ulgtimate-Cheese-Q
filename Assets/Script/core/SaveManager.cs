@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.IO;
-using UnityEngine.InputSystem;
 
 public class SaveManager : MonoBehaviour
 {
@@ -11,20 +10,6 @@ public class SaveManager : MonoBehaviour
         saveFilePath = Path.Combine(Application.persistentDataPath, "save.json");
         Load();
     }
-    private void Update()
-    {
-        if (Keyboard.current.tKey.wasPressedThisFrame)
-        {
-            SaveData.tutorialCleared = true;
-            Save();
-            Debug.Log("保存しました");
-        }
-
-        if (Keyboard.current.lKey.wasPressedThisFrame)
-        {
-            Debug.Log("tutorialCleared = " + SaveData.tutorialCleared);
-        }
-    }    
     public void Save()
     {
         string json = JsonUtility.ToJson(SaveData);
