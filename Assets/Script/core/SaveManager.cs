@@ -8,6 +8,21 @@ public class SaveManager : MonoBehaviour
     private void Awake()
     {
         saveFilePath = Path.Combine(Application.persistentDataPath, "save.json");
+        Load();
+    }
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            SaveData.tutorialCleared = true;
+            Save();
+            Debug.Log("保存しました");
+        }
+
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            Debug.Log("tutorialCleared = " + SaveData.tutorialCleared);
+        }
     }
     public void Save()
     {
