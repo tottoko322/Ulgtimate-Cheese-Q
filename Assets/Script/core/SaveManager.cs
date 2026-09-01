@@ -8,6 +8,7 @@ public class SaveManager : MonoBehaviour
     private void Awake()
     {
         saveFilePath = Path.Combine(Application.persistentDataPath, "save.json");
+        DontDestroyOnLoad(gameObject);
         Load();
     }
     public void Save()

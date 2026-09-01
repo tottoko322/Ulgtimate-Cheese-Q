@@ -4,6 +4,10 @@ using UnityEngine.SceneManagement;
 public class GameFlowManager : MonoBehaviour
 {
     [SerializeField] private SaveManager saveManager;
+    private void Awake()
+    {
+        DontDestroyOnLoad(gameObject);
+    }
     private void Start()
     {
         DecideStartScene();
