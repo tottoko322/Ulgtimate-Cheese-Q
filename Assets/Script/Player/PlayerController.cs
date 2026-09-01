@@ -30,7 +30,12 @@ public class PlayerController : MonoBehaviour
     [Header("Fast Fall")]
     [SerializeField] private float fastFallSpeed = 6f;
 
-    private int moveInput;
+    [Header("Wall")]
+    [SerializeField] private float wallMoveSpeed;
+    [SerializeField] private float wallDetachForce;
+    [SerializeField] private LayerMask climbableWallLayer;
+
+    private Vector2 moveInput;
     private int airMoveInput;
     private bool jumpPressed = false;
     private bool jumpReleased = false;
@@ -56,27 +61,31 @@ public class PlayerController : MonoBehaviour
         UpdateGroundState();
         HandleGroundedMovement();
         HandleAirMovement();
-        StartFastFall();
         Jump();
+        StartFastFall();
+        EnterWallCling();
+        HandleWallMovement();
     }
 
     private void ReadInput()
     {
-        //左右移動の入力
-        moveInput = 0;
+        //移動の入力
+        moveInput = Vector2.zero;
         if (Keyboard.current.dKey.isPressed)
         {
-            moveInput += 1;
+            moveInput.x += 1;
         }
         if (Keyboard.current.aKey.isPressed)
         {
-            moveInput -= 1;
+            moveInput.x -= 1;
         }
-        
-        //急降下の入力
-        if (Keyboard.current.sKey.wasPressedThisFrame)
+        if (Keyboard.current.wKey.isPressed)
         {
-            isFastFalling = true;
+            moveInput.y += 1;
+        }
+        if (Keyboard.current.sKey.isPressed)
+        {
+            moveInput.y -= 1;
         }
 
         //ジャンプの入力
@@ -90,6 +99,12 @@ public class PlayerController : MonoBehaviour
         }
 
         jumpHeld = Keyboard.current.wKey.isPressed;
+
+        //急降下の入力
+        if (Keyboard.current.sKey.wasPressedThisFrame)
+        {
+            isFastFalling = true;
+        }
     }
 
     private void UpdateGroundState() //接地判定
@@ -117,7 +132,7 @@ public class PlayerController : MonoBehaviour
     {
         if (CurrentLocomotionState == LocomotionState.Grounded)
         {
-            rb.linearVelocity = new Vector2(groundMoveSpeed * moveInput, rb.linearVelocity.y);
+            rb.linearVelocity = new Vector2(groundMoveSpeed * moveInput.x, rb.linearVelocity.y);
         }
     }
 
@@ -125,7 +140,7 @@ public class PlayerController : MonoBehaviour
     {
         if (CurrentLocomotionState == LocomotionState.Airborne)
         {
-            switch(moveInput)
+            switch(moveInput.x)
             {
                 case -1:
                 rb.linearVelocity = new Vector2(Mathf.MoveTowards(rb.linearVelocity.x, -airMoveSpeed, airAcceleration * Time.fixedDeltaTime), rb.linearVelocity.y);
@@ -142,18 +157,9 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void StartFastFall() //急降下
-    {
-        if (isFastFalling && CurrentLocomotionState == LocomotionState.Airborne)
-        {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Min(rb.linearVelocity.y, -fastFallSpeed));
-            hasUsedAirJump = true;//急降下中のジャンプを無くす
-        }
-    }
-
     private void Jump() //ジャンプ
     {
-        if (jumpPressed)
+        if (jumpPressed ())
         {
             switch(CurrentLocomotionState)
             {
@@ -194,6 +200,39 @@ public class PlayerController : MonoBehaviour
         {
             rb.AddForce(Vector2.up * jumpHoldForce, ForceMode2D.Force);
             jumpHoldTimer += Time.fixedDeltaTime;
+        }
+    }
+
+    private void StartFastFall() //急降下
+    {
+        if (isFastFalling && CurrentLocomotionState == LocomotionState.Airborne)
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Min(rb.linearVelocity.y, -fastFallSpeed));
+            hasUsedAirJump = true;//急降下中のジャンプを無くす
+        }
+    }
+
+    private void EnterWallCling() //壁への接触判定
+    {
+        Vector2 topLeftRayOrigin = new Vector2(transform.position.x -0.5f, transform.position.y +0.5f);
+        Vector2 bottomLeftRayOrigin = new Vector2(transform.position.x -0.5f, transform.position.y -0.5f); //左上と左下に1本ずつのray
+
+        RaycastHit2D topLeftHit = Physics2D.Raycast(topLeftRayOrigin, Vector2.left, 0.1f, climbableWallLayer);
+        RaycastHit2D bottomLeftHit = Physics2D.Raycast(bottomLeftRayOrigin, Vector2.left, 0.1f, climbableWallLayer); //左方向
+
+        if (CurrentLocomotionState == LocomotionState.Airborne && topLeftHit.collider != null && bottomLeftHit.collider != null)
+        {
+            CurrentLocomotionState = LocomotionState.WallCling;
+        }
+    }
+
+    private void HandleWallMovement() //壁での上下移動
+    {
+        if (CurrentLocomotionState == LocomotionState.WallCling)
+        {
+
+            float velocityY = moveInput.y * wallMoveSpeed;
+            rb.linearVelocity = new Vector2(0f, velocityY);
         }
     }
 }
