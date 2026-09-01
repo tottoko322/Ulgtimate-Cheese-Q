@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameFlowManager : MonoBehaviour
 {
@@ -12,11 +13,19 @@ public class GameFlowManager : MonoBehaviour
     {
         if (!saveManager.SaveData.tutorialCleared)
         {
-            Debug.Log("Tutorialへ移動");
+            GoToTutorial();
         }
         else
         {
-            Debug.Log("Titleへ移動");
+            GoToTitle();
         }
+    }
+    public void GoToTutorial()
+    {
+        SceneManager.LoadScene("Tutorial");
+    }
+    public void GoToTitle()
+    {
+        SceneManager.LoadScene("Title");
     }
 }
