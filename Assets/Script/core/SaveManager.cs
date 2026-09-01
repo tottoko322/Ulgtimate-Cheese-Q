@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.IO;
+using UnityEngine.InputSystem;
 
 public class SaveManager : MonoBehaviour
 {
@@ -12,18 +13,18 @@ public class SaveManager : MonoBehaviour
     }
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.T))
+        if (Keyboard.current.tKey.wasPressedThisFrame)
         {
             SaveData.tutorialCleared = true;
             Save();
             Debug.Log("保存しました");
         }
 
-        if (Input.GetKeyDown(KeyCode.L))
+        if (Keyboard.current.lKey.wasPressedThisFrame)
         {
             Debug.Log("tutorialCleared = " + SaveData.tutorialCleared);
         }
-    }
+    }    
     public void Save()
     {
         string json = JsonUtility.ToJson(SaveData);
