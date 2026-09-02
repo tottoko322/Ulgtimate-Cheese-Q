@@ -66,8 +66,11 @@ public class PlayerController : MonoBehaviour
 
         HandleGroundedMovement();
         HandleAirMovement();
+
         Jump();
         StartFastFall();
+
+        EnterWallCling();
         HandleWallMovement();
         DetachFromWall();
     }
@@ -94,16 +97,19 @@ public class PlayerController : MonoBehaviour
         }
 
         //ジャンプの入力
-        if (Keyboard.current.wKey.wasPressedThisFrame)
+        if (CurrentLocomotionState == LocomotionState.Grounded || CurrentLocomotionState == LocomotionState.Airborne)
         {
-            jumpPressed = true;
-        }
-        if (Keyboard.current.wKey.wasReleasedThisFrame)
-        {
-            jumpReleased = true;
-        }
+            if (Keyboard.current.wKey.wasPressedThisFrame)
+            {
+                jumpPressed = true;
+            }
+            if (Keyboard.current.wKey.wasReleasedThisFrame)
+            {
+                jumpReleased = true;
+            }
 
-        jumpHeld = Keyboard.current.wKey.isPressed;
+            jumpHeld = Keyboard.current.wKey.isPressed;
+        }
 
         //急降下の入力
         if (Keyboard.current.sKey.wasPressedThisFrame)
@@ -154,7 +160,6 @@ public class PlayerController : MonoBehaviour
         {
             CurrentLocomotionState = LocomotionState.Airborne;
         }
-        Debug.Log($"Grounded:{isGrounded} Wall:{isTouchingWall} State:{CurrentLocomotionState}");
     }
 
     private void HandleGroundedMovement() //地面での左右移動
@@ -196,7 +201,6 @@ public class PlayerController : MonoBehaviour
                 {
                     case LocomotionState.Grounded: //一回目のジャンプ
                     rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpPower);
-                    CurrentLocomotionState = LocomotionState.Airborne;
                     jumpHoldTimer = 0f;
                     jumpPressed = false;
                     break;
@@ -244,14 +248,13 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void HandleWallMovement() //壁での上下移動
+    private void EnterWallCling() //重力
     {
-        if (CurrentLocomotionState == LocomotionState.WallCling) //WallClingのとき
+        if (CurrentLocomotionState == LocomotionState.WallCling)
         {
-            rb.gravityScale = 0f; //重力なし
-
-            float velocityY = moveInput.y * wallMoveSpeed;
-            rb.linearVelocity = new Vector2(0f, velocityY);
+            rb.gravityScale = 0f;
+            hasUsedAirJump = false;
+            isFastFalling = false;
         }
         else
         {
@@ -259,9 +262,21 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void HandleWallMovement() //壁での上下移動
+    {
+        if (CurrentLocomotionState == LocomotionState.WallCling) //WallClingのとき
+        {
+            float velocityY = moveInput.y * wallMoveSpeed;
+            rb.linearVelocity = new Vector2(0f, velocityY);
+        }
+    }
+
     private void DetachFromWall()
     {
-        float forceX = moveInput.x * wallDetachForce;
-        rb.AddForce(Vector2.right * forceX, ForceMode2D.Impulse);
+        if (CurrentLocomotionState == LocomotionState.WallCling)
+        {
+            float forceX = moveInput.x * wallDetachForce;
+            rb.AddForce(Vector2.right * forceX, ForceMode2D.Impulse);
+        }
     }
 }
