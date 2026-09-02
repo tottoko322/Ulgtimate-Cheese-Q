@@ -32,16 +32,18 @@ public class PlayerController : MonoBehaviour
 
     [Header("Wall")]
     [SerializeField] private float wallMoveSpeed = 6f;
-    [SerializeField] private float wallDetachForce;
+    [SerializeField] private float wallDetachForce = 6f;
     [SerializeField] private LayerMask climbableWallLayer;
 
     private Vector2 moveInput;
-    private int airMoveInput;
     private bool jumpPressed = false;
     private bool jumpReleased = false;
     private bool jumpHeld = false;
     private bool hasUsedAirJump = false;
     private bool isFastFalling = false;
+
+    private bool isGrounded = false;
+    private bool isTouchingWall = false;
 
     [SerializeField] private LayerMask groundLayer;
     private Rigidbody2D rb;
@@ -60,12 +62,14 @@ public class PlayerController : MonoBehaviour
     {
         UpdateGroundState();
         UpdateWallState();
+        UpdateLocomotionState();
 
         HandleGroundedMovement();
         HandleAirMovement();
         Jump();
         StartFastFall();
         HandleWallMovement();
+        DetachFromWall();
     }
 
     private void ReadInput()
@@ -111,21 +115,12 @@ public class PlayerController : MonoBehaviour
     private void UpdateGroundState() //接地判定
     {
         Vector2 leftRayOrigin = new Vector2(transform.position.x -0.5f, transform.position.y -0.5f);
-        Vector2 rightRayOrigin = new Vector2(transform.position.x +0.5f, transform.position.y -0.5f);//rayを2本作る
+        Vector2 rightRayOrigin = new Vector2(transform.position.x +0.5f, transform.position.y -0.5f);
 
         RaycastHit2D leftHit = Physics2D.Raycast(leftRayOrigin, Vector2.down, 0.1f, groundLayer);
         RaycastHit2D rightHit = Physics2D.Raycast(rightRayOrigin, Vector2.down, 0.1f, groundLayer);
 
-        if (leftHit.collider != null || rightHit.collider != null)
-        {
-            CurrentLocomotionState = LocomotionState.Grounded;
-            hasUsedAirJump = false;
-            isFastFalling = false;
-        }
-        else
-        {
-            CurrentLocomotionState = LocomotionState.Airborne;
-        }
+        isGrounded = leftHit.collider != null || rightHit.collider != null; //どちらか片方が接地するとisGroundedがtrueへ
     }
 
     private void UpdateWallState() //壁の接触判定
@@ -140,11 +135,26 @@ public class PlayerController : MonoBehaviour
         RaycastHit2D bottomLeftHit = Physics2D.Raycast(bottomLeftRayOrigin, Vector2.left, 0.1f, climbableWallLayer); //左下から左へ
         RaycastHit2D bottomRightHit = Physics2D.Raycast(bottomRightRayOrigin, Vector2.right, 0.1f, climbableWallLayer); //右下から右へ
 
-        if()
-        {
-            
-        }
+        isTouchingWall = (topLeftHit.collider != null && bottomLeftHit.collider != null) || (topRightHit.collider != null && bottomRightHit.collider != null);
+    }
 
+    private void UpdateLocomotionState() //足場状態更新
+    {
+        if (isGrounded)
+        {
+            CurrentLocomotionState = LocomotionState.Grounded;
+            hasUsedAirJump = false;
+            isFastFalling = false;
+        }
+        else if (isTouchingWall)
+        {
+            CurrentLocomotionState = LocomotionState.WallCling;
+        }
+        else
+        {
+            CurrentLocomotionState = LocomotionState.Airborne;
+        }
+        Debug.Log($"Grounded:{isGrounded} Wall:{isTouchingWall} State:{CurrentLocomotionState}");
     }
 
     private void HandleGroundedMovement() //地面での左右移動
@@ -236,9 +246,9 @@ public class PlayerController : MonoBehaviour
 
     private void HandleWallMovement() //壁での上下移動
     {
-        if (CurrentLocomotionState == LocomotionState.WallCling)
+        if (CurrentLocomotionState == LocomotionState.WallCling) //WallClingのとき
         {
-            rb.gravityScale = 0f;
+            rb.gravityScale = 0f; //重力なし
 
             float velocityY = moveInput.y * wallMoveSpeed;
             rb.linearVelocity = new Vector2(0f, velocityY);
@@ -247,5 +257,11 @@ public class PlayerController : MonoBehaviour
         {
             rb.gravityScale = 1f;
         }
+    }
+
+    private void DetachFromWall()
+    {
+        float forceX = moveInput.x * wallDetachForce;
+        rb.AddForce(Vector2.right * forceX, ForceMode2D.Impulse);
     }
 }
