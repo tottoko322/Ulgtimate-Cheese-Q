@@ -36,7 +36,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private LayerMask climbableWallLayer;
 
     private Vector2 moveInput;
-    private int wallDirection = 0;
 
     private bool jumpPressed = false;
     private bool jumpReleased = false;
@@ -77,9 +76,9 @@ public class PlayerController : MonoBehaviour
         DetachFromWall();
     }
 
-    private void ReadInput()
+    private void ReadInput() //入力取得
     {
-        //移動の入力
+        //左右移動、ジャンプ、壁離れの入力
         moveInput = Vector2.zero;
         if (Keyboard.current.dKey.isPressed)
         {
@@ -126,7 +125,7 @@ public class PlayerController : MonoBehaviour
         Vector2 rightRayOrigin = new Vector2(transform.position.x +0.5f, transform.position.y -0.5f);
 
         RaycastHit2D leftHit = Physics2D.Raycast(leftRayOrigin, Vector2.down, 0.1f, groundLayer);
-        RaycastHit2D rightHit = Physics2D.Raycast(rightRayOrigin, Vector2.down, 0.1f, groundLayer);
+        RaycastHit2D rightHit = Physics2D.Raycast(rightRayOrigin, Vector2.down, 0.1f, groundLayer); //下面から下向きに2本
 
         isGrounded = leftHit.collider != null || rightHit.collider != null; //どちらか片方が接地するとisGroundedがtrueへ
     }
@@ -144,21 +143,22 @@ public class PlayerController : MonoBehaviour
         RaycastHit2D bottomRightHit = Physics2D.Raycast(bottomRightRayOrigin, Vector2.right, 0.1f, climbableWallLayer); //右下から右へ
 
         isTouchingWall = (topLeftHit.collider != null && bottomLeftHit.collider != null) || (topRightHit.collider != null && bottomRightHit.collider != null);
+        //右または左の2本が壁に当たると、isTouchingWallをtrueへ
     }
 
     private void UpdateLocomotionState() //足場状態更新
     {
-        if (isGrounded)
+        if (isGrounded) //isGroundedがtrueならば足場状態Groundedへ
         {
             CurrentLocomotionState = LocomotionState.Grounded;
-            hasUsedAirJump = false;
-            isFastFalling = false;
+            hasUsedAirJump = false; //空中ジャンプの復活
+            isFastFalling = false; //急降下の復活
         }
-        else if (isTouchingWall)
+        else if (isTouchingWall) //isTouchingWallがtrueならば足場状態WallClingへ
         {
             CurrentLocomotionState = LocomotionState.WallCling;
         }
-        else
+        else //isGrounded,isTouchingWallがfalseならば足場状態Airborneへ
         {
             CurrentLocomotionState = LocomotionState.Airborne;
         }
@@ -224,16 +224,16 @@ public class PlayerController : MonoBehaviour
                 }
             }
 
-            if (jumpReleased)
+            if (jumpReleased) //wキーを離すと
             {
-                if (rb.linearVelocity.y > 0)
+                if (rb.linearVelocity.y > 0) //y方向の速度が正なら
                 {
-                    rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * 0.4f);
+                    rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * 0.4f); //y方向の速度0.4倍
                 }
                 jumpReleased = false;
             }
 
-            if (jumpHeld && jumpHoldTimer < maxJumpHoldTime)
+            if (jumpHeld && jumpHoldTimer < maxJumpHoldTime) //高さ調節
             {
                 rb.AddForce(Vector2.up * jumpHoldForce, ForceMode2D.Force);
                 jumpHoldTimer += Time.fixedDeltaTime;
@@ -250,13 +250,13 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void EnterWallCling() //重力
+    private void EnterWallCling() //重力操作、壁張り付きで空中ジャンプと急降下回復
     {
         if (CurrentLocomotionState == LocomotionState.WallCling)
         {
             rb.gravityScale = 0f;
-            hasUsedAirJump = false;
-            isFastFalling = false;
+            hasUsedAirJump = false; //空中ジャンプ回復
+            isFastFalling = false; //急降下回復
         }
         else
         {
@@ -266,19 +266,19 @@ public class PlayerController : MonoBehaviour
 
     private void HandleWallMovement() //壁での上下移動
     {
-        if (CurrentLocomotionState == LocomotionState.WallCling) //WallClingのとき
+        if (CurrentLocomotionState == LocomotionState.WallCling)
         {
             float velocityY = moveInput.y * wallMoveSpeed;
-            rb.linearVelocity = new Vector2(0f, velocityY);
+            rb.linearVelocity = new Vector2(0f, velocityY); //x方向の速度0,y方向の速度はvelocityY
         }
     }
 
-    private void DetachFromWall()
+    private void DetachFromWall() //壁から離れる
     {
         if (CurrentLocomotionState == LocomotionState.WallCling)
         {
-            float forceX = moveInput.x * wallDetachForce;
-            rb.linearVelocity = new Vector2(forceX, rb.linearVelocity.y);
+            float velocityX = moveInput.x * wallDetachForce;
+            rb.linearVelocity = new Vector2(velocityX, rb.linearVelocity.y); //x方向に速度velocityX,y方向の速度はそのまま
         }
     }
 }
