@@ -36,6 +36,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private LayerMask climbableWallLayer;
 
     private Vector2 moveInput;
+    private int wallDirection = 0;
+
     private bool jumpPressed = false;
     private bool jumpReleased = false;
     private bool jumpHeld = false;
@@ -276,7 +278,7 @@ public class PlayerController : MonoBehaviour
         if (CurrentLocomotionState == LocomotionState.WallCling)
         {
             float forceX = moveInput.x * wallDetachForce;
-            rb.AddForce(Vector2.right * forceX, ForceMode2D.Impulse);
+            rb.linearVelocity = new Vector2(forceX, rb.linearVelocity.y);
         }
     }
 }
