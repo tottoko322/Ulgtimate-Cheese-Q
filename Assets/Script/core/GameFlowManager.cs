@@ -6,6 +6,9 @@ public class GameFlowManager : MonoBehaviour
     public static GameFlowManager Instance { get; private set; }
 
     [SerializeField] private SaveManager saveManager;
+
+    [SerializeField] private StageDefinition[] stageDefinitions;
+
     private void Awake()
     {
 
@@ -46,5 +49,18 @@ public class GameFlowManager : MonoBehaviour
     public void GoToStageSelect()
     {
         SceneManager.LoadScene("StageSelect");
+    }
+
+    public void GoToStage(StageId stageId)
+    {
+        foreach (StageDefinition definition in stageDefinitions)
+        {
+            if (definition.stageId == stageId)
+            {
+                SceneManager.LoadScene(definition.sceneName);
+                return;
+            }
+        }
+        Debug.LogError("Stage not found: " + stageId);
     }
 }
