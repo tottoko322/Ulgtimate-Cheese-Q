@@ -3,11 +3,22 @@ using UnityEngine.SceneManagement;
 
 public class GameFlowManager : MonoBehaviour
 {
+    public static GameFlowManager Instance { get; private set; }
+
     [SerializeField] private SaveManager saveManager;
     private void Awake()
     {
-        DontDestroyOnLoad(gameObject);
-    }
+
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+        } 
+   }
     private void Start()
     {
         DecideStartScene();
