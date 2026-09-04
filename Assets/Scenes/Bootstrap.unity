@@ -149,6 +149,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameFlowManager
   saveManager: {fileID: 1938710510}
+  stageDefinitions:
+  - sceneName: Port
+    stageId: 2
 --- !u!4 &47835761
 Transform:
   m_ObjectHideFlags: 0

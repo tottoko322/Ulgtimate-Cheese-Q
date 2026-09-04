@@ -9,13 +9,13 @@ EditorBuildSettings:
     path: Assets/Scenes/SampleScene.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
   - enabled: 1
-    path: Assets/Scenes/PlayerTest.unity
+    path: Assets/Scenes/test/PlayerTest.unity
     guid: 64e65b661530b9749a5c6aff60c424ea
   - enabled: 1
-    path: Assets/Scenes/EnemyTest.unity
+    path: Assets/Scenes/test/EnemyTest.unity
     guid: 1039ef2fa9bb10a4f91998ebd8467119
   - enabled: 1
-    path: Assets/Scenes/SystemTest.unity
+    path: Assets/Scenes/test/SystemTest.unity
     guid: f562a72bc8cef114188db17948783000
   - enabled: 1
     path: Assets/Scenes/Tutorial.unity
@@ -26,5 +26,35 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Bootstrap.unity
     guid: 8694779295d233448bbe8b35bfb1b976
+  - enabled: 1
+    path: Assets/Scenes/StageSelect.unity
+    guid: 9ab837d675bbc514e82674064f9e43e9
+  - enabled: 1
+    path: Assets/Scenes/Stage/Prologue.unity
+    guid: b42c8cae19da2f64bb3c6e6c689ccee5
+  - enabled: 1
+    path: Assets/Scenes/Stage/Port.unity
+    guid: 9a19f27f21cf2734992283b358a17318
+  - enabled: 1
+    path: Assets/Scenes/Stage/PortBoss.unity
+    guid: a7a97c6cf1e5f3a4e9acfb29c1ea456a
+  - enabled: 1
+    path: Assets/Scenes/Stage/Gakken.unity
+    guid: 1a55a19229266e7408371f7551130fe0
+  - enabled: 1
+    path: Assets/Scenes/Stage/GakkenBoss.unity
+    guid: 8e0cc98123d6fb34993ee137f0a0cfcf
+  - enabled: 1
+    path: Assets/Scenes/Stage/Underground.unity
+    guid: 64d705647a9a4d74fa7a46f8f049376b
+  - enabled: 1
+    path: Assets/Scenes/Stage/UndergroundBoss.unity
+    guid: 5b11c22c1f8296347b4c4e45f572f23c
+  - enabled: 1
+    path: Assets/Scenes/Stage/FinalBoss.unity
+    guid: 8bc19c4a5f9a52c408b0767a584917bb
+  - enabled: 1
+    path: Assets/Scenes/Stage/BossRush.unity
+    guid: 908394d62b0200049b47afcd370822c1
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
