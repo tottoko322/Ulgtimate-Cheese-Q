@@ -42,6 +42,12 @@ public class GameFlowManager : MonoBehaviour
     {
         SceneManager.LoadScene("Tutorial");
     }
+    public void CompleteTutorial()
+    {
+        saveManager.SaveData.tutorialCleared = true;
+        saveManager.Save();
+        GoToPrologue();
+    }
     public void GoToTitle()
     {
         SceneManager.LoadScene("Title");
@@ -49,6 +55,10 @@ public class GameFlowManager : MonoBehaviour
     public void GoToStageSelect()
     {
         SceneManager.LoadScene("StageSelect");
+    }
+    public void GoToPrologue()
+    {
+        GoToStage(StageId.Prologue);
     }
 
     public void GoToStage(StageId stageId)
