@@ -15,6 +15,7 @@ public class EnemyController : MonoBehaviour
     private EnemyStatusBox EnemyCurrentStatus = EnemyStatusBox.Stay;
     //Data取得
     EnemyData dataofenemy;
+    Damageable damagesystem;
     //索敵用
     private float distanceX;
     private float distanceY;
@@ -32,6 +33,8 @@ public class EnemyController : MonoBehaviour
     private bool isInCoolTime;
     private float passTimeAfterAttack;
     //被弾、死亡用
+    public bool isDamaged;
+    private float damage;
     private float currentHP;
     //処理
     void Start()
@@ -42,6 +45,7 @@ public class EnemyController : MonoBehaviour
     }
     void Update()
     {
+        Damaged();
         //索敵範囲内かの判定
         CheckDistance();
         //追跡処理
@@ -114,6 +118,21 @@ public class EnemyController : MonoBehaviour
                 transform.Translate(Vector3.right*dataofenemy.enemySpeed*Time.deltaTime);
             }
         }
+    }
+    void Damaged()
+    {
+        if(isDamaged)
+        {
+            EnemyCurrentStatus = EnemyStatusBox.Hurt;
+            //何かでdamageの値を取得する(damagesystemからの取得を想定)
+            currentHP -= damage;
+            isDamaged = false;
+            if(currentHP <= 0f)
+            {
+                EnemyCurrentStatus = EnemyStatusBox.Dead;
+            }
+        }
+        
     }
     void ChangeSprite()
     {
