@@ -12,7 +12,7 @@ public class EnemyController : MonoBehaviour
         Hurt,
         Dead
     }
-    private EnemyStatusBox EnemyCurrentStatus = EnemyStatusBox.Stay;
+    [SerializeField] private EnemyStatusBox EnemyCurrentStatus = EnemyStatusBox.Stay;
     //Data取得
     [SerializeField] EnemyData dataofenemy;
     //索敵用
@@ -22,7 +22,7 @@ public class EnemyController : MonoBehaviour
     [SerializeField] Transform playertransform;
     //アニメーション用
     private int viewMoveSpriteNumber;
-    private int viewAttackSpriteNumber;
+    [SerializeField] private int viewAttackSpriteNumber;
     private int viewStaySpriteNumber;
     private float viewTimeMoveSprite;
     private float viewTimeAttackSprite;
@@ -31,22 +31,19 @@ public class EnemyController : MonoBehaviour
     //攻撃用
     private bool isInCoolTime;
     private float passTimeAfterAttack;
-    private float passFixedTime;
     //処理
     void Start()
     {
         sr = GetComponent<SpriteRenderer>();
         sr.sprite = dataofenemy.enemyStayAnimationSprites[0];
+        isInCoolTime = false;
     }
     void Update()
     {
         //索敵範囲内かの判定
         CheckDistance();
         //追跡処理
-        if(EnemyCurrentStatus == EnemyStatusBox.Chase)
-        {
-            ChasePlayer();
-        }
+        ChasePlayer();
         //攻撃処理
         //被弾、死亡処理
         //アニメーション処理
@@ -71,7 +68,7 @@ public class EnemyController : MonoBehaviour
         }
         if(EnemyCurrentStatus == EnemyStatusBox.Chase)
         {
-            if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemyCooltime*dataofenemy.enemyCooltime)
+            if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemyAttackRange*dataofenemy.enemyAttackRange)
             {
                 if(!isInCoolTime)
                 {
@@ -87,25 +84,18 @@ public class EnemyController : MonoBehaviour
     }
     void CheckTime()
     {
-        if(EnemyCurrentStatus == EnemyStatusBox.Attack)
-        {
-            
-            if(passFixedTime < dataofenemy.enemyFixedTime)
-            {
-                passFixedTime += Time.deltaTime;
-            }
-            else
-            {
-                EnemyCurrentStatus = EnemyStatusBox.Chase;
-                passFixedTime = 0f;
-            }
-        }
         if(isInCoolTime)
         {
             passTimeAfterAttack += Time.deltaTime;
+            if(EnemyCurrentStatus == EnemyStatusBox.Attack && passTimeAfterAttack > dataofenemy.enemyFixedTime)
+            {
+                EnemyCurrentStatus = EnemyStatusBox.Chase;
+            }
             if(passTimeAfterAttack >= dataofenemy.enemyCooltime)
             {
                 isInCoolTime = false;
+                passTimeAfterAttack = 0f;
+                viewAttackSpriteNumber = 0;
             }
         }
     }
@@ -153,20 +143,20 @@ public class EnemyController : MonoBehaviour
                 viewTimeMoveSprite += Time.deltaTime;
             }
         }
-        else if(EnemyCurrentStatus == EnemyStatusBox.Attack)
+        else if(EnemyCurrentStatus == EnemyStatusBox.Attack)//攻撃アニメーション
         {
-            if(viewTimeAttackSprite >= dataofenemy.enemyChangeAttackSpritesInterval)
+            if(viewAttackSpriteNumber < dataofenemy.enemyAttackAnimationSprites.Length - 1)
             {
-                if(viewAttackSpriteNumber < dataofenemy.enemyAttackAnimationSprites.Length - 1)
+                if(viewTimeAttackSprite >= dataofenemy.enemyChangeAttackSpritesInterval)
                 {
                     viewAttackSpriteNumber ++;
-                    sr.sprite = dataofenemy.enemyAttackAnimationSprites[viewAttackSpriteNumber];
                     viewTimeAttackSprite = 0f;
                 }
-            }
-            else
-            {
-                viewTimeAttackSprite += Time.deltaTime;
+                else
+                {
+                    viewTimeAttackSprite += Time.deltaTime;
+                }
+                sr.sprite = dataofenemy.enemyAttackAnimationSprites[viewAttackSpriteNumber];
             }
         }
         else if(EnemyCurrentStatus == EnemyStatusBox.Stay)//待機アニメーション
