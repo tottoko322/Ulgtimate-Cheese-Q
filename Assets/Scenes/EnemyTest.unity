@@ -271,8 +271,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 111ad7613bda4bb4ab66191aef14ae9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
+  EnemyCurrentStatus: 0
   dataofenemy: {fileID: 443669135}
   playertransform: {fileID: 1202132498}
+  viewAttackSpriteNumber: 0
 --- !u!114 &443669135
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -288,13 +290,13 @@ MonoBehaviour:
   enemyHp: 100
   enemyAttack: 1
   enemySpeed: 1
-  enemySearchRange: 3
-  enemyChaseRange: 5
-  enemyAttackRange: 1
+  enemySearchRange: 7
+  enemyChaseRange: 10
+  enemyAttackRange: 3
   enemyCooltime: 5
   enemyFixedTime: 3
   enemyChangeMoveSpritesInterval: 0.5
-  enemyChangeAttackSpritesInterval: 0.5
+  enemyChangeAttackSpritesInterval: 1
   enemyChangeStaySpritesInterval: 0.5
   enemyMoveAnimationSprites:
   - {fileID: 21300000, guid: bc4df35a3b8d6f140a72f26bd8d7acb7, type: 3}
@@ -372,7 +374,7 @@ Transform:
   m_GameObject: {fileID: 443669132}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.97, y: -1.12, z: 0}
+  m_LocalPosition: {x: 3, y: -2.76, z: 0}
   m_LocalScale: {x: 0.125, y: 0.125, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -538,7 +540,7 @@ Transform:
   m_GameObject: {fileID: 1202132495}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.68, y: -1.18, z: 0}
+  m_LocalPosition: {x: -3.56, y: -0.9, z: 0}
   m_LocalScale: {x: 0.125, y: 0.125, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
