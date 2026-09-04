@@ -157,7 +157,7 @@ public class EnemyController : MonoBehaviour
         {
             if(viewTimeAttackSprite >= dataofenemy.enemyChangeAttackSpritesInterval)
             {
-                if(viewAttackSpriteNumber < dataofenemy.enemyAttackAnimationSprites.Length)
+                if(viewAttackSpriteNumber < dataofenemy.enemyAttackAnimationSprites.Length - 1)
                 {
                     viewAttackSpriteNumber ++;
                     sr.sprite = dataofenemy.enemyAttackAnimationSprites[viewAttackSpriteNumber];
