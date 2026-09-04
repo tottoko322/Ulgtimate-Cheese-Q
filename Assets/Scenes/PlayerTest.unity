@@ -131,6 +131,7 @@ GameObject:
   - component: {fileID: 26335088}
   - component: {fileID: 26335087}
   - component: {fileID: 26335090}
+  - component: {fileID: 26335091}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -256,6 +257,22 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!114 &26335091
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 26335086}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c6491d9d6175e74eae3857dfa17215c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraController
+  Player: {fileID: 1745922059}
+  horizontalLookAhead: 3
+  verticalLookAhead: 3
+  cameraMoveSpeed: 0.3
 --- !u!1 &64982309
 GameObject:
   m_ObjectHideFlags: 0
@@ -831,7 +848,7 @@ Transform:
   m_GameObject: {fileID: 1745922055}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.66, y: -3.89, z: 0}
+  m_LocalPosition: {x: 3.07, y: -3.62, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -857,7 +874,7 @@ MonoBehaviour:
   airMoveSpeed: 6
   airAcceleration: 30
   airDeceleration: 5
-  fastFallSpeed: 6
+  fastFallSpeed: 10
   wallMoveSpeed: 6
   wallDetachForce: 6
   climbableWallLayer:

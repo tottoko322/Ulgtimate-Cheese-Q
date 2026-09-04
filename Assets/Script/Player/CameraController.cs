@@ -13,8 +13,9 @@ public class CameraController : MonoBehaviour
     [Header("Camera Movement")]
     [SerializeField] private float cameraMoveSpeed;
 
-    private Vector3 targetPosition;
-    private Vector3 lookOffset;
+    private Vector3 cameraPosition;
+    private Vector3 lookAhead;
+    private Vector3 velocity;
 
     void Start()
     {
@@ -31,34 +32,34 @@ public class CameraController : MonoBehaviour
         CameraPosition();
     }
 
-    private void CameraReadInput()
+    private void CameraReadInput() //WASDキー
     {
-        lookOffset = Vector3.zero;
+        lookAhead = Vector3.zero;
 
         if (Keyboard.current.dKey.isPressed)
         {
-            lookOffset.x += horizontalLookAhead;
+            lookAhead.x += horizontalLookAhead;
         }
         if (Keyboard.current.aKey.isPressed)
         {
-            lookOffset.x -= horizontalLookAhead;
+            lookAhead.x -= horizontalLookAhead;
         }
 
-        if (Keyboard.current.upArrowKey.isPressed)
+        if (Keyboard.current.wKey.isPressed)
         {
-            lookOffset.y += verticalLookAhead;
+            lookAhead.y += verticalLookAhead;
         }
-        if (Keyboard.current.downArrowKey.isPressed)
+        if (Keyboard.current.sKey.isPressed)
         {
-            lookOffset.y -= verticalLookAhead;
+            lookAhead.y -= verticalLookAhead;
         }
     }
 
     private void CameraPosition()
     {
+        cameraPosition = Player.position + lookAhead; //カメラの位置＝プレイヤーの位置＋先読み
 
-        targetPosition = Player.position + lookOffset;
-
-        transform.position = Vector3.Lerp(transform.position, targetPosition + new Vector3(0f, 0f, -10f), cameraMoveSpeed * Time.deltaTime);
+        transform.position = Vector3.SmoothDamp(transform.position, cameraPosition + new Vector3(0f, 1f, -10f), ref velocity, cameraMoveSpeed);
+        //プレイヤーが画面中央ちょい下
     }
 }
