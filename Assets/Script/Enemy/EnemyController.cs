@@ -12,17 +12,17 @@ public class EnemyController : MonoBehaviour
         Hurt,
         Dead
     }
-    [SerializeField] private EnemyStatusBox EnemyCurrentStatus = EnemyStatusBox.Stay;
+    private EnemyStatusBox EnemyCurrentStatus = EnemyStatusBox.Stay;
     //Data取得
-    [SerializeField] EnemyData dataofenemy;
+    EnemyData dataofenemy;
     //索敵用
     private float distanceX;
     private float distanceY;
     //移動用
-    [SerializeField] Transform playertransform;
+    Transform playertransform;
     //アニメーション用
     private int viewMoveSpriteNumber;
-    [SerializeField] private int viewAttackSpriteNumber;
+    private int viewAttackSpriteNumber;
     private int viewStaySpriteNumber;
     private float viewTimeMoveSprite;
     private float viewTimeAttackSprite;
@@ -31,6 +31,8 @@ public class EnemyController : MonoBehaviour
     //攻撃用
     private bool isInCoolTime;
     private float passTimeAfterAttack;
+    //被弾、死亡用
+    private float currentHP;
     //処理
     void Start()
     {
