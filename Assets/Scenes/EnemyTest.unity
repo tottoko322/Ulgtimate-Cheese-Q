@@ -271,10 +271,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 111ad7613bda4bb4ab66191aef14ae9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
-  EnemyCurrentStatus: 0
   dataofenemy: {fileID: 443669135}
+  damagesystem: {fileID: 0}
   playertransform: {fileID: 1202132498}
-  viewAttackSpriteNumber: 0
+  isDamaged: 0
 --- !u!114 &443669135
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -293,14 +293,14 @@ MonoBehaviour:
   enemySearchRange: 7
   enemyChaseRange: 10
   enemyAttackRange: 3
-  enemyCooltime: 5
+  enemyCooltime: 10
   enemyFixedTime: 3
   enemyChangeMoveSpritesInterval: 0.5
-  enemyChangeAttackSpritesInterval: 1
+  enemyChangeAttackSpritesInterval: 0.5
   enemyChangeStaySpritesInterval: 0.5
   enemyMoveAnimationSprites:
+  - {fileID: 21300000, guid: 99c6d2a9cb0e3584e8837185d0d40ec1, type: 3}
   - {fileID: 21300000, guid: bc4df35a3b8d6f140a72f26bd8d7acb7, type: 3}
-  - {fileID: 21300000, guid: b9b9e94dffb11f743a519320f1cac02f, type: 3}
   enemyAttackAnimationSprites:
   - {fileID: 2001858015017421665, guid: 9d31a894e1d8ec346a9f40938a7f604a, type: 3}
   - {fileID: -2897055423673852335, guid: 8a896f39ee028bb499b9d8d122778584, type: 3}

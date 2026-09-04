@@ -14,13 +14,13 @@ public class EnemyController : MonoBehaviour
     }
     private EnemyStatusBox EnemyCurrentStatus = EnemyStatusBox.Stay;
     //Data取得
-    EnemyData dataofenemy;
-    Damageable damagesystem;
+    [SerializeField] EnemyData dataofenemy;
+    [SerializeField] Damageable damagesystem;
     //索敵用
     private float distanceX;
     private float distanceY;
     //移動用
-    Transform playertransform;
+    [SerializeField] Transform playertransform;
     //アニメーション用
     private int viewMoveSpriteNumber;
     private int viewAttackSpriteNumber;
