@@ -34,6 +34,7 @@ public class EnemyController : MonoBehaviour
     private float passTimeAfterAttack;
     //被弾、死亡用
     public bool isDamaged;
+    private bool canBeDamaged;
     private float damage;
     private float currentHP;
     private float passTimeAfterHurt;
@@ -83,6 +84,7 @@ public class EnemyController : MonoBehaviour
                 {
                     EnemyCurrentStatus = EnemyStatusBox.Attack;
                     isInCoolTime = true;
+                    //passTimeAfterAttackの初期化
                 }
                 else
                 {
@@ -113,22 +115,46 @@ public class EnemyController : MonoBehaviour
             if(passTimeAfterHurt >= dataofenemy.enemyFixedTimeHurt)
             {
                 EnemyCurrentStatus = EnemyStatusBox.Stay;
-                passTimeAfterHurt = 0f;
+                if(canBeDamaged)
+                {
+                    passTimeAfterHurt = 0f;
+                }
+            }
+        }
+        if(!canBeDamaged)
+        {
+            if(passTimeAfterHurt >= dataofenemy.enemyNondamageTime)
+            {
+                canBeDamaged = true;
+                if(EnemyCurrentStatus != EnemyStatusBox.Hurt)
+                {
+                        passTimeAfterHurt = 0f;
+                }
+            }
+            else if(EnemyCurrentStatus != EnemyStatusBox.Hurt)
+            {
+                passTimeAfterHurt += Time.deltaTime;
             }
         }
     }
     void CheckDamage()
     {
-        if(isDamaged)
+        if(isDamaged && canBeDamaged)
         {
             EnemyCurrentStatus = EnemyStatusBox.Hurt;
             //何かでdamageの値を取得する(damagesystemからの取得を想定)
             currentHP -= damage;
             isDamaged = false;
+            canBeDamaged = false;
+            //passTimeAfterHurtの初期化
             if(currentHP <= 0f)
             {
                 EnemyCurrentStatus = EnemyStatusBox.Dead;
             }
+        }
+        else if (!canBeDamaged)
+        {
+            isDamaged = false;
         }
     }
     void ChasePlayer()
