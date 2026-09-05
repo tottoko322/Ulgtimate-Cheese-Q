@@ -45,7 +45,7 @@ public class EnemyController : MonoBehaviour
     }
     void Update()
     {
-        Damaged();
+        CheckDamage();
         //索敵範囲内かの判定
         CheckDistance();
         //追跡処理
@@ -105,6 +105,20 @@ public class EnemyController : MonoBehaviour
             }
         }
     }
+    void CheckDamage()
+    {
+        if(isDamaged)
+        {
+            EnemyCurrentStatus = EnemyStatusBox.Hurt;
+            //何かでdamageの値を取得する(damagesystemからの取得を想定)
+            currentHP -= damage;
+            isDamaged = false;
+            if(currentHP <= 0f)
+            {
+                EnemyCurrentStatus = EnemyStatusBox.Dead;
+            }
+        }
+    }
     void ChasePlayer()
     {
         if(EnemyCurrentStatus == EnemyStatusBox.Chase)
@@ -118,21 +132,6 @@ public class EnemyController : MonoBehaviour
                 transform.Translate(Vector3.right*dataofenemy.enemySpeed*Time.deltaTime);
             }
         }
-    }
-    void Damaged()
-    {
-        if(isDamaged)
-        {
-            EnemyCurrentStatus = EnemyStatusBox.Hurt;
-            //何かでdamageの値を取得する(damagesystemからの取得を想定)
-            currentHP -= damage;
-            isDamaged = false;
-            if(currentHP <= 0f)
-            {
-                EnemyCurrentStatus = EnemyStatusBox.Dead;
-            }
-        }
-        
     }
     void ChangeSprite()
     {
