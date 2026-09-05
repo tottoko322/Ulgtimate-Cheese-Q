@@ -167,6 +167,8 @@ public class EnemyController : MonoBehaviour
             isDamaged = false;
             canBeDamaged = false;
             passTimeAfterHurt = 0f;
+            viewHurtSpriteNumber = 0;
+            viewTimeHurtSprite = 0f;
             if(currentHP <= 0f)
             {
                 EnemyCurrentStatus = EnemyStatusBox.Dead;
