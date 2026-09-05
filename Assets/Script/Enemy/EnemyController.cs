@@ -30,10 +30,12 @@ public class EnemyController : MonoBehaviour
     private int viewAttackSpriteNumber;
     private int viewStaySpriteNumber;
     private int viewHurtSpriteNumber;
+    private int viewDeadSpriteNumber;
     private float viewTimeMoveSprite;
     private float viewTimeAttackSprite;
     private float viewTimeStaySprite;
     private float viewTimeHurtSprite;
+    private float viewTimeDeadSprite;
     private SpriteRenderer sr;
 
     //攻撃用
@@ -46,6 +48,7 @@ public class EnemyController : MonoBehaviour
     private float damage;
     private float currentHP;
     private float passTimeAfterHurt;
+    private bool canBeRemoved;
 
     //処理
     void Start()
@@ -53,6 +56,9 @@ public class EnemyController : MonoBehaviour
         sr = GetComponent<SpriteRenderer>();
         sr.sprite = dataofenemy.enemyStayAnimationSprites[0];
         isInCoolTime = false;
+        isDamaged = false;
+        canBeDamaged = true;
+        canBeRemoved = false;
     }
     void Update()
     {
@@ -68,6 +74,7 @@ public class EnemyController : MonoBehaviour
         //被弾、死亡処理
         //アニメーション処理
         ChangeSprite();
+        Dead();
     }
 
     //関数
@@ -262,6 +269,33 @@ public class EnemyController : MonoBehaviour
             {
                 viewTimeStaySprite += Time.deltaTime;
             }
+        }
+        else if(EnemyCurrentStatus == EnemyStatusBox.Dead)//被弾アニメーション
+        {
+            if(viewDeadSpriteNumber < dataofenemy.enemyDeadAnimationSprites.Length - 1)
+            {
+                if(viewTimeDeadSprite >= dataofenemy.enemyChangeDeadSpritesInterval)
+                {
+                    viewDeadSpriteNumber ++;
+                    viewTimeDeadSprite = 0f;
+                }
+                else
+                {
+                    viewTimeDeadSprite += Time.deltaTime;
+                }
+                sr.sprite = dataofenemy.enemyDeadAnimationSprites[viewDeadSpriteNumber];
+            }
+            else if(viewDeadSpriteNumber == dataofenemy.enemyDeadAnimationSprites.Length - 1)
+            {
+                canBeRemoved = true;
+            }
+        }
+    }
+    void Dead()
+    {
+        if (canBeRemoved)
+        {
+            gameObject.SetActive(false);
         }
     }
 }

@@ -18,8 +18,10 @@ public class EnemyData : MonoBehaviour
     public float enemyChangeAttackSpritesInterval;
     public float enemyChangeStaySpritesInterval;
     public float enemyChangeHurtSpritesInterval;
+    public float enemyChangeDeadSpritesInterval;
     public Sprite[] enemyMoveAnimationSprites;
     public Sprite[] enemyAttackAnimationSprites;
     public Sprite[] enemyStayAnimationSprites;
     public Sprite[] enemyHurtAnimationSprites;
+    public Sprite[] enemyDeadAnimationSprites;
 }
