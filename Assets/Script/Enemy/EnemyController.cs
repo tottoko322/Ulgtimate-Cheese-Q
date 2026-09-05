@@ -29,9 +29,11 @@ public class EnemyController : MonoBehaviour
     private int viewMoveSpriteNumber;
     private int viewAttackSpriteNumber;
     private int viewStaySpriteNumber;
+    private int viewHurtSpriteNumber;
     private float viewTimeMoveSprite;
     private float viewTimeAttackSprite;
     private float viewTimeStaySprite;
+    private float viewTimeHurtSprite;
     private SpriteRenderer sr;
 
     //攻撃用
@@ -67,7 +69,7 @@ public class EnemyController : MonoBehaviour
         //アニメーション処理
         ChangeSprite();
     }
-    
+
     //関数
     void CheckDistance()
     {
@@ -223,6 +225,22 @@ public class EnemyController : MonoBehaviour
                     viewTimeAttackSprite += Time.deltaTime;
                 }
                 sr.sprite = dataofenemy.enemyAttackAnimationSprites[viewAttackSpriteNumber];
+            }
+        }
+        else if(EnemyCurrentStatus == EnemyStatusBox.Hurt)//被弾アニメーション
+        {
+            if(viewHurtSpriteNumber < dataofenemy.enemyHurtAnimationSprites.Length - 1)
+            {
+                if(viewTimeHurtSprite >= dataofenemy.enemyChangeHurtSpritesInterval)
+                {
+                    viewHurtSpriteNumber ++;
+                    viewTimeHurtSprite = 0f;
+                }
+                else
+                {
+                    viewTimeHurtSprite += Time.deltaTime;
+                }
+                sr.sprite = dataofenemy.enemyHurtAnimationSprites[viewHurtSpriteNumber];
             }
         }
         else if(EnemyCurrentStatus == EnemyStatusBox.Stay)//待機アニメーション
