@@ -101,7 +101,7 @@ public class EnemyController : MonoBehaviour
                 {
                     EnemyCurrentStatus = EnemyStatusBox.Attack;
                     isInCoolTime = true;
-                    //passTimeAfterAttackの初期化
+                    passTimeAfterAttack = 0f;
                 }
                 else
                 {
@@ -163,7 +163,7 @@ public class EnemyController : MonoBehaviour
             currentHP -= damage;
             isDamaged = false;
             canBeDamaged = false;
-            //passTimeAfterHurtの初期化
+            passTimeAfterHurt = 0f;
             if(currentHP <= 0f)
             {
                 EnemyCurrentStatus = EnemyStatusBox.Dead;
