@@ -64,6 +64,7 @@ public class EnemyController : MonoBehaviour
     }
     void Update()
     {
+        Damage();
         //硬直やクールタイムなどの時間管理
         CheckTime();
         //被弾検知、

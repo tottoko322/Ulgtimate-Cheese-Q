@@ -275,6 +275,7 @@ MonoBehaviour:
   damagesystem: {fileID: 0}
   playertransform: {fileID: 1202132498}
   isDamaged: 0
+  currentHP: 0
 --- !u!114 &443669135
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -294,10 +295,14 @@ MonoBehaviour:
   enemyChaseRange: 10
   enemyAttackRange: 3
   enemyCooltime: 7
-  enemyFixedTime: 3
+  enemyFixedTimeAttack: 5
+  enemyFixedTimeHurt: 5
+  enemyNondamageTime: 5
   enemyChangeMoveSpritesInterval: 0.5
   enemyChangeAttackSpritesInterval: 0.5
   enemyChangeStaySpritesInterval: 0.5
+  enemyChangeHurtSpritesInterval: 0.5
+  enemyChangeDeadSpritesInterval: 0.5
   enemyMoveAnimationSprites:
   - {fileID: 21300000, guid: 99c6d2a9cb0e3584e8837185d0d40ec1, type: 3}
   - {fileID: 21300000, guid: bc4df35a3b8d6f140a72f26bd8d7acb7, type: 3}
@@ -306,6 +311,11 @@ MonoBehaviour:
   - {fileID: -2897055423673852335, guid: 8a896f39ee028bb499b9d8d122778584, type: 3}
   enemyStayAnimationSprites:
   - {fileID: 21300000, guid: 99c6d2a9cb0e3584e8837185d0d40ec1, type: 3}
+  enemyHurtAnimationSprites:
+  - {fileID: 21300000, guid: 855f717a7812e004c8c0c1dba9e2a4b6, type: 3}
+  - {fileID: 21300000, guid: 2e1e5636886d4b44bae714b2c7757356, type: 3}
+  enemyDeadAnimationSprites:
+  - {fileID: 21300000, guid: 08a7b04f8efb1ce499e65f2735d91a9d, type: 3}
 --- !u!212 &443669136
 SpriteRenderer:
   serializedVersion: 2
