@@ -1,5 +1,6 @@
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class EnemyController : MonoBehaviour
 {
@@ -46,7 +47,7 @@ public class EnemyController : MonoBehaviour
     public bool isDamaged;
     private bool canBeDamaged;
     private float damage;
-    private float currentHP;
+    [SerializeField] private float currentHP;
     private float passTimeAfterHurt;
     private bool canBeRemoved;
 
@@ -59,6 +60,7 @@ public class EnemyController : MonoBehaviour
         isDamaged = false;
         canBeDamaged = true;
         canBeRemoved = false;
+        currentHP = dataofenemy.enemyHp;
     }
     void Update()
     {
@@ -296,6 +298,16 @@ public class EnemyController : MonoBehaviour
         if (canBeRemoved)
         {
             gameObject.SetActive(false);
+        }
+    }
+
+    //debug用
+    void Damage()
+    {
+        if (Keyboard.current.aKey.isPressed)
+        {
+            isDamaged = true;
+            damage = 10f;
         }
     }
 }
