@@ -13,14 +13,18 @@ public class EnemyController : MonoBehaviour
         Dead
     }
     private EnemyStatusBox EnemyCurrentStatus = EnemyStatusBox.Stay;
+
     //Data取得
     [SerializeField] EnemyData dataofenemy;
     [SerializeField] Damageable damagesystem;
+
     //索敵用
     private float distanceX;
     private float distanceY;
+
     //移動用
     [SerializeField] Transform playertransform;
+
     //アニメーション用
     private int viewMoveSpriteNumber;
     private int viewAttackSpriteNumber;
@@ -29,15 +33,18 @@ public class EnemyController : MonoBehaviour
     private float viewTimeAttackSprite;
     private float viewTimeStaySprite;
     private SpriteRenderer sr;
+
     //攻撃用
     private bool isInCoolTime;
     private float passTimeAfterAttack;
+
     //被弾、死亡用
     public bool isDamaged;
     private bool canBeDamaged;
     private float damage;
     private float currentHP;
     private float passTimeAfterHurt;
+
     //処理
     void Start()
     {
@@ -60,6 +67,7 @@ public class EnemyController : MonoBehaviour
         //アニメーション処理
         ChangeSprite();
     }
+    
     //関数
     void CheckDistance()
     {
