@@ -36,6 +36,7 @@ public class EnemyController : MonoBehaviour
     public bool isDamaged;
     private float damage;
     private float currentHP;
+    private float passTimeAfterHurt;
     //処理
     void Start()
     {
@@ -45,6 +46,9 @@ public class EnemyController : MonoBehaviour
     }
     void Update()
     {
+        //硬直やクールタイムなどの時間管理
+        CheckTime();
+        //被弾検知、
         CheckDamage();
         //索敵範囲内かの判定
         CheckDistance();
@@ -54,7 +58,6 @@ public class EnemyController : MonoBehaviour
         //被弾、死亡処理
         //アニメーション処理
         ChangeSprite();
-        CheckTime();
     }
     //関数
     void CheckDistance()
@@ -90,10 +93,10 @@ public class EnemyController : MonoBehaviour
     }
     void CheckTime()
     {
-        if(isInCoolTime)
+        if(isInCoolTime)//硬直やクールタイムがアニメーションの表示時間より短い場合のでバックログを追加予定
         {
             passTimeAfterAttack += Time.deltaTime;
-            if(EnemyCurrentStatus == EnemyStatusBox.Attack && passTimeAfterAttack > dataofenemy.enemyFixedTime)
+            if(EnemyCurrentStatus == EnemyStatusBox.Attack && passTimeAfterAttack > dataofenemy.enemyFixedTimeAttack)
             {
                 EnemyCurrentStatus = EnemyStatusBox.Chase;
             }
@@ -102,6 +105,15 @@ public class EnemyController : MonoBehaviour
                 isInCoolTime = false;
                 passTimeAfterAttack = 0f;
                 viewAttackSpriteNumber = 0;
+            }
+        }
+        if(EnemyCurrentStatus == EnemyStatusBox.Hurt)
+        {
+            passTimeAfterHurt += Time.deltaTime;
+            if(passTimeAfterHurt >= dataofenemy.enemyFixedTimeHurt)
+            {
+                EnemyCurrentStatus = EnemyStatusBox.Stay;
+                passTimeAfterHurt = 0f;
             }
         }
     }

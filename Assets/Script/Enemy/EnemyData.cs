@@ -10,7 +10,8 @@ public class EnemyData : MonoBehaviour
     public float enemyChaseRange;
     public float enemyAttackRange;
     public float enemyCooltime;
-    public float enemyFixedTime;
+    public float enemyFixedTimeAttack;
+    public float enemyFixedTimeHurt;
     //アニメーション設定
     public float enemyChangeMoveSpritesInterval;
     public float enemyChangeAttackSpritesInterval;
