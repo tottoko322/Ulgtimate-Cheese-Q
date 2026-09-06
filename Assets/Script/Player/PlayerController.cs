@@ -7,7 +7,8 @@ public class PlayerController : MonoBehaviour
     { 
         Grounded,
         Airborne,
-        WallCling
+        WallCling,
+        ClimbingLedge
     } 
 
     public LocomotionState CurrentLocomotionState { get; private set; } = LocomotionState.Grounded;
@@ -21,6 +22,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float maxJumpHoldTime = 0.2f;
     [SerializeField] private float jumpHoldForce = 5f;
     private float jumpHoldTimer = 0f;
+    private float ledgeJumpTimer = 0f;
 
     [Header("Air Movement")]
     [SerializeField] private float airMoveSpeed = 6f; 
@@ -35,6 +37,13 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float wallDetachForce = 6f;
     [SerializeField] private LayerMask climbableWallLayer;
 
+    [Header("Ledge Climb")] 
+    [SerializeField] private float ledgeClimbUpSpeed; 
+    [SerializeField] private float ledgeClimbForwardSpeed;
+    [SerializeField] private float ledgeClimbDuration;
+
+    private int wallDirection = 0;
+
     private Vector2 moveInput;
 
     private bool jumpPressed = false;
@@ -42,9 +51,12 @@ public class PlayerController : MonoBehaviour
     private bool jumpHeld = false;
     private bool hasUsedAirJump = false;
     private bool isFastFalling = false;
+    private bool isAtLedge = false;
 
     private bool isGrounded = false;
-    private bool isTouchingWall = false;
+    private bool isRightTouchingWall = false;
+    private bool isLeftTouchingWall = false;
+    private bool canLedgeJump = false;
 
     [SerializeField] private LayerMask groundLayer;
     private Rigidbody2D rb;
@@ -74,6 +86,9 @@ public class PlayerController : MonoBehaviour
         EnterWallCling();
         HandleWallMovement();
         DetachFromWall();
+        StartLedgeClimb();
+        HandleLedgeClimb();
+        CompleteLedgeClimb();
     }
 
     private void ReadInput() //入力取得
@@ -142,8 +157,11 @@ public class PlayerController : MonoBehaviour
         RaycastHit2D bottomLeftHit = Physics2D.Raycast(bottomLeftRayOrigin, Vector2.left, 0.1f, climbableWallLayer); //左下から左へ
         RaycastHit2D bottomRightHit = Physics2D.Raycast(bottomRightRayOrigin, Vector2.right, 0.1f, climbableWallLayer); //右下から右へ
 
-        isTouchingWall = (topLeftHit.collider != null && bottomLeftHit.collider != null) || (topRightHit.collider != null && bottomRightHit.collider != null);
-        //右または左の2本が壁に当たると、isTouchingWallをtrueへ
+        isRightTouchingWall = (topRightHit.collider != null || bottomRightHit.collider != null);
+        isLeftTouchingWall = (topLeftHit.collider != null || bottomLeftHit.collider != null);
+
+        isAtLedge = ((topLeftHit.collider == null && bottomLeftHit.collider != null) || (topRightHit.collider == null && bottomRightHit.collider != null));
+        //上端が壁に当たっていないかつ下端が壁に当たっているならば、壁上端
     }
 
     private void UpdateLocomotionState() //足場状態更新
@@ -154,13 +172,18 @@ public class PlayerController : MonoBehaviour
             hasUsedAirJump = false; //空中ジャンプの復活
             isFastFalling = false; //急降下の復活
         }
-        else if (isTouchingWall) //isTouchingWallがtrueならば足場状態WallClingへ
+        else if (isRightTouchingWall || isLeftTouchingWall) //isTouchingWallがtrueならば足場状態WallClingへ
         {
             CurrentLocomotionState = LocomotionState.WallCling;
         }
         else //isGrounded,isTouchingWallがfalseならば足場状態Airborneへ
         {
             CurrentLocomotionState = LocomotionState.Airborne;
+        }
+        
+        if (canLedgeJump)
+        {
+            CurrentLocomotionState = LocomotionState.ClimbingLedge;
         }
     }
 
@@ -257,6 +280,15 @@ public class PlayerController : MonoBehaviour
             rb.gravityScale = 0f;
             hasUsedAirJump = false; //空中ジャンプ回復
             isFastFalling = false; //急降下回復
+
+            if (isRightTouchingWall) //右の壁なら1
+            {
+                wallDirection = 1;
+            }
+            if (isLeftTouchingWall) //左の壁なら-1
+            {
+                wallDirection = -1;
+            }
         }
         else
         {
@@ -279,6 +311,41 @@ public class PlayerController : MonoBehaviour
         {
             float velocityX = moveInput.x * wallDetachForce;
             rb.linearVelocity = new Vector2(velocityX, rb.linearVelocity.y); //x方向に速度velocityX,y方向の速度はそのまま
+        }
+    }
+
+    private void StartLedgeClimb() //ClimbongLedgeへ状態変化
+    {
+        if (CurrentLocomotionState == LocomotionState.WallCling && isAtLedge && moveInput.y >= 0)
+        {
+            canLedgeJump = true;
+        }
+    }
+
+    private void HandleLedgeClimb() //よじ登り小ジャンプ
+    {
+        if (CurrentLocomotionState == LocomotionState.ClimbingLedge)
+        {
+            Debug.Log("ClimbingLedge");
+            ledgeJumpTimer += Time.fixedDeltaTime;
+ 
+            if (ledgeJumpTimer < 0.3) //ledgeJumpTimerまで上方向に上昇
+            {
+                rb.linearVelocity = new Vector2(0f, ledgeClimbUpSpeed);
+            }
+            else //それ以降は壁の反対側に移動
+            {
+                rb.linearVelocity = new Vector2(wallDirection * ledgeClimbForwardSpeed, rb.linearVelocity.y);
+            }
+        }
+    }
+
+    private void CompleteLedgeClimb()
+    {
+        if (isGrounded)
+        {
+            canLedgeJump = false; //壁よじ登りの終わり
+            ledgeJumpTimer = 0f; //壁よじ登りのタイマー0へ
         }
     }
 }

@@ -271,7 +271,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CameraController
   Player: {fileID: 1745922059}
   horizontalLookAhead: 3
-  verticalLookAhead: 3
+  verticalLookAhead: 2
   cameraMoveSpeed: 0.3
 --- !u!1 &64982309
 GameObject:
