@@ -40,7 +40,12 @@ public class PlayerController : MonoBehaviour
     [Header("Ledge Climb")] 
     [SerializeField] private float ledgeClimbUpSpeed; 
     [SerializeField] private float ledgeClimbForwardSpeed;
-    [SerializeField] private float ledgeClimbDuration;
+    private float ledgeClimbDuration;
+
+    [Header("Ledge Jump")] 
+    [SerializeField] private float ledgeJumpPower;
+    [SerializeField] private float ledgeJumpHorizontalPower;
+    [SerializeField] private float ledgeJumpInputWindow; //ledgejumpの受け入れ時間
 
     private int wallDirection = 0;
 
@@ -56,7 +61,8 @@ public class PlayerController : MonoBehaviour
     private bool isGrounded = false;
     private bool isRightTouchingWall = false;
     private bool isLeftTouchingWall = false;
-    private bool canLedgeJump = false;
+    private bool canLedgeClimb = false;
+    private bool hasLedgeJumped = false;
 
     [SerializeField] private LayerMask groundLayer;
     private Rigidbody2D rb;
@@ -89,6 +95,7 @@ public class PlayerController : MonoBehaviour
         StartLedgeClimb();
         HandleLedgeClimb();
         CompleteLedgeClimb();
+        StartLedgeJump();
     }
 
     private void ReadInput() //入力取得
@@ -113,7 +120,7 @@ public class PlayerController : MonoBehaviour
         }
 
         //ジャンプの入力
-        if (CurrentLocomotionState == LocomotionState.Grounded || CurrentLocomotionState == LocomotionState.Airborne)
+        if (CurrentLocomotionState == LocomotionState.Grounded || CurrentLocomotionState == LocomotionState.Airborne || CurrentLocomotionState == LocomotionState.ClimbingLedge)
         {
             if (Keyboard.current.wKey.wasPressedThisFrame)
             {
@@ -180,10 +187,15 @@ public class PlayerController : MonoBehaviour
         {
             CurrentLocomotionState = LocomotionState.Airborne;
         }
-        
-        if (canLedgeJump)
+
+        if (canLedgeClimb)
         {
             CurrentLocomotionState = LocomotionState.ClimbingLedge;
+        }
+        if (hasLedgeJumped)
+        {
+            CurrentLocomotionState = LocomotionState.Airborne;
+            hasLedgeJumped = false;
         }
     }
 
@@ -237,6 +249,8 @@ public class PlayerController : MonoBehaviour
                         jumpHoldTimer = 0f;
                         jumpPressed = false;
                         hasUsedAirJump = true;
+
+                        ledgeJumpTimer = 0f; //
                         break;
                     }
                     else //それ以降
@@ -318,22 +332,26 @@ public class PlayerController : MonoBehaviour
     {
         if (CurrentLocomotionState == LocomotionState.WallCling && isAtLedge && moveInput.y >= 0)
         {
-            canLedgeJump = true;
+            canLedgeClimb = true;
         }
     }
 
     private void HandleLedgeClimb() //よじ登り小ジャンプ
     {
+        if (hasLedgeJumped)
+        {
+            return;
+        }
+
         if (CurrentLocomotionState == LocomotionState.ClimbingLedge)
         {
-            Debug.Log("ClimbingLedge");
-            ledgeJumpTimer += Time.fixedDeltaTime;
+            ledgeClimbDuration += Time.fixedDeltaTime; //上方向に速度を加える時間のタイマー
  
-            if (ledgeJumpTimer < 0.3) //ledgeJumpTimerまで上方向に上昇
+            if (ledgeClimbDuration < 0.3) //ある一定時間まで上方向に上昇
             {
                 rb.linearVelocity = new Vector2(0f, ledgeClimbUpSpeed);
             }
-            else //それ以降は壁の反対側に移動
+            else //それ以降は壁側に移動
             {
                 rb.linearVelocity = new Vector2(wallDirection * ledgeClimbForwardSpeed, rb.linearVelocity.y);
             }
@@ -344,8 +362,33 @@ public class PlayerController : MonoBehaviour
     {
         if (isGrounded)
         {
-            canLedgeJump = false; //壁よじ登りの終わり
-            ledgeJumpTimer = 0f; //壁よじ登りのタイマー0へ
+            canLedgeClimb = false; //壁よじ登りの終わり
+            hasLedgeJumped = false; //ledgejumpの回復
+            ledgeClimbDuration = 0f; //壁よじ登りのタイマー0へ
+        }
+    }
+
+    private void StartLedgeJump()
+    {
+        if (CurrentLocomotionState == LocomotionState.ClimbingLedge)
+        {
+            ledgeJumpTimer += Time.fixedDeltaTime;
+        }
+
+        if (0.3f < ledgeJumpTimer && ledgeJumpTimer < ledgeJumpInputWindow && jumpPressed)
+        {
+            rb.linearVelocity = new Vector2(-wallDirection * ledgeJumpHorizontalPower, ledgeJumpPower);
+
+            hasLedgeJumped = true;
+            canLedgeClimb = false;
+
+            ledgeClimbDuration = 0f;
+            ledgeJumpTimer = 0f;
+
+            //通常ジャンプをした後と同じ状況にする
+            jumpReleased = false;
+            jumpPressed = false;
+            jumpHeld = false;
         }
     }
 }
