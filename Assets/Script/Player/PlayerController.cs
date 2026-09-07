@@ -40,6 +40,7 @@ public class PlayerController : MonoBehaviour
     [Header("Ledge Climb")] 
     [SerializeField] private float ledgeClimbUpSpeed; 
     [SerializeField] private float ledgeClimbForwardSpeed;
+    [SerializeField] private float ledgeClimbFallPower;
     private float ledgeClimbDuration;
 
     [Header("Ledge Jump")] 
@@ -96,6 +97,7 @@ public class PlayerController : MonoBehaviour
         HandleLedgeClimb();
         CompleteLedgeClimb();
         StartLedgeJump();
+        Debug.Log(CurrentLocomotionState);
     }
 
     private void ReadInput() //入力取得
@@ -173,7 +175,7 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateLocomotionState() //足場状態更新
     {
-        if (isGrounded) //isGroundedがtrueならば足場状態Groundedへ
+        if (isGrounded) //接地ならば足場状態Groundedへ
         {
             CurrentLocomotionState = LocomotionState.Grounded;
             hasUsedAirJump = false; //空中ジャンプの復活
@@ -263,14 +265,14 @@ public class PlayerController : MonoBehaviour
 
             if (jumpReleased) //wキーを離すと
             {
-                if (rb.linearVelocity.y > 0) //y方向の速度が正なら
+                if (rb.linearVelocity.y > 0)
                 {
                     rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * 0.4f); //y方向の速度0.4倍
                 }
                 jumpReleased = false;
             }
 
-            if (jumpHeld && jumpHoldTimer < maxJumpHoldTime) //高さ調節
+            if (jumpHeld && jumpHoldTimer < maxJumpHoldTime && rb.linearVelocity.y > 0) //高さ調節
             {
                 rb.AddForce(Vector2.up * jumpHoldForce, ForceMode2D.Force);
                 jumpHoldTimer += Time.fixedDeltaTime;
@@ -304,6 +306,10 @@ public class PlayerController : MonoBehaviour
                 wallDirection = -1;
             }
         }
+        else if (CurrentLocomotionState == LocomotionState.ClimbingLedge)
+        {
+            rb.gravityScale = 0f;
+        }
         else
         {
             rb.gravityScale = 1f;
@@ -330,7 +336,7 @@ public class PlayerController : MonoBehaviour
 
     private void StartLedgeClimb() //ClimbongLedgeへ状態変化
     {
-        if (CurrentLocomotionState == LocomotionState.WallCling && isAtLedge && moveInput.y >= 0)
+        if (CurrentLocomotionState == LocomotionState.WallCling && isAtLedge && moveInput.y > 0)
         {
             canLedgeClimb = true;
         }
@@ -347,13 +353,17 @@ public class PlayerController : MonoBehaviour
         {
             ledgeClimbDuration += Time.fixedDeltaTime; //上方向に速度を加える時間のタイマー
  
-            if (ledgeClimbDuration < 0.3) //ある一定時間まで上方向に上昇
+            if (ledgeClimbDuration < 0.2) //ある一定時間まで上方向に上昇
             {
                 rb.linearVelocity = new Vector2(0f, ledgeClimbUpSpeed);
             }
-            else //それ以降は壁側に移動
+            else if (0.2 <= ledgeClimbDuration && ledgeClimbDuration < 0.4)
             {
                 rb.linearVelocity = new Vector2(wallDirection * ledgeClimbForwardSpeed, rb.linearVelocity.y);
+            }
+            else
+            {
+                rb.linearVelocity = new Vector2(wallDirection * ledgeClimbForwardSpeed, -ledgeClimbFallPower);
             }
         }
     }
