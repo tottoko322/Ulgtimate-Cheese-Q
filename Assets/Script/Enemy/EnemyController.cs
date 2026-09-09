@@ -92,10 +92,6 @@ public class EnemyController : MonoBehaviour
                 EnemyCurrentStatus = EnemyStatusBox.Chase;
             }
         }
-        else if(distanceX*distanceX + distanceY*distanceY > dataofenemy.enemyChaseRange*dataofenemy.enemyChaseRange)//追跡範囲内か
-        {
-            EnemyCurrentStatus = EnemyStatusBox.Stay;
-        }
         if(EnemyCurrentStatus == EnemyStatusBox.Chase)
         {
             if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemyAttackRange*dataofenemy.enemyAttackRange)
@@ -110,6 +106,10 @@ public class EnemyController : MonoBehaviour
                 {
                     EnemyCurrentStatus = EnemyStatusBox.Stay;
                 }
+            }
+            else if(distanceX*distanceX + distanceY*distanceY > dataofenemy.enemyChaseRange*dataofenemy.enemyChaseRange)//追跡範囲内か
+            {
+                EnemyCurrentStatus = EnemyStatusBox.Stay;
             }
         }
     }
