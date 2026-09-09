@@ -116,7 +116,7 @@ public class EnemyController : MonoBehaviour
             passTimeAfterAttack += Time.deltaTime;
             if(EnemyCurrentStatus == EnemyStatusBox.Attack && passTimeAfterAttack > dataofenemy.enemyFixedTimeAttack)
             {
-                EnemyCurrentStatus = EnemyStatusBox.Chase;
+                EnemyCurrentStatus = EnemyStatusBox.Stay;
             }
             if(passTimeAfterAttack >= dataofenemy.enemyCooltime)
             {
