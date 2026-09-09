@@ -102,10 +102,6 @@ public class EnemyController : MonoBehaviour
                     isInCoolTime = true;
                     passTimeAfterAttack = 0f;
                 }
-                else
-                {
-                    EnemyCurrentStatus = EnemyStatusBox.Stay;
-                }
             }
             else if(distanceX*distanceX + distanceY*distanceY > dataofenemy.enemyChaseRange*dataofenemy.enemyChaseRange)//追跡範囲内か
             {
