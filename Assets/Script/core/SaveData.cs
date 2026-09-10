@@ -1,16 +1,21 @@
 using UnityEngine;
 
-public class SaveData : MonoBehaviour
+[System.Serializable]
+public class SaveData
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    public bool tutorialCleared;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public bool portUnlocked;
+    public bool portBossCleared;
+
+    public bool gakkenUnlocked;
+    public bool gakkenBossCleared;
+
+    public bool undergroundUnlocked;
+    public bool undergroundBossCleared;
+
+    public bool finalBossUnlocked;
+    public bool finalBossCleared;
+
+    public bool bossRushUnlocked;
 }
