@@ -272,7 +272,7 @@ MonoBehaviour:
   Player: {fileID: 1745922059}
   horizontalLookAhead: 3
   verticalLookAhead: 2
-  cameraMoveSpeed: 0.3
+  cameraSmoothTime: 0.3
 --- !u!1 &64982309
 GameObject:
   m_ObjectHideFlags: 0
@@ -544,7 +544,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -4.01, y: 2.38, z: 0}
-  m_LocalScale: {x: 5, y: 0.154, z: 1}
+  m_LocalScale: {x: 5, y: 0.2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -986,7 +986,7 @@ Transform:
   m_GameObject: {fileID: 1745922055}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.07, y: -3.62, z: 0}
+  m_LocalPosition: {x: 2.65, y: -3.63, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1008,20 +1008,22 @@ MonoBehaviour:
   jumpPower: 5
   airJumpPower: 5
   maxJumpHoldTime: 0.2
-  jumpHoldForce: 2
+  jumpHoldForce: 15
   airMoveSpeed: 6
   airAcceleration: 30
   airDeceleration: 5
-  fastFallSpeed: 10
+  fastFallSpeed: 4
   wallMoveSpeed: 6
   wallDetachForce: 6
+  wallKickForce: 6
   climbableWallLayer:
     serializedVersion: 2
     m_Bits: 64
-  ledgeClimbUpSpeed: 4
+  ledgeClimbUpSpeed: 5
   ledgeClimbForwardSpeed: 3
-  ledgeJumpPower: 8
-  ledgeJumpHorizontalPower: 5
+  ledgeClimbFallPower: 3
+  ledgeJumpPower: 6
+  ledgeJumpHorizontalPower: 6
   ledgeJumpInputWindow: 2
   groundLayer:
     serializedVersion: 2

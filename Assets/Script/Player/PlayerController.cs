@@ -307,10 +307,6 @@ public class PlayerController : MonoBehaviour
                 wallDirection = -1;
             }
         }
-        else if (CurrentLocomotionState == LocomotionState.ClimbingLedge)
-        {
-            rb.gravityScale = 0f;
-        }
         else
         {
             rb.gravityScale = 1f;
@@ -360,17 +356,13 @@ public class PlayerController : MonoBehaviour
         {
             ledgeClimbDuration += Time.fixedDeltaTime; //上方向に速度を加える時間のタイマー
  
-            if (ledgeClimbDuration < 0.2) //ある一定時間まで上方向に上昇
+            if (ledgeClimbDuration < 0.25) //ある一定時間まで上方向に上昇
             {
                 rb.linearVelocity = new Vector2(0f, ledgeClimbUpSpeed);
             }
-            else if (0.2 <= ledgeClimbDuration && ledgeClimbDuration < 0.4)
+            else if (0.25 <= ledgeClimbDuration && ledgeClimbDuration < 0.4)
             {
                 rb.linearVelocity = new Vector2(wallDirection * ledgeClimbForwardSpeed, rb.linearVelocity.y);
-            }
-            else
-            {
-                rb.linearVelocity = new Vector2(wallDirection * ledgeClimbForwardSpeed, -ledgeClimbFallPower);
             }
         }
     }
