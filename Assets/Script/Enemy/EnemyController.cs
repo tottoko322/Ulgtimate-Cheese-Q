@@ -78,7 +78,6 @@ public class EnemyController : MonoBehaviour
         //追跡処理
         ChasePlayer();
         //攻撃処理
-        //被弾、死亡処理
         //アニメーション処理
         ChangeSprite();
         Dead();
