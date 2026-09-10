@@ -1,4 +1,3 @@
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -15,16 +14,19 @@ public class EnemyController : MonoBehaviour
     }
     private EnemyStatusBox EnemyCurrentStatus = EnemyStatusBox.Stay;
 
-    //Data取得
+    //Data,Component取得
     [SerializeField] EnemyData dataofenemy;
     [SerializeField] Damageable damagesystem;
+    [SerializeField] Transform playertransform;
+    private Rigidbody2D enemyrb;
+    private SpriteRenderer sr;
 
     //索敵用
     private float distanceX;
     private float distanceY;
 
     //移動用
-    [SerializeField] Transform playertransform;
+    
 
     //アニメーション用
     private int viewMoveSpriteNumber;
@@ -37,7 +39,7 @@ public class EnemyController : MonoBehaviour
     private float viewTimeStaySprite;
     private float viewTimeHurtSprite;
     private float viewTimeDeadSprite;
-    private SpriteRenderer sr;
+    
 
     //攻撃用
     private bool isInCoolTime;
@@ -47,9 +49,11 @@ public class EnemyController : MonoBehaviour
     public bool isDamaged;
     private bool canBeDamaged;
     private float damage;
+    private Vector2 knockBack;
     [SerializeField] private float currentHP;
     private float passTimeAfterHurt;
     private bool canBeRemoved;
+    private bool canKnockBack;
 
     //処理
     void Start()
@@ -78,6 +82,10 @@ public class EnemyController : MonoBehaviour
         //アニメーション処理
         ChangeSprite();
         Dead();
+    }
+    void FixedUpdate()
+    {
+        KnockBack();
     }
 
     //関数
@@ -162,6 +170,7 @@ public class EnemyController : MonoBehaviour
             currentHP -= damage;
             isDamaged = false;
             canBeDamaged = false;
+            canKnockBack = true;
             passTimeAfterHurt = 0f;
             viewHurtSpriteNumber = 0;
             viewTimeHurtSprite = 0f;
@@ -290,6 +299,13 @@ public class EnemyController : MonoBehaviour
             {
                 canBeRemoved = true;
             }
+        }
+    }
+    void KnockBack()
+    {
+        if (canKnockBack)
+        {
+            enemyrb.AddForce(knockBack,ForceMode2D.Impulse);
         }
     }
     void Dead()
