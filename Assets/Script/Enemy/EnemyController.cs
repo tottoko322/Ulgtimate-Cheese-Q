@@ -15,6 +15,7 @@ public class EnemyController : MonoBehaviour
     private EnemyStatusBox EnemyCurrentStatus = EnemyStatusBox.Stay;
 
     //Data,Component取得
+    [Header("Component取得")]
     [SerializeField] EnemyData dataofenemy;
     [SerializeField] Damageable damagesystem;
     [SerializeField] Transform playertransform;
