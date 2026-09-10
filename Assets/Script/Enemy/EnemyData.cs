@@ -3,6 +3,7 @@ using UnityEngine;
 public class EnemyData : MonoBehaviour
 {
     //能力値
+    [Header("能力値")]
     public float enemyHp;
     public float enemyAttack;
     public float enemySpeed;
@@ -14,6 +15,7 @@ public class EnemyData : MonoBehaviour
     public float enemyFixedTimeHurt;
     public float enemyNondamageTime;
     //アニメーション設定
+    [Header("アニメーション設定")]
     public float enemyChangeMoveSpritesInterval;
     public float enemyChangeAttackSpritesInterval;
     public float enemyChangeStaySpritesInterval;
