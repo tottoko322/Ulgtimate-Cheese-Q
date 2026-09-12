@@ -274,6 +274,7 @@ MonoBehaviour:
   dataofenemy: {fileID: 443669135}
   damagesystem: {fileID: 0}
   playertransform: {fileID: 1202132498}
+  enemyrb: {fileID: 443669133}
   isDamaged: 0
   currentHP: 0
 --- !u!114 &443669135
@@ -290,6 +291,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   enemyHp: 100
   enemyAttack: 1
+  enemyGiveKnockBack: 1
   enemySpeed: 1
   enemySearchRange: 7
   enemyChaseRange: 10
@@ -316,6 +318,10 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 2e1e5636886d4b44bae714b2c7757356, type: 3}
   enemyDeadAnimationSprites:
   - {fileID: 21300000, guid: 08a7b04f8efb1ce499e65f2735d91a9d, type: 3}
+  enemyAttackActionForce:
+  - {x: 0, y: 1}
+  enemyAttackActionInterval:
+  - 1
 --- !u!212 &443669136
 SpriteRenderer:
   serializedVersion: 2

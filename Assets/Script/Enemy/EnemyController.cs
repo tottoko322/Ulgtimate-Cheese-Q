@@ -19,7 +19,7 @@ public class EnemyController : MonoBehaviour
     [SerializeField] EnemyData dataofenemy;
     [SerializeField] Damageable damagesystem;
     [SerializeField] Transform playertransform;
-    private Rigidbody2D enemyrb;
+    [SerializeField] private Rigidbody2D enemyrb;
     private SpriteRenderer sr;
 
     //索敵用
@@ -305,7 +305,7 @@ public class EnemyController : MonoBehaviour
     void AttackAction()
     {
 
-        if(EnemyCurrentStatus == EnemyStatusBox.Attack)
+        if(EnemyCurrentStatus == EnemyStatusBox.Attack && attackActionPhase < dataofenemy.enemyAttackActionInterval.Length - 1)
         {
             if(attackActionPhase == -1)
             {
