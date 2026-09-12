@@ -6,6 +6,7 @@ public class EnemyData : MonoBehaviour
     [Header("能力値")]
     public float enemyHp;
     public float enemyAttack;
+    public float enemyGiveKnockBack;
     public float enemySpeed;
     public float enemySearchRange;
     public float enemyChaseRange;
