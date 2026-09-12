@@ -185,20 +185,6 @@ public class EnemyController : MonoBehaviour
             isDamaged = false;
         }
     }
-    void ChasePlayer()
-    {
-        if(EnemyCurrentStatus == EnemyStatusBox.Chase)
-        {
-            if(distanceX < 0f)
-            {
-                enemyrb.linearVelocityX = -dataofenemy.enemySpeed;//左向き
-            }
-            else if(distanceX > 0f)
-            {
-                enemyrb.linearVelocityX = dataofenemy.enemySpeed;//右向き
-            }
-        }
-    }
     void ChangeSprite()
     {
         if(EnemyCurrentStatus == EnemyStatusBox.Chase)//追跡アニメーション
@@ -299,6 +285,20 @@ public class EnemyController : MonoBehaviour
             else if(viewDeadSpriteNumber == dataofenemy.enemyDeadAnimationSprites.Length - 1)
             {
                 canBeRemoved = true;
+            }
+        }
+    }
+    void ChasePlayer()
+    {
+        if(EnemyCurrentStatus == EnemyStatusBox.Chase)
+        {
+            if(distanceX < 0f)
+            {
+                enemyrb.linearVelocityX = -dataofenemy.enemySpeed;//左向き
+            }
+            else if(distanceX > 0f)
+            {
+                enemyrb.linearVelocityX = dataofenemy.enemySpeed;//右向き
             }
         }
     }
