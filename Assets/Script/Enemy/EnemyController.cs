@@ -56,7 +56,7 @@ public class EnemyController : MonoBehaviour
     private float passTimeAfterHurtFixed;
     private float passTimeAfterHurtNonDamage;
     private bool canBeRemoved;
-    private bool canKnockBack;
+    private bool isInKnockBack;
 
     //処理
     void Start()
@@ -67,6 +67,7 @@ public class EnemyController : MonoBehaviour
         isDamaged = false;
         canBeDamaged = true;
         canBeRemoved = false;
+        isInKnockBack = false;
         currentHP = dataofenemy.enemyHp;
     }
     void Update()
@@ -164,7 +165,7 @@ public class EnemyController : MonoBehaviour
             currentHP -= damage;
             isDamaged = false;
             canBeDamaged = false;
-            canKnockBack = true;
+            isInKnockBack = true;
             passTimeAfterHurtFixed = 0f;
             passTimeAfterHurtNonDamage = 0f;
             viewHurtSpriteNumber = 0;
@@ -298,7 +299,7 @@ public class EnemyController : MonoBehaviour
     }
     void KnockBack()
     {
-        if (canKnockBack)
+        if (isInKnockBack)
         {
             enemyrb.AddForce(knockBack,ForceMode2D.Impulse);
         }
