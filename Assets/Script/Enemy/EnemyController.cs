@@ -76,8 +76,6 @@ public class EnemyController : MonoBehaviour
         CheckDamage();
         //索敵範囲内かの判定
         CheckDistance();
-        //追跡処理
-        ChasePlayer();
         //攻撃処理
         //アニメーション処理
         ChangeSprite();
@@ -85,6 +83,7 @@ public class EnemyController : MonoBehaviour
     }
     void FixedUpdate()
     {
+        ChasePlayer();
         KnockBack();
     }
 
@@ -190,11 +189,11 @@ public class EnemyController : MonoBehaviour
         {
             if(distanceX < 0f)
             {
-                transform.Translate(Vector3.left*dataofenemy.enemySpeed*Time.deltaTime);
+                enemyrb.linearVelocityX = -dataofenemy.enemySpeed;//左向き
             }
             else if(distanceX > 0f)
             {
-                transform.Translate(Vector3.right*dataofenemy.enemySpeed*Time.deltaTime);
+                enemyrb.linearVelocityX = dataofenemy.enemySpeed;//右向き
             }
         }
     }
