@@ -53,7 +53,8 @@ public class EnemyController : MonoBehaviour
     private float damage;
     private Vector2 knockBack;
     [SerializeField] private float currentHP;
-    private float passTimeAfterHurt;
+    private float passTimeAfterHurtFixed;
+    private float passTimeAfterHurtNonDamage;
     private bool canBeRemoved;
     private bool canKnockBack;
 
@@ -139,29 +140,17 @@ public class EnemyController : MonoBehaviour
         }
         if(EnemyCurrentStatus == EnemyStatusBox.Hurt)
         {
-            passTimeAfterHurt += Time.deltaTime;
-            if(passTimeAfterHurt >= dataofenemy.enemyFixedTimeHurt)
+            passTimeAfterHurtFixed += Time.deltaTime;
+            if(passTimeAfterHurtFixed >= dataofenemy.enemyFixedTimeHurt)
             {
                 EnemyCurrentStatus = EnemyStatusBox.Stay;
-                if(canBeDamaged)
-                {
-                    passTimeAfterHurt = 0f;
-                }
             }
         }
         if(!canBeDamaged)
         {
-            if(passTimeAfterHurt >= dataofenemy.enemyNondamageTime)
+            if(passTimeAfterHurtNonDamage >= dataofenemy.enemyNondamageTime)
             {
                 canBeDamaged = true;
-                if(EnemyCurrentStatus != EnemyStatusBox.Hurt)
-                {
-                        passTimeAfterHurt = 0f;
-                }
-            }
-            else if(EnemyCurrentStatus != EnemyStatusBox.Hurt)
-            {
-                passTimeAfterHurt += Time.deltaTime;
             }
         }
     }
@@ -175,7 +164,8 @@ public class EnemyController : MonoBehaviour
             isDamaged = false;
             canBeDamaged = false;
             canKnockBack = true;
-            passTimeAfterHurt = 0f;
+            passTimeAfterHurtFixed = 0f;
+            passTimeAfterHurtNonDamage = 0f;
             viewHurtSpriteNumber = 0;
             viewTimeHurtSprite = 0f;
             if(currentHP <= 0f)
