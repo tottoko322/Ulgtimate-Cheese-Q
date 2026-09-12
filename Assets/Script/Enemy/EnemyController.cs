@@ -112,6 +112,7 @@ public class EnemyController : MonoBehaviour
                     passTimeAfterAttackFixed = 0f;
                     passTimeAfterAttackCool = 0f;
                     viewAttackSpriteNumber = 0;
+                    viewTimeAttackSprite = 0f;
                 }
             }
             else if(distanceX*distanceX + distanceY*distanceY > dataofenemy.enemyChaseRange*dataofenemy.enemyChaseRange)//追跡範囲内か
