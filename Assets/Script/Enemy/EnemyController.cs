@@ -127,13 +127,15 @@ public class EnemyController : MonoBehaviour
             if(passTimeAfterAttackCool >= dataofenemy.enemyCooltime)
             {
                 isInCoolTime = false;
-                passTimeAfterAttackCool = 0f;
-                viewAttackSpriteNumber = 0;
             }
         }
         if(EnemyCurrentStatus == EnemyStatusBox.Attack)
         {
             passTimeAfterAttackFixed += Time.deltaTime;
+            if(passTimeAfterAttackFixed >= dataofenemy.enemyFixedTimeAttack)
+            {
+                EnemyCurrentStatus = EnemyStatusBox.Stay;
+            }
         }
         if(EnemyCurrentStatus == EnemyStatusBox.Hurt)
         {
