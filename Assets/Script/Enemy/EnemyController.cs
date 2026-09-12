@@ -40,6 +40,8 @@ public class EnemyController : MonoBehaviour
     private float viewTimeStaySprite;
     private float viewTimeHurtSprite;
     private float viewTimeDeadSprite;
+    private int attackActionPhase;
+    private float attackActionTime;
     
 
     //攻撃用
@@ -87,6 +89,7 @@ public class EnemyController : MonoBehaviour
     void FixedUpdate()
     {
         ChasePlayer();
+        AttackAction();
         KnockBack();
     }
 
@@ -114,6 +117,8 @@ public class EnemyController : MonoBehaviour
                     passTimeAfterAttackCool = 0f;
                     viewAttackSpriteNumber = 0;
                     viewTimeAttackSprite = 0f;
+                    attackActionPhase = -1;//初回のアクションを起こすため
+                    attackActionTime = 0f;
                 }
             }
             else if(distanceX*distanceX + distanceY*distanceY > dataofenemy.enemyChaseRange*dataofenemy.enemyChaseRange)//追跡範囲内か
@@ -294,6 +299,24 @@ public class EnemyController : MonoBehaviour
             else if(viewDeadSpriteNumber == dataofenemy.enemyDeadAnimationSprites.Length - 1)
             {
                 canBeRemoved = true;
+            }
+        }
+    }
+    void AttackAction()
+    {
+
+        if(EnemyCurrentStatus == EnemyStatusBox.Attack)
+        {
+            if(attackActionPhase == -1)
+            {
+                attackActionPhase ++ ;
+                enemyrb.AddForce(dataofenemy.enemyAttackActionForce[0],ForceMode2D.Impulse);
+            }
+            attackActionTime += Time.fixedDeltaTime;
+            if(attackActionTime >= dataofenemy.enemyAttackActionInterval[attackActionPhase])
+            {
+                attackActionPhase ++ ;
+                enemyrb.AddForce(dataofenemy.enemyAttackActionForce[attackActionPhase],ForceMode2D.Impulse);
             }
         }
     }

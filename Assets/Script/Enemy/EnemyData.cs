@@ -15,6 +15,7 @@ public class EnemyData : MonoBehaviour
     public float enemyFixedTimeAttack;
     public float enemyFixedTimeHurt;
     public float enemyNondamageTime;
+
     //アニメーション設定
     [Header("アニメーション設定")]
     public float enemyChangeMoveSpritesInterval;
@@ -27,4 +28,6 @@ public class EnemyData : MonoBehaviour
     public Sprite[] enemyStayAnimationSprites;
     public Sprite[] enemyHurtAnimationSprites;
     public Sprite[] enemyDeadAnimationSprites;
+    public Vector2[] enemyAttackActionForce;
+    public float[] enemyAttackActionInterval;
 }
