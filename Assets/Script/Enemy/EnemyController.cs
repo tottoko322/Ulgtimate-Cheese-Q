@@ -44,7 +44,8 @@ public class EnemyController : MonoBehaviour
 
     //攻撃用
     private bool isInCoolTime;
-    private float passTimeAfterAttack;
+    private float passTimeAfterAttackFixed;
+    private float passTimeAfterAttackCool;
 
     //被弾、死亡用
     public bool isDamaged;
@@ -107,7 +108,9 @@ public class EnemyController : MonoBehaviour
                 {
                     EnemyCurrentStatus = EnemyStatusBox.Attack;
                     isInCoolTime = true;
-                    passTimeAfterAttack = 0f;
+                    passTimeAfterAttackFixed = 0f;
+                    passTimeAfterAttackCool = 0f;
+                    viewAttackSpriteNumber = 0;
                 }
             }
             else if(distanceX*distanceX + distanceY*distanceY > dataofenemy.enemyChaseRange*dataofenemy.enemyChaseRange)//追跡範囲内か
@@ -120,17 +123,17 @@ public class EnemyController : MonoBehaviour
     {
         if(isInCoolTime)//硬直やクールタイムがアニメーションの表示時間より短い場合のでバックログを追加予定
         {
-            passTimeAfterAttack += Time.deltaTime;
-            if(EnemyCurrentStatus == EnemyStatusBox.Attack && passTimeAfterAttack > dataofenemy.enemyFixedTimeAttack)
-            {
-                EnemyCurrentStatus = EnemyStatusBox.Stay;
-            }
-            if(passTimeAfterAttack >= dataofenemy.enemyCooltime)
+            passTimeAfterAttackCool += Time.deltaTime;
+            if(passTimeAfterAttackCool >= dataofenemy.enemyCooltime)
             {
                 isInCoolTime = false;
-                passTimeAfterAttack = 0f;
+                passTimeAfterAttackCool = 0f;
                 viewAttackSpriteNumber = 0;
             }
+        }
+        if(EnemyCurrentStatus == EnemyStatusBox.Attack)
+        {
+            passTimeAfterAttackFixed += Time.deltaTime;
         }
         if(EnemyCurrentStatus == EnemyStatusBox.Hurt)
         {
