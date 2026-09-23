@@ -317,6 +317,7 @@ public class EnemyController : MonoBehaviour
             {
                 attackActionPhase ++ ;
                 enemyrb.AddForce(dataofenemy.enemyAttackActionForce[attackActionPhase],ForceMode2D.Impulse);
+                attackActionTime = 0f;
             }
         }
     }
@@ -325,6 +326,7 @@ public class EnemyController : MonoBehaviour
         if (isInKnockBack)
         {
             enemyrb.AddForce(knockBack,ForceMode2D.Impulse);
+            isInKnockBack = false;
         }
     }
     void Dead()
