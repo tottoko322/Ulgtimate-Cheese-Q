@@ -14,28 +14,32 @@ public class PlayerController : MonoBehaviour
     public LocomotionState CurrentLocomotionState { get; private set; } = LocomotionState.Grounded;
 
     [Header("Ground Movement")]
-    [SerializeField] private float groundMoveSpeed = 6f;
+    [SerializeField] private float groundMoveSpeed;
 
     [Header("Jump")]
-    [SerializeField] private float jumpPower = 5f; 
-    [SerializeField] private float airJumpPower = 5f;
-    [SerializeField] private float maxJumpHoldTime = 0.2f;
-    [SerializeField] private float jumpHoldForce = 5f;
+    [SerializeField] private float jumpPower; 
+    [SerializeField] private float airJumpPower;
+    [SerializeField] private float maxJumpHoldTime;
+    [SerializeField] private float jumpHoldForce;
+    [SerializeField] private float rayLength;
     private float jumpHoldTimer = 0f;
     private float ledgeJumpTimer = 0f;
+    private float wallKickTimer = 0f;
 
     [Header("Air Movement")]
-    [SerializeField] private float airMoveSpeed = 6f; 
-    [SerializeField] private float airAcceleration = 30f;
-    [SerializeField] private float airDeceleration = 5f;
+    [SerializeField] private float airMoveSpeed; 
+    [SerializeField] private float airAcceleration;
+    [SerializeField] private float airDeceleration;
 
     [Header("Fast Fall")]
-    [SerializeField] private float fastFallSpeed = 6f;
+    [SerializeField] private float fastFallSpeed;
+    [SerializeField] private float slowDownFallMultiplier;
 
     [Header("Wall")]
-    [SerializeField] private float wallMoveSpeed = 6f;
-    [SerializeField] private float wallDetachForce = 6f;
+    [SerializeField] private float wallMoveSpeed;
+    [SerializeField] private float wallDetachForce;
     [SerializeField] private float wallKickForce;
+    [SerializeField] private float wallKickLimitTime;
     [SerializeField] private LayerMask climbableWallLayer;
 
     [Header("Ledge Climb")] 
@@ -53,18 +57,23 @@ public class PlayerController : MonoBehaviour
 
     private Vector2 moveInput;
 
-    private bool jumpPressed = false;
-    private bool jumpReleased = false;
-    private bool jumpHeld = false;
-    private bool hasUsedAirJump = false;
-    private bool isFastFalling = false;
-    private bool isAtLedge = false;
+    private bool jumpPressed;
+    private bool jumpReleased;
+    private bool jumpHeld;
+    private bool hasUsedAirJump;
+    private bool airJumpStateBeforeFastFalling;
+    private bool isFastFalling;
+    private bool stopFastFalling;
+    private bool isAtLedge;
 
-    private bool isGrounded = false;
-    private bool isRightTouchingWall = false;
-    private bool isLeftTouchingWall = false;
-    private bool canLedgeClimb = false;
-    private bool hasLedgeJumped = false;
+    private bool isGrounded;
+    private bool isRightTouchingWall;
+    private bool isLeftTouchingWall;
+    private bool canLedgeClimb;
+    private bool hasLedgeJumped;
+
+    private bool wallKick;
+    private bool canWallKick;
 
     [SerializeField] private LayerMask groundLayer;
     private Rigidbody2D rb;
@@ -98,7 +107,7 @@ public class PlayerController : MonoBehaviour
         HandleLedgeClimb();
         CompleteLedgeClimb();
         StartLedgeJump();
-        Debug.Log(CurrentLocomotionState);
+        //Debug.Log(CurrentLocomotionState);
     }
 
     private void ReadInput() //入力取得
@@ -137,10 +146,20 @@ public class PlayerController : MonoBehaviour
             jumpHeld = Keyboard.current.spaceKey.isPressed;
         }
 
+        if (Keyboard.current.spaceKey.wasPressedThisFrame && CurrentLocomotionState == LocomotionState.WallCling)
+        {
+            wallKick = true;
+        }
+
         //急降下の入力
         if (Keyboard.current.sKey.wasPressedThisFrame)
         {
             isFastFalling = true;
+            airJumpStateBeforeFastFalling = hasUsedAirJump; //急降下前の空中ジャンプの使用の有無の記録
+        }
+        if (Keyboard.current.wKey.wasPressedThisFrame && isFastFalling)
+        {
+            stopFastFalling = true;
         }
     }
 
@@ -149,8 +168,8 @@ public class PlayerController : MonoBehaviour
         Vector2 leftRayOrigin = new Vector2(transform.position.x -0.5f, transform.position.y -0.5f);
         Vector2 rightRayOrigin = new Vector2(transform.position.x +0.5f, transform.position.y -0.5f);
 
-        RaycastHit2D leftHit = Physics2D.Raycast(leftRayOrigin, Vector2.down, 0.1f, groundLayer);
-        RaycastHit2D rightHit = Physics2D.Raycast(rightRayOrigin, Vector2.down, 0.1f, groundLayer); //下面から下向きに2本
+        RaycastHit2D leftHit = Physics2D.Raycast(leftRayOrigin, Vector2.down, rayLength, groundLayer);
+        RaycastHit2D rightHit = Physics2D.Raycast(rightRayOrigin, Vector2.down, rayLength, groundLayer); //下面から下向きに2本
 
         isGrounded = leftHit.collider != null || rightHit.collider != null; //どちらか片方が接地するとisGroundedがtrueへ
     }
@@ -281,12 +300,30 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void StartFastFall() //急降下
+    private void StartFastFall() //急降下について
     {
-        if (isFastFalling && CurrentLocomotionState == LocomotionState.Airborne)
+        //Debug.Log(stopFastFalling);
+        if (isFastFalling && CurrentLocomotionState == LocomotionState.Airborne) //急降下
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Min(rb.linearVelocity.y, -fastFallSpeed));
             hasUsedAirJump = true;//急降下中のジャンプを無くす
+
+            //Debug.Log(stopFastFalling);
+
+            if (stopFastFalling) //急降下の解除
+            {
+                //Debug.Log("stopFastFalling");
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * slowDownFallMultiplier);
+
+                isFastFalling = false;
+                stopFastFalling = false;
+
+                if (airJumpStateBeforeFastFalling == false) //空中ジャンプが使用されていないとき、空中ジャンプの回復
+                {
+                    hasUsedAirJump = false;
+                    Debug.Log("ジャンプ回復");
+                }
+            }
         }
     }
 
@@ -318,22 +355,35 @@ public class PlayerController : MonoBehaviour
         if (CurrentLocomotionState == LocomotionState.WallCling)
         {
             float velocityY = moveInput.y * wallMoveSpeed;
-            rb.linearVelocity = new Vector2(0f, velocityY); //x方向の速度0,y方向の速度はvelocityY
+            rb.linearVelocity = new Vector2(0f, velocityY);
         }
     }
 
     private void DetachFromWall() //壁から離れるor壁キック
     {
-        if (CurrentLocomotionState == LocomotionState.WallCling && moveInput.y <= 0)
+        if (CurrentLocomotionState == LocomotionState.WallCling && moveInput.x != 0) //壁から離れる
         {
             float velocityX = moveInput.x * wallDetachForce;
-            rb.linearVelocity = new Vector2(velocityX, rb.linearVelocity.y); //x方向に速度velocityX,y方向の速度はそのまま
+            rb.linearVelocity = new Vector2(velocityX, rb.linearVelocity.y * 0.3f);
+
+            //wallKickTimer = Time.fixedDeltaTime;
+            //if (wallKickTimer < wallKickLimitTime)
+            //{
+                //canWallKick = true;
+            //}
         }
 
-        else if (CurrentLocomotionState == LocomotionState.WallCling && moveInput.y > 0)
+        if (CurrentLocomotionState == LocomotionState.WallCling && wallKick && moveInput.y >= 0) //壁キック
         {
-            float velocityX = moveInput.x * wallDetachForce;
+            float velocityX = -wallDirection * wallDetachForce;
             rb.linearVelocity = new Vector2(velocityX, wallKickForce);
+
+            wallKick = false;
+            //Debug.Log("壁キック");
+        }
+        else if (CurrentLocomotionState == LocomotionState.WallCling && wallKick && moveInput.y < 0)
+        {
+            wallKick = false;
         }
     }
 

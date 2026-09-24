@@ -1009,21 +1009,24 @@ MonoBehaviour:
   airJumpPower: 5
   maxJumpHoldTime: 0.2
   jumpHoldForce: 15
+  rayLength: 0.3
   airMoveSpeed: 6
   airAcceleration: 30
   airDeceleration: 5
-  fastFallSpeed: 4
+  fastFallSpeed: 7
+  slowDownFallMultiplier: 0
   wallMoveSpeed: 6
   wallDetachForce: 6
   wallKickForce: 6
+  wallKickLimitTime: 0.5
   climbableWallLayer:
     serializedVersion: 2
     m_Bits: 64
   ledgeClimbUpSpeed: 5
   ledgeClimbForwardSpeed: 3
   ledgeClimbFallPower: 3
-  ledgeJumpPower: 4
-  ledgeJumpHorizontalPower: 7
+  ledgeJumpPower: 10
+  ledgeJumpHorizontalPower: 5
   ledgeJumpInputWindow: 3
   groundLayer:
     serializedVersion: 2
