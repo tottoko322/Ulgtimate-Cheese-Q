@@ -125,16 +125,16 @@ public class PlayerController : MonoBehaviour
         //ジャンプの入力
         if (CurrentLocomotionState == LocomotionState.Grounded || CurrentLocomotionState == LocomotionState.Airborne || CurrentLocomotionState == LocomotionState.ClimbingLedge)
         {
-            if (Keyboard.current.wKey.wasPressedThisFrame)
+            if (Keyboard.current.spaceKey.wasPressedThisFrame)
             {
                 jumpPressed = true;
             }
-            if (Keyboard.current.wKey.wasReleasedThisFrame)
+            if (Keyboard.current.spaceKey.wasReleasedThisFrame)
             {
                 jumpReleased = true;
             }
 
-            jumpHeld = Keyboard.current.wKey.isPressed;
+            jumpHeld = Keyboard.current.spaceKey.isPressed;
         }
 
         //急降下の入力
@@ -167,8 +167,8 @@ public class PlayerController : MonoBehaviour
         RaycastHit2D bottomLeftHit = Physics2D.Raycast(bottomLeftRayOrigin, Vector2.left, 0.1f, climbableWallLayer); //左下から左へ
         RaycastHit2D bottomRightHit = Physics2D.Raycast(bottomRightRayOrigin, Vector2.right, 0.1f, climbableWallLayer); //右下から右へ
 
-        isRightTouchingWall = (topRightHit.collider != null || bottomRightHit.collider != null);
-        isLeftTouchingWall = (topLeftHit.collider != null || bottomLeftHit.collider != null);
+        isRightTouchingWall = (topRightHit.collider != null && bottomRightHit.collider != null);
+        isLeftTouchingWall = (topLeftHit.collider != null && bottomLeftHit.collider != null);
 
         isAtLedge = ((topLeftHit.collider == null && bottomLeftHit.collider != null) || (topRightHit.collider == null && bottomRightHit.collider != null));
         //上端が壁に当たっていないかつ下端が壁に当たっているならば、壁上端
@@ -268,7 +268,7 @@ public class PlayerController : MonoBehaviour
             {
                 if (rb.linearVelocity.y > 0)
                 {
-                    rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * 0.4f); //y方向の速度0.4倍
+                    rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * 0.4f);
                 }
                 jumpReleased = false;
             }
@@ -339,7 +339,7 @@ public class PlayerController : MonoBehaviour
 
     private void StartLedgeClimb() //ClimbongLedgeへ状態変化
     {
-        if (CurrentLocomotionState == LocomotionState.WallCling && isAtLedge && moveInput.y > 0)
+        if (CurrentLocomotionState == LocomotionState.Airborne && isAtLedge && moveInput.y > 0)
         {
             canLedgeClimb = true;
         }
