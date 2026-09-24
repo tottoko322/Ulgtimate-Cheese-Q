@@ -153,23 +153,23 @@ public class EnemyController : MonoBehaviour
                 EnemyCurrentStatus = EnemyStatusBox.Stay;
             }
         }
-        if(!canBeDamaged)
+        /*if(!canBeDamaged)
         {
             if(passTimeAfterHurtNonDamage >= dataofenemy.enemyNondamageTime)
             {
                 canBeDamaged = true;
             }
-        }
+        }*/
     }
     void CheckDamage()
     {
-        if(isDamaged && canBeDamaged)
+        if(isDamaged) //&& canBeDamaged)
         {
             EnemyCurrentStatus = EnemyStatusBox.Hurt;
             //何かでdamageの値を取得する(damagesystemからの取得を想定)
             currentHP -= damage;
             isDamaged = false;
-            canBeDamaged = false;
+            //canBeDamaged = false;
             isInKnockBack = true;
             passTimeAfterHurtFixed = 0f;
             passTimeAfterHurtNonDamage = 0f;
