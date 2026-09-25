@@ -21,6 +21,7 @@ public class EnemyController : MonoBehaviour
     [SerializeField] Transform playertransform;
     [SerializeField] private Rigidbody2D enemyrb;
     private SpriteRenderer sr;
+    [SerializeField] private Animator enemyanim;
 
     //索敵用
     private float distanceX;
@@ -30,7 +31,7 @@ public class EnemyController : MonoBehaviour
     
 
     //アニメーション用
-    private int viewMoveSpriteNumber;
+    /*private int viewMoveSpriteNumber;
     private int viewAttackSpriteNumber;
     private int viewStaySpriteNumber;
     private int viewHurtSpriteNumber;
@@ -41,13 +42,13 @@ public class EnemyController : MonoBehaviour
     private float viewTimeHurtSprite;
     private float viewTimeDeadSprite;
     private int attackActionPhase;
-    private float attackActionTime;
+    private float attackActionTime;*/
     
 
     //攻撃用
     private bool isInCoolTime;
-    private float passTimeAfterAttackFixed;
-    private float passTimeAfterAttackCool;
+    /*private float passTimeAfterAttackFixed;
+    private float passTimeAfterAttackCool;*/
 
     //被弾、死亡用
     public bool isDamaged;
@@ -55,8 +56,8 @@ public class EnemyController : MonoBehaviour
     private float damage;
     private Vector2 knockBack;
     [SerializeField] private float currentHP;
-    private float passTimeAfterHurtFixed;
-    private float passTimeAfterHurtNonDamage;
+    /*private float passTimeAfterHurtFixed;
+    private float passTimeAfterHurtNonDamage;*/
     private bool canBeRemoved;
     private bool isInKnockBack;
 
@@ -76,20 +77,20 @@ public class EnemyController : MonoBehaviour
     {
         Damage();
         //硬直やクールタイムなどの時間管理
-        CheckTime();
+        //CheckTime();
         //被弾検知、
         CheckDamage();
         //索敵範囲内かの判定
         CheckDistance();
         //攻撃処理
         //アニメーション処理
-        ChangeSprite();
+        //ChangeSprite();
         Dead();
     }
     void FixedUpdate()
     {
         ChasePlayer();
-        AttackAction();
+        //AttackAction();
         KnockBack();
     }
 
@@ -113,12 +114,12 @@ public class EnemyController : MonoBehaviour
                 {
                     EnemyCurrentStatus = EnemyStatusBox.Attack;
                     isInCoolTime = true;
-                    passTimeAfterAttackFixed = 0f;
+                    /*passTimeAfterAttackFixed = 0f;
                     passTimeAfterAttackCool = 0f;
                     viewAttackSpriteNumber = 0;
                     viewTimeAttackSprite = 0f;
                     attackActionPhase = -1;//初回のアクションを起こすため
-                    attackActionTime = 0f;
+                    attackActionTime = 0f;*/
                 }
             }
             else if(distanceX*distanceX + distanceY*distanceY > dataofenemy.enemyChaseRange*dataofenemy.enemyChaseRange)//追跡範囲内か
@@ -127,7 +128,7 @@ public class EnemyController : MonoBehaviour
             }
         }
     }
-    void CheckTime()
+    /*void CheckTime()
     {
         if(isInCoolTime)//硬直やクールタイムがアニメーションの表示時間より短い場合のでバックログを追加予定
         {
@@ -153,14 +154,14 @@ public class EnemyController : MonoBehaviour
                 EnemyCurrentStatus = EnemyStatusBox.Stay;
             }
         }
-        /*if(!canBeDamaged)
+        if(!canBeDamaged)
         {
             if(passTimeAfterHurtNonDamage >= dataofenemy.enemyNondamageTime)
             {
                 canBeDamaged = true;
             }
-        }*/
-    }
+        }
+    }*/
     void CheckDamage()
     {
         if(isDamaged) //&& canBeDamaged)
@@ -171,10 +172,10 @@ public class EnemyController : MonoBehaviour
             isDamaged = false;
             //canBeDamaged = false;
             isInKnockBack = true;
-            passTimeAfterHurtFixed = 0f;
-            passTimeAfterHurtNonDamage = 0f;
-            viewHurtSpriteNumber = 0;
-            viewTimeHurtSprite = 0f;
+            /*passTimeAfterHurtFixed = 0f;
+            passTimeAfterHurtNonDamage = 0f;*/
+            /*viewHurtSpriteNumber = 0;
+            viewTimeHurtSprite = 0f;*/
             if(currentHP <= 0f)
             {
                 EnemyCurrentStatus = EnemyStatusBox.Dead;
@@ -185,7 +186,20 @@ public class EnemyController : MonoBehaviour
             isDamaged = false;
         }
     }
-    void ChangeSprite()
+    void ControlAnimation()
+    {
+        string animationStstus = EnemyCurrentStatus switch
+        {
+            EnemyStatusBox.Stay => "StayStatus",
+            EnemyStatusBox.Chase => "ChaseStatus",
+            EnemyStatusBox.Attack => "AttackStatus",
+            EnemyStatusBox.Hurt => "HurtStatus",
+            EnemyStatusBox.Dead => "DeadStatus",
+            _ => "ChaseStatus"//趣味。バグったときは動いていてほしい()
+        };
+        enemyanim.SetTrigger(animationStstus);
+    }
+    /*void ChangeSprite()
     {
         if(EnemyCurrentStatus == EnemyStatusBox.Chase)//追跡アニメーション
         {
@@ -287,7 +301,7 @@ public class EnemyController : MonoBehaviour
                 canBeRemoved = true;
             }
         }
-    }
+    }*/
     void ChasePlayer()
     {
         if(EnemyCurrentStatus == EnemyStatusBox.Chase)
@@ -302,7 +316,7 @@ public class EnemyController : MonoBehaviour
             }
         }
     }
-    void AttackAction()
+    /*void AttackAction()
     {
 
         if(EnemyCurrentStatus == EnemyStatusBox.Attack && attackActionPhase < dataofenemy.enemyAttackActionInterval.Length - 1)
@@ -320,7 +334,7 @@ public class EnemyController : MonoBehaviour
                 attackActionTime = 0f;
             }
         }
-    }
+    }*/
     void KnockBack()
     {
         if (isInKnockBack)
