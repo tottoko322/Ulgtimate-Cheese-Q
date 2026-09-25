@@ -1005,9 +1005,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   groundMoveSpeed: 6
-  jumpPower: 5
+  jumpPower: 3
   airJumpPower: 5
-  fallPower: 0
+  fallPower: 10
   maxJumpHoldTime: 0.2
   jumpHoldForce: 15
   rayLength: 0.3
@@ -1019,7 +1019,7 @@ MonoBehaviour:
   wallMoveSpeed: 6
   wallDetachForce: 6
   wallKickForce: 6
-  wallKickLimitTime: 0.1
+  wallKickLimitTime: 0.5
   climbableWallLayer:
     serializedVersion: 2
     m_Bits: 64

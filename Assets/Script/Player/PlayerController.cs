@@ -19,12 +19,13 @@ public class PlayerController : MonoBehaviour
     [Header("Jump")]
     [SerializeField] private float jumpPower; 
     [SerializeField] private float airJumpPower;
+    [SerializeField] private float fallPower;
     [SerializeField] private float maxJumpHoldTime;
     [SerializeField] private float jumpHoldForce;
     [SerializeField] private float rayLength;
     private float jumpHoldTimer = 0f;
     private float ledgeJumpTimer = 0f;
-    private float wallKickTimer = 0f;
+    private float wallKickTimer = 10f;
 
     [Header("Air Movement")]
     [SerializeField] private float airMoveSpeed; 
@@ -58,7 +59,6 @@ public class PlayerController : MonoBehaviour
     private Vector2 moveInput;
 
     private bool jumpPressed;
-    private bool jumpReleased;
     private bool jumpHeld;
     private bool hasUsedAirJump;
     private bool airJumpStateBeforeFastFalling;
@@ -73,7 +73,6 @@ public class PlayerController : MonoBehaviour
     private bool hasLedgeJumped;
 
     private bool wallKick;
-    private bool canWallKick;
 
     [SerializeField] private LayerMask groundLayer;
     private Rigidbody2D rb;
@@ -138,15 +137,12 @@ public class PlayerController : MonoBehaviour
             {
                 jumpPressed = true;
             }
-            if (Keyboard.current.spaceKey.wasReleasedThisFrame)
-            {
-                jumpReleased = true;
-            }
 
             jumpHeld = Keyboard.current.spaceKey.isPressed;
         }
 
-        if (Keyboard.current.spaceKey.wasPressedThisFrame && CurrentLocomotionState == LocomotionState.WallCling)
+        //壁キックの入力
+        if (Keyboard.current.spaceKey.wasPressedThisFrame && (CurrentLocomotionState == LocomotionState.WallCling || wallKickTimer < wallKickLimitTime))
         {
             wallKick = true;
         }
@@ -200,6 +196,7 @@ public class PlayerController : MonoBehaviour
             CurrentLocomotionState = LocomotionState.Grounded;
             hasUsedAirJump = false; //空中ジャンプの復活
             isFastFalling = false; //急降下の復活
+            wallKickTimer = wallKickLimitTime;
         }
         else if (isRightTouchingWall || isLeftTouchingWall) //isTouchingWallがtrueならば足場状態WallClingへ
         {
@@ -229,7 +226,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void HandleAirMovement() //空中での左右移動
+    private void HandleAirMovement() //空中移動
     {
         if (CurrentLocomotionState == LocomotionState.Airborne)
         {
@@ -247,6 +244,12 @@ public class PlayerController : MonoBehaviour
                 rb.linearVelocity = new Vector2(Mathf.MoveTowards(rb.linearVelocity.x, airMoveSpeed, airAcceleration * Time.fixedDeltaTime), rb.linearVelocity.y);
                 break;
             }
+
+            if (rb.linearVelocity.y < 0f && isFastFalling != true) //落下速度の調節
+            {
+                rb.AddForce(Vector2.down * fallPower, ForceMode2D.Force);
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Max(rb.linearVelocity.y, -fastFallSpeed));
+            }
         }
     }
 
@@ -260,14 +263,16 @@ public class PlayerController : MonoBehaviour
                 {
                     case LocomotionState.Grounded: //一回目のジャンプ
                     rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpPower);
+
                     jumpHoldTimer = 0f;
                     jumpPressed = false;
                     break;
 
                     case LocomotionState.Airborne:
-                    if (hasUsedAirJump == false) //二回目のジャンプ
+                    if (hasUsedAirJump == false && wallKickTimer >= wallKickLimitTime) //二回目のジャンプ
                     {
                         rb.linearVelocity = new Vector2(rb.linearVelocity.x, airJumpPower);
+
                         jumpHoldTimer = 0f;
                         jumpPressed = false;
                         hasUsedAirJump = true;
@@ -283,17 +288,9 @@ public class PlayerController : MonoBehaviour
                 }
             }
 
-            if (jumpReleased) //wキーを離すと
-            {
-                if (rb.linearVelocity.y > 0)
-                {
-                    rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * 0.4f);
-                }
-                jumpReleased = false;
-            }
-
             if (jumpHeld && jumpHoldTimer < maxJumpHoldTime && rb.linearVelocity.y > 0) //高さ調節
             {
+                //Debug.Log("高さ調節");
                 rb.AddForce(Vector2.up * jumpHoldForce, ForceMode2D.Force);
                 jumpHoldTimer += Time.fixedDeltaTime;
             }
@@ -334,6 +331,7 @@ public class PlayerController : MonoBehaviour
             rb.gravityScale = 0f;
             hasUsedAirJump = false; //空中ジャンプ回復
             isFastFalling = false; //急降下回復
+            wallKickTimer = 0f;
 
             if (isRightTouchingWall) //右の壁なら1
             {
@@ -366,22 +364,19 @@ public class PlayerController : MonoBehaviour
             float velocityX = moveInput.x * wallDetachForce;
             rb.linearVelocity = new Vector2(velocityX, rb.linearVelocity.y * 0.3f);
 
-            //wallKickTimer = Time.fixedDeltaTime;
-            //if (wallKickTimer < wallKickLimitTime)
-            //{
-                //canWallKick = true;
-            //}
+            wallKickTimer += Time.fixedDeltaTime;
         }
 
-        if (CurrentLocomotionState == LocomotionState.WallCling && wallKick && moveInput.y >= 0) //壁キック
+        if (wallKick && moveInput.y >= 0 && wallKickTimer < wallKickLimitTime) //壁キック
         {
             float velocityX = -wallDirection * wallDetachForce;
             rb.linearVelocity = new Vector2(velocityX, wallKickForce);
 
             wallKick = false;
-            //Debug.Log("壁キック");
+            wallKickTimer = wallKickLimitTime;
+            Debug.Log("壁キック");
         }
-        else if (CurrentLocomotionState == LocomotionState.WallCling && wallKick && moveInput.y < 0)
+        else if (wallKick && moveInput.y < 0)
         {
             wallKick = false;
         }
@@ -445,7 +440,6 @@ public class PlayerController : MonoBehaviour
             ledgeJumpTimer = 0f;
 
             //通常ジャンプをした後と同じ状況にする
-            jumpReleased = false;
             jumpPressed = false;
             jumpHeld = false;
         }
