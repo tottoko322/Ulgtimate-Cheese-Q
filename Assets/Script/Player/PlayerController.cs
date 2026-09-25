@@ -40,6 +40,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float wallDetachForce;
     [SerializeField] private float wallKickForce;
     [SerializeField] private float wallRayLength;
+    [SerializeField] private float detachWallMultiplier;
     [SerializeField] private LayerMask climbableWallLayer;
 
     [Header("Ledge Climb")] 
@@ -374,7 +375,7 @@ public class PlayerController : MonoBehaviour
         if (CurrentLocomotionState == LocomotionState.WallCling && moveInput.x == -wallDirection) //壁から離れる
         {
             float velocityX = moveInput.x * wallDetachForce;
-            rb.linearVelocity = new Vector2(velocityX, rb.linearVelocity.y * 0.3f);
+            rb.linearVelocity = new Vector2(velocityX, rb.linearVelocity.y * detachWallMultiplier);
         }
 
         if ((wallKick && moveInput.y >= 0) || (wallKickRange && canWallKick)) //壁キック
