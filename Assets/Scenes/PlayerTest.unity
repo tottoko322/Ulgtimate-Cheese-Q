@@ -272,7 +272,8 @@ MonoBehaviour:
   Player: {fileID: 1745922059}
   horizontalLookAhead: 3
   verticalLookAhead: 2
-  cameraSmoothTime: 0.3
+  horizontalSmoothTime: 0.3
+  verticalSmoothTime: 0.3
 --- !u!1 &64982309
 GameObject:
   m_ObjectHideFlags: 0
@@ -1005,30 +1006,31 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   groundMoveSpeed: 6
-  jumpPower: 5
+  jumpPower: 3
   airJumpPower: 5
-  fallPower: 0
+  fallPower: 10
   maxJumpHoldTime: 0.2
   jumpHoldForce: 15
-  rayLength: 0.3
+  rayLength: 0.4
   airMoveSpeed: 6
   airAcceleration: 30
   airDeceleration: 5
   fastFallSpeed: 7
-  slowDownFallMultiplier: 0
+  slowDownFallMultiplier: 0.2
   wallMoveSpeed: 6
   wallDetachForce: 6
   wallKickForce: 6
-  wallKickLimitTime: 0.1
+  wallRayLength: 1
   climbableWallLayer:
     serializedVersion: 2
     m_Bits: 64
   ledgeClimbUpSpeed: 5
   ledgeClimbForwardSpeed: 3
-  ledgeClimbFallPower: 3
+  ledgeJumpUpTime: 0.3
+  ledgeJumpHorizontalTime: 0.4
   ledgeJumpPower: 10
-  ledgeJumpHorizontalPower: 5
-  ledgeJumpInputWindow: 3
+  ledgeJumpHorizontalPower: 6
+  ledgeJumpInputWindow: 5
   groundLayer:
     serializedVersion: 2
     m_Bits: 8

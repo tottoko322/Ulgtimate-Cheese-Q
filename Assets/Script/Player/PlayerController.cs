@@ -25,7 +25,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float rayLength;
     private float jumpHoldTimer = 0f;
     private float ledgeJumpTimer = 0f;
-    private float wallKickTimer = 10f;
 
     [Header("Air Movement")]
     [SerializeField] private float airMoveSpeed; 
@@ -40,13 +39,14 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float wallMoveSpeed;
     [SerializeField] private float wallDetachForce;
     [SerializeField] private float wallKickForce;
-    [SerializeField] private float wallKickLimitTime;
+    [SerializeField] private float wallRayLength;
     [SerializeField] private LayerMask climbableWallLayer;
 
     [Header("Ledge Climb")] 
     [SerializeField] private float ledgeClimbUpSpeed; 
     [SerializeField] private float ledgeClimbForwardSpeed;
-    [SerializeField] private float ledgeClimbFallPower;
+    [SerializeField] private float ledgeJumpUpTime;
+    [SerializeField] private float ledgeJumpHorizontalTime;
     private float ledgeClimbDuration;
 
     [Header("Ledge Jump")] 
@@ -73,6 +73,8 @@ public class PlayerController : MonoBehaviour
     private bool hasLedgeJumped;
 
     private bool wallKick;
+    private bool canWallKick;
+    private bool wallKickRange;
 
     [SerializeField] private LayerMask groundLayer;
     private Rigidbody2D rb;
@@ -142,9 +144,13 @@ public class PlayerController : MonoBehaviour
         }
 
         //壁キックの入力
-        if (Keyboard.current.spaceKey.wasPressedThisFrame && (CurrentLocomotionState == LocomotionState.WallCling || wallKickTimer < wallKickLimitTime))
+        if (Keyboard.current.spaceKey.wasPressedThisFrame && CurrentLocomotionState == LocomotionState.WallCling)
         {
             wallKick = true;
+        }
+        if (Keyboard.current.spaceKey.wasPressedThisFrame && CurrentLocomotionState == LocomotionState.Airborne && !hasUsedAirJump) //!hasUsedAirJumpはAirborneの時にSpaceキーを何度も押されるとcanWallKickがtrueになるため
+        {
+            canWallKick = true;
         }
 
         //急降下の入力
@@ -182,6 +188,11 @@ public class PlayerController : MonoBehaviour
         RaycastHit2D bottomLeftHit = Physics2D.Raycast(bottomLeftRayOrigin, Vector2.left, 0.1f, climbableWallLayer); //左下から左へ
         RaycastHit2D bottomRightHit = Physics2D.Raycast(bottomRightRayOrigin, Vector2.right, 0.1f, climbableWallLayer); //右下から右へ
 
+        Vector2 halfRayOrigin = new Vector2(transform.position.x +0.5f * wallDirection, transform.position.y);
+        RaycastHit2D halftHit = Physics2D.Raycast(halfRayOrigin, Vector2.right * wallDirection, wallRayLength, climbableWallLayer);
+
+        wallKickRange = halftHit.collider != null;
+
         isRightTouchingWall = (topRightHit.collider != null && bottomRightHit.collider != null);
         isLeftTouchingWall = (topLeftHit.collider != null && bottomLeftHit.collider != null);
 
@@ -196,7 +207,6 @@ public class PlayerController : MonoBehaviour
             CurrentLocomotionState = LocomotionState.Grounded;
             hasUsedAirJump = false; //空中ジャンプの復活
             isFastFalling = false; //急降下の復活
-            wallKickTimer = wallKickLimitTime;
         }
         else if (isRightTouchingWall || isLeftTouchingWall) //isTouchingWallがtrueならば足場状態WallClingへ
         {
@@ -269,13 +279,14 @@ public class PlayerController : MonoBehaviour
                     break;
 
                     case LocomotionState.Airborne:
-                    if (hasUsedAirJump == false && wallKickTimer >= wallKickLimitTime) //二回目のジャンプ
+                    if (hasUsedAirJump == false && !wallKickRange) //二回目のジャンプ
                     {
                         rb.linearVelocity = new Vector2(rb.linearVelocity.x, airJumpPower);
 
                         jumpHoldTimer = 0f;
                         jumpPressed = false;
                         hasUsedAirJump = true;
+                        canWallKick = false;
 
                         ledgeJumpTimer = 0f; //
                         break;
@@ -283,6 +294,7 @@ public class PlayerController : MonoBehaviour
                     else //それ以降
                     {
                         jumpPressed = false;
+                        //canWallKick = false;
                         break;
                     }
                 }
@@ -331,7 +343,7 @@ public class PlayerController : MonoBehaviour
             rb.gravityScale = 0f;
             hasUsedAirJump = false; //空中ジャンプ回復
             isFastFalling = false; //急降下回復
-            wallKickTimer = 0f;
+            canWallKick = false;
 
             if (isRightTouchingWall) //右の壁なら1
             {
@@ -359,21 +371,20 @@ public class PlayerController : MonoBehaviour
 
     private void DetachFromWall() //壁から離れるor壁キック
     {
-        if (CurrentLocomotionState == LocomotionState.WallCling && moveInput.x != 0) //壁から離れる
+        if (CurrentLocomotionState == LocomotionState.WallCling && moveInput.x == -wallDirection) //壁から離れる
         {
             float velocityX = moveInput.x * wallDetachForce;
             rb.linearVelocity = new Vector2(velocityX, rb.linearVelocity.y * 0.3f);
-
-            wallKickTimer += Time.fixedDeltaTime;
         }
 
-        if (wallKick && moveInput.y >= 0 && wallKickTimer < wallKickLimitTime) //壁キック
+        if ((wallKick && moveInput.y >= 0) || (wallKickRange && canWallKick)) //壁キック
         {
             float velocityX = -wallDirection * wallDetachForce;
             rb.linearVelocity = new Vector2(velocityX, wallKickForce);
 
             wallKick = false;
-            wallKickTimer = wallKickLimitTime;
+            canWallKick = false;
+            wallKickRange = false;
             Debug.Log("壁キック");
         }
         else if (wallKick && moveInput.y < 0)
@@ -401,11 +412,11 @@ public class PlayerController : MonoBehaviour
         {
             ledgeClimbDuration += Time.fixedDeltaTime; //上方向に速度を加える時間のタイマー
  
-            if (ledgeClimbDuration < 0.25) //ある一定時間まで上方向に上昇
+            if (ledgeClimbDuration < ledgeJumpUpTime) //ある一定時間まで上方向に上昇
             {
                 rb.linearVelocity = new Vector2(0f, ledgeClimbUpSpeed);
             }
-            else if (0.25 <= ledgeClimbDuration && ledgeClimbDuration < 0.4)
+            else if (ledgeJumpUpTime <= ledgeClimbDuration && ledgeClimbDuration < ledgeJumpHorizontalTime)
             {
                 rb.linearVelocity = new Vector2(wallDirection * ledgeClimbForwardSpeed, rb.linearVelocity.y);
             }

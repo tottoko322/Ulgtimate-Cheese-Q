@@ -11,16 +11,13 @@ public class CameraController : MonoBehaviour
     [SerializeField] private float verticalLookAhead;
 
     [Header("Camera Movement")]
-    [SerializeField] private float cameraSmoothTime;
+    [SerializeField] private float horizontalSmoothTime;
+    [SerializeField] private float verticalSmoothTime;
 
     private Vector3 cameraPosition;
     private Vector3 lookAhead;
-    private Vector3 velocity;
-
-    void Start()
-    {
-        
-    }
+    private float horizontalVelocity;
+    private float verticalVelocity;
 
     void Update()
     {
@@ -59,7 +56,11 @@ public class CameraController : MonoBehaviour
     {
         cameraPosition = Player.position + lookAhead; //カメラの位置＝プレイヤーの位置＋先読み
 
-        transform.position = Vector3.SmoothDamp(transform.position, cameraPosition + new Vector3(0f, 1f, -10f), ref velocity, cameraSmoothTime);
+        float xPosition = Mathf.SmoothDamp(transform.position.x, cameraPosition.x, ref horizontalVelocity, horizontalSmoothTime);
+        float yPosition = Mathf.SmoothDamp(transform.position.y, cameraPosition.y+1, ref verticalVelocity, verticalSmoothTime);
+
+        transform.position = new Vector3(xPosition, yPosition, -10f);
+        //transform.position = Vector3.SmoothDamp(transform.position, cameraPosition + new Vector3(0f, 1f, -10f), ref velocity, cameraSmoothTime);
         //プレイヤーが画面中央ちょい下
 
         float screenTop = Camera.main.ViewportToWorldPoint(new Vector3(0, 1, 0)).y; 
