@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class WoodenBox : MonoBehaviour
 {
-    [SerializeField] private float Durability;
-    public bool canDestroy;
-    public bool canPush;
+    [SerializeField] private int durability;
+    [SerializeField] private bool canDestroy;
+    [SerializeField] private bool canPush;
 
     public BoxCollider2D col;
     private Rigidbody2D rb;
@@ -18,7 +18,9 @@ public class WoodenBox : MonoBehaviour
 
     void FixedUpdate()
     {
-        
+        BlowAway();
+        UpdateDurability();
+        DestroyWoodenBox();
     }
 
     void CanPush() //プレイヤーとの衝突の有無
@@ -31,6 +33,29 @@ public class WoodenBox : MonoBehaviour
         {
             col.enabled = false;
             rb.gravityScale = 0f;
+        }
+    }
+
+    void BlowAway() //攻撃を受けると吹き飛ぶ
+    {
+        
+    }
+
+    void UpdateDurability() //耐久値の計算
+    {
+        
+    }
+
+    void DestroyWoodenBox() //木箱を壊す
+    {
+        if (!canDestroy)
+        {
+            return;
+        }
+
+        else if (canDestroy && durability <= 0f)
+        {
+            this.gameObject.SetActive(false);
         }
     }
 }
