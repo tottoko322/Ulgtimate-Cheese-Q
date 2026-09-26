@@ -276,6 +276,7 @@ MonoBehaviour:
   damagesystem: {fileID: 0}
   playertransform: {fileID: 1202132498}
   enemyrb: {fileID: 443669133}
+  enemyanim: {fileID: 443669139}
   isDamaged: 0
   currentHP: 0
 --- !u!114 &443669135

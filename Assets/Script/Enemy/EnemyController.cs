@@ -7,6 +7,7 @@ public class EnemyController : MonoBehaviour
     private enum EnemyStatusBox
     {
         Stay,
+        Detect,
         Chase,
         Attack,
         Hurt,
@@ -188,16 +189,17 @@ public class EnemyController : MonoBehaviour
     }
     void ControlAnimation()
     {
-        string animationStstus = EnemyCurrentStatus switch
+        string enemyAnimationTrigger = EnemyCurrentStatus switch
         {
-            EnemyStatusBox.Stay => "StayStatus",
-            EnemyStatusBox.Chase => "ChaseStatus",
-            EnemyStatusBox.Attack => "AttackStatus",
-            EnemyStatusBox.Hurt => "HurtStatus",
-            EnemyStatusBox.Dead => "DeadStatus",
+            EnemyStatusBox.Stay => "StayTrigger",
+            EnemyStatusBox.Detect => "DetectTrigger",
+            EnemyStatusBox.Chase => "ChaseTrigger",
+            EnemyStatusBox.Attack => "AttackTrigger",
+            EnemyStatusBox.Hurt => "HurtTrigger",
+            EnemyStatusBox.Dead => "DeadTrigger",
             _ => "ChaseStatus"//趣味。バグったときは動いていてほしい()
         };
-        enemyanim.SetTrigger(animationStstus);
+        enemyanim.SetTrigger(enemyAnimationTrigger);
     }
     /*void ChangeSprite()
     {
