@@ -57,7 +57,7 @@ public class CameraController : MonoBehaviour
         cameraPosition = Player.position + lookAhead; //カメラの位置＝プレイヤーの位置＋先読み
 
         float xPosition = Mathf.SmoothDamp(transform.position.x, cameraPosition.x, ref horizontalVelocity, horizontalSmoothTime);
-        float yPosition = Mathf.SmoothDamp(transform.position.y, cameraPosition.y+1, ref verticalVelocity, verticalSmoothTime);
+        float yPosition = Mathf.SmoothDamp(transform.position.y, cameraPosition.y+1.5f, ref verticalVelocity, verticalSmoothTime);
 
         transform.position = new Vector3(xPosition, yPosition, -10f);
         //transform.position = Vector3.SmoothDamp(transform.position, cameraPosition + new Vector3(0f, 1f, -10f), ref velocity, cameraSmoothTime);

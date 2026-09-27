@@ -6,7 +6,7 @@ public class WoodenBox : MonoBehaviour
     [SerializeField] private bool canDestroy;
     [SerializeField] private bool canPush;
 
-    public BoxCollider2D col;
+    public PolygonCollider2D col;
     private Rigidbody2D rb;
 
     void Start()
