@@ -13,7 +13,9 @@ public class EnemyController : MonoBehaviour
         Hurt,
         Dead
     }
-    private EnemyStatusBox EnemyCurrentStatus = EnemyStatusBox.Stay;
+    private EnemyStatusBox EnemyCurrentStatus;
+    private EnemyStatusBox EnemyLatestStatu;
+    private bool canChangeStatus;
 
     //Data,Component取得
     [Header("Component取得")]
@@ -48,45 +50,52 @@ public class EnemyController : MonoBehaviour
 
     //攻撃用
     private bool isInCoolTime;
-    /*private float passTimeAfterAttackFixed;
-    private float passTimeAfterAttackCool;*/
+    private float passTimeAfterAttackFixed;
+    private float passTimeAfterAttackCool;
 
     //被弾、死亡用
     public bool isDamaged;
-    private bool canBeDamaged;
+    //private bool canBeDamaged;
     private float damage;
     private Vector2 knockBack;
     [SerializeField] private float currentHP;
-    /*private float passTimeAfterHurtFixed;
-    private float passTimeAfterHurtNonDamage;*/
-    private bool canBeRemoved;
+    private float passTimeAfterHurtFixed;
+    //private float passTimeAfterHurtNonDamage;
+    //private bool canBeRemoved;
     private bool isInKnockBack;
+    private float passTimeAfterDead;
 
     //処理
     void Start()
     {
         sr = GetComponent<SpriteRenderer>();
-        sr.sprite = dataofenemy.enemyStayAnimationSprites[0];
+        EnemyCurrentStatus = EnemyStatusBox.Stay;
+        EnemyLatestStatu = EnemyStatusBox.Stay;
+        //sr.sprite = dataofenemy.enemyStayAnimationSprites[0];
+        canChangeStatus = true;
         isInCoolTime = false;
         isDamaged = false;
-        canBeDamaged = true;
-        canBeRemoved = false;
+        //canBeDamaged = true;
+        //canBeRemoved = false;
         isInKnockBack = false;
         currentHP = dataofenemy.enemyHp;
     }
     void Update()
     {
-        Damage();
-        //硬直やクールタイムなどの時間管理
-        //CheckTime();
-        //被弾検知、
+        if(canChangeStatus)
+        {
+            CheckDistance();
+            BeforeDead();
+        }
+        else
+        {
+            Dead();
+        }
         CheckDamage();
-        //索敵範囲内かの判定
-        CheckDistance();
-        //攻撃処理
-        //アニメーション処理
-        //ChangeSprite();
-        Dead();
+        CheckTime();
+        ControlAnimation();
+        Damage();
+        //Dead();
     }
     void FixedUpdate()
     {
@@ -96,41 +105,48 @@ public class EnemyController : MonoBehaviour
     }
 
     //関数
-    void CheckDistance()
+    void CheckDistance()//Stay,Detect,Chase,Attackへの変更
     {
         distanceX = playertransform.position.x - transform.position.x;
         distanceY = playertransform.position.y - transform.position.y;
-        if(EnemyCurrentStatus == EnemyStatusBox.Stay)//索敵範囲内か
+        //索敵範囲内か
+        if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemySearchRange*dataofenemy.enemySearchRange)
         {
-            if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemySearchRange*dataofenemy.enemySearchRange)
+            if(EnemyCurrentStatus == EnemyStatusBox.Stay)
+            {
+                EnemyCurrentStatus = EnemyStatusBox.Detect;
+                canChangeStatus = false;
+            }
+            else
             {
                 EnemyCurrentStatus = EnemyStatusBox.Chase;
+                canChangeStatus = true;
             }
         }
-        if(EnemyCurrentStatus == EnemyStatusBox.Chase)
+        else if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemyAttackRange*dataofenemy.enemyAttackRange)
         {
-            if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemyAttackRange*dataofenemy.enemyAttackRange)
+            if(!isInCoolTime)
             {
-                if(!isInCoolTime)
-                {
-                    EnemyCurrentStatus = EnemyStatusBox.Attack;
-                    isInCoolTime = true;
-                    /*passTimeAfterAttackFixed = 0f;
-                    passTimeAfterAttackCool = 0f;
-                    viewAttackSpriteNumber = 0;
-                    viewTimeAttackSprite = 0f;
-                    attackActionPhase = -1;//初回のアクションを起こすため
-                    attackActionTime = 0f;*/
-                }
+                EnemyCurrentStatus = EnemyStatusBox.Attack;
+                isInCoolTime = true;
+                canChangeStatus = false;
+                /*passTimeAfterAttackFixed = 0f;
+                passTimeAfterAttackCool = 0f;
+                viewAttackSpriteNumber = 0;
+                viewTimeAttackSprite = 0f;
+                attackActionPhase = -1;//初回のアクションを起こすため
+                attackActionTime = 0f;*/
             }
-            else if(distanceX*distanceX + distanceY*distanceY > dataofenemy.enemyChaseRange*dataofenemy.enemyChaseRange)//追跡範囲内か
-            {
-                EnemyCurrentStatus = EnemyStatusBox.Stay;
-            }
+        }
+        if(distanceX*distanceX + distanceY*distanceY > dataofenemy.enemyChaseRange*dataofenemy.enemyChaseRange)//追跡範囲内か
+        {
+            EnemyCurrentStatus = EnemyStatusBox.Stay;
+            canChangeStatus = true;
         }
     }
-    /*void CheckTime()
+    void CheckTime()
     {
+        
         if(isInCoolTime)//硬直やクールタイムがアニメーションの表示時間より短い場合のでバックログを追加予定
         {
             passTimeAfterAttackCool += Time.deltaTime;
@@ -142,27 +158,27 @@ public class EnemyController : MonoBehaviour
         if(EnemyCurrentStatus == EnemyStatusBox.Attack)
         {
             passTimeAfterAttackFixed += Time.deltaTime;
-            if(passTimeAfterAttackFixed >= dataofenemy.enemyFixedTimeAttack)
+            if(passTimeAfterAttackFixed >= dataofenemy.enemyAttackAnimationTime)
             {
-                EnemyCurrentStatus = EnemyStatusBox.Stay;
+                canChangeStatus = true;
             }
         }
         if(EnemyCurrentStatus == EnemyStatusBox.Hurt)
         {
             passTimeAfterHurtFixed += Time.deltaTime;
-            if(passTimeAfterHurtFixed >= dataofenemy.enemyFixedTimeHurt)
+            if(passTimeAfterHurtFixed >= dataofenemy.enemyHurtAnimationTime)
             {
-                EnemyCurrentStatus = EnemyStatusBox.Stay;
+                canChangeStatus = true;
             }
         }
-        if(!canBeDamaged)
+        /*if(!canBeDamaged)
         {
             if(passTimeAfterHurtNonDamage >= dataofenemy.enemyNondamageTime)
             {
                 canBeDamaged = true;
             }
-        }
-    }*/
+        }*/
+    }
     void CheckDamage()
     {
         if(isDamaged) //&& canBeDamaged)
@@ -177,29 +193,26 @@ public class EnemyController : MonoBehaviour
             passTimeAfterHurtNonDamage = 0f;*/
             /*viewHurtSpriteNumber = 0;
             viewTimeHurtSprite = 0f;*/
-            if(currentHP <= 0f)
-            {
-                EnemyCurrentStatus = EnemyStatusBox.Dead;
-            }
-        }
-        else if (!canBeDamaged)
-        {
-            isDamaged = false;
+            canChangeStatus = false;
         }
     }
     void ControlAnimation()
     {
-        string enemyAnimationTrigger = EnemyCurrentStatus switch
+        if(EnemyLatestStatu != EnemyCurrentStatus)
         {
-            EnemyStatusBox.Stay => "StayTrigger",
-            EnemyStatusBox.Detect => "DetectTrigger",
-            EnemyStatusBox.Chase => "ChaseTrigger",
-            EnemyStatusBox.Attack => "AttackTrigger",
-            EnemyStatusBox.Hurt => "HurtTrigger",
-            EnemyStatusBox.Dead => "DeadTrigger",
-            _ => "ChaseStatus"//趣味。バグったときは動いていてほしい()
-        };
-        enemyanim.SetTrigger(enemyAnimationTrigger);
+            string enemyAnimationTrigger = EnemyCurrentStatus switch
+            {
+                EnemyStatusBox.Stay => "StayTrigger",
+                EnemyStatusBox.Detect => "DetectTrigger",
+                EnemyStatusBox.Chase => "ChaseTrigger",
+                EnemyStatusBox.Attack => "AttackTrigger",
+                EnemyStatusBox.Hurt => "HurtTrigger",
+                EnemyStatusBox.Dead => "DeadTrigger",
+                _ => "ChaseStatus"//趣味。バグったときは動いていてほしい()
+            };
+            enemyanim.SetTrigger(enemyAnimationTrigger);
+            EnemyLatestStatu = EnemyCurrentStatus;
+        }
     }
     /*void ChangeSprite()
     {
@@ -339,24 +352,36 @@ public class EnemyController : MonoBehaviour
     }*/
     void KnockBack()
     {
-        if (isInKnockBack)
+        if(isInKnockBack)
         {
             enemyrb.AddForce(knockBack,ForceMode2D.Impulse);
             isInKnockBack = false;
         }
     }
+    void BeforeDead()
+    {
+        if(currentHP <= dataofenemy.enemyHp)
+        {
+            EnemyCurrentStatus = EnemyStatusBox.Dead;
+            canChangeStatus = false;
+        }
+    }
     void Dead()
     {
-        if (canBeRemoved)
+        if(EnemyCurrentStatus == EnemyStatusBox.Dead)
         {
-            gameObject.SetActive(false);
+            passTimeAfterDead += Time.deltaTime;
+            if(passTimeAfterDead >= dataofenemy.enemyDeadAnimationTime)
+            {
+                gameObject.SetActive(false);
+            }
         }
     }
 
     //debug用
     void Damage()
     {
-        if (Keyboard.current.aKey.isPressed)
+        if(Keyboard.current.mKey.isPressed)
         {
             isDamaged = true;
             damage = 10f;
