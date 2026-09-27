@@ -123,7 +123,7 @@ public class EnemyController : MonoBehaviour
                 canChangeStatus = true;
             }
         }
-        else if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemyAttackRange*dataofenemy.enemyAttackRange)
+        if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemyAttackRange*dataofenemy.enemyAttackRange)
         {
             if(!isInCoolTime)
             {
@@ -373,6 +373,7 @@ public class EnemyController : MonoBehaviour
             passTimeAfterDead += Time.deltaTime;
             if(passTimeAfterDead >= dataofenemy.enemyDeadAnimationTime)
             {
+                Debug.Log("enemyDie");
                 gameObject.SetActive(false);
             }
         }

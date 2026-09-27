@@ -302,28 +302,9 @@ MonoBehaviour:
   enemyFixedTimeAttack: 5
   enemyFixedTimeHurt: 5
   enemyNondamageTime: 5
-  enemyChangeMoveSpritesInterval: 0.5
-  enemyChangeAttackSpritesInterval: 0.5
-  enemyChangeStaySpritesInterval: 0.5
-  enemyChangeHurtSpritesInterval: 0.5
-  enemyChangeDeadSpritesInterval: 0.5
-  enemyMoveAnimationSprites:
-  - {fileID: 21300000, guid: 99c6d2a9cb0e3584e8837185d0d40ec1, type: 3}
-  - {fileID: 21300000, guid: bc4df35a3b8d6f140a72f26bd8d7acb7, type: 3}
-  enemyAttackAnimationSprites:
-  - {fileID: 2001858015017421665, guid: 9d31a894e1d8ec346a9f40938a7f604a, type: 3}
-  - {fileID: -2897055423673852335, guid: 8a896f39ee028bb499b9d8d122778584, type: 3}
-  enemyStayAnimationSprites:
-  - {fileID: 21300000, guid: 99c6d2a9cb0e3584e8837185d0d40ec1, type: 3}
-  enemyHurtAnimationSprites:
-  - {fileID: 21300000, guid: 855f717a7812e004c8c0c1dba9e2a4b6, type: 3}
-  - {fileID: 21300000, guid: 2e1e5636886d4b44bae714b2c7757356, type: 3}
-  enemyDeadAnimationSprites:
-  - {fileID: 21300000, guid: 08a7b04f8efb1ce499e65f2735d91a9d, type: 3}
-  enemyAttackActionForce:
-  - {x: 0, y: 1}
-  enemyAttackActionInterval:
-  - 1
+  enemyAttackAnimationTime: 1
+  enemyHurtAnimationTime: 1
+  enemyDeadAnimationTime: 1
 --- !u!212 &443669136
 SpriteRenderer:
   serializedVersion: 2
