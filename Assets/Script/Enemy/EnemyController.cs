@@ -360,7 +360,7 @@ public class EnemyController : MonoBehaviour
     }
     void BeforeDead()
     {
-        if(currentHP <= dataofenemy.enemyHp)
+        if(currentHP <= 0)
         {
             EnemyCurrentStatus = EnemyStatusBox.Dead;
             canChangeStatus = false;
