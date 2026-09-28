@@ -13,8 +13,8 @@ public class EnemyController : MonoBehaviour
         Hurt,
         Dead
     }
-    private EnemyStatusBox EnemyCurrentStatus;
-    private EnemyStatusBox EnemyLatestStatu;
+    [SerializeField] private EnemyStatusBox EnemyCurrentStatus;
+    [SerializeField] private EnemyStatusBox EnemyLatestStatu;
     private bool canChangeStatus;
 
     //Data,Component取得
@@ -29,6 +29,7 @@ public class EnemyController : MonoBehaviour
     //索敵用
     private float distanceX;
     private float distanceY;
+    private float passTimeAfterDetect;
 
     //移動用
     
@@ -56,7 +57,7 @@ public class EnemyController : MonoBehaviour
     //被弾、死亡用
     public bool isDamaged;
     //private bool canBeDamaged;
-    private float damage;
+    [SerializeField] private float damage;
     private Vector2 knockBack;
     [SerializeField] private float currentHP;
     private float passTimeAfterHurtFixed;
@@ -114,6 +115,7 @@ public class EnemyController : MonoBehaviour
         {
             if(EnemyCurrentStatus == EnemyStatusBox.Stay)
             {
+                passTimeAfterDetect = 0f;
                 EnemyCurrentStatus = EnemyStatusBox.Detect;
                 canChangeStatus = false;
             }
@@ -130,9 +132,9 @@ public class EnemyController : MonoBehaviour
                 EnemyCurrentStatus = EnemyStatusBox.Attack;
                 isInCoolTime = true;
                 canChangeStatus = false;
-                /*passTimeAfterAttackFixed = 0f;
+                passTimeAfterAttackFixed = 0f;
                 passTimeAfterAttackCool = 0f;
-                viewAttackSpriteNumber = 0;
+                /*viewAttackSpriteNumber = 0;
                 viewTimeAttackSprite = 0f;
                 attackActionPhase = -1;//初回のアクションを起こすため
                 attackActionTime = 0f;*/
@@ -146,7 +148,14 @@ public class EnemyController : MonoBehaviour
     }
     void CheckTime()
     {
-        
+        if(EnemyCurrentStatus == EnemyStatusBox.Detect)
+        {
+            passTimeAfterDetect += Time.deltaTime;
+            if(passTimeAfterDetect >= dataofenemy.enemyDetectAnimationTime)
+            {
+                canChangeStatus = true;
+            }
+        }
         if(isInCoolTime)//硬直やクールタイムがアニメーションの表示時間より短い場合のでバックログを追加予定
         {
             passTimeAfterAttackCool += Time.deltaTime;
@@ -189,8 +198,8 @@ public class EnemyController : MonoBehaviour
             isDamaged = false;
             //canBeDamaged = false;
             isInKnockBack = true;
-            /*passTimeAfterHurtFixed = 0f;
-            passTimeAfterHurtNonDamage = 0f;*/
+            passTimeAfterHurtFixed = 0f;
+            //passTimeAfterHurtNonDamage = 0f;
             /*viewHurtSpriteNumber = 0;
             viewTimeHurtSprite = 0f;*/
             canChangeStatus = false;
@@ -330,6 +339,10 @@ public class EnemyController : MonoBehaviour
                 enemyrb.linearVelocityX = dataofenemy.enemySpeed;//右向き
             }
         }
+        else
+        {
+            enemyrb.linearVelocityX = 0f;
+        }
     }
     /*void AttackAction()
     {
@@ -385,7 +398,6 @@ public class EnemyController : MonoBehaviour
         if(Keyboard.current.mKey.isPressed)
         {
             isDamaged = true;
-            damage = 10f;
         }
     }
 }

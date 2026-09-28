@@ -272,12 +272,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 111ad7613bda4bb4ab66191aef14ae9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
+  EnemyCurrentStatus: 0
+  EnemyLatestStatu: 0
   dataofenemy: {fileID: 443669135}
   damagesystem: {fileID: 0}
   playertransform: {fileID: 1202132498}
   enemyrb: {fileID: 443669133}
   enemyanim: {fileID: 443669139}
   isDamaged: 0
+  damage: 10
   currentHP: 0
 --- !u!114 &443669135
 MonoBehaviour:
@@ -299,9 +302,7 @@ MonoBehaviour:
   enemyChaseRange: 10
   enemyAttackRange: 3
   enemyCooltime: 7
-  enemyFixedTimeAttack: 5
-  enemyFixedTimeHurt: 5
-  enemyNondamageTime: 5
+  enemyDetectAnimationTime: 1
   enemyAttackAnimationTime: 1
   enemyHurtAnimationTime: 1
   enemyDeadAnimationTime: 1

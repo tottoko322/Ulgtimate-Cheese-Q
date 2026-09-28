@@ -12,12 +12,13 @@ public class EnemyData : MonoBehaviour
     public float enemyChaseRange;
     public float enemyAttackRange;
     public float enemyCooltime;
-    public float enemyFixedTimeAttack;
-    public float enemyFixedTimeHurt;
-    public float enemyNondamageTime;
+    //public float enemyFixedTimeAttack;
+    //public float enemyFixedTimeHurt;
+    //public float enemyNondamageTime;
 
     //アニメーション設定
     [Header("アニメーション設定/状況把握")]
+    public float enemyDetectAnimationTime;
     public float enemyAttackAnimationTime;
     public float enemyHurtAnimationTime;
     public float enemyDeadAnimationTime;
