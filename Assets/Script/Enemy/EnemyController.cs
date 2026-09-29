@@ -88,10 +88,7 @@ public class EnemyController : MonoBehaviour
             CheckDistance();
             BeforeDead();
         }
-        else
-        {
-            Dead();
-        }
+        Dead();
         CheckDamage();
         CheckTime();
         ControlAnimation();
@@ -333,10 +330,18 @@ public class EnemyController : MonoBehaviour
             if(distanceX < 0f)
             {
                 enemyrb.linearVelocityX = -dataofenemy.enemySpeed;//左向き
+                if(transform.localScale.x > 0)
+                {
+                    transform.localScale *= -1;
+                }
             }
             else if(distanceX > 0f)
             {
                 enemyrb.linearVelocityX = dataofenemy.enemySpeed;//右向き
+                if(transform.localScale.x < 0)
+                {
+                    transform.localScale *= -1;
+                }
             }
         }
         else
@@ -383,12 +388,12 @@ public class EnemyController : MonoBehaviour
     {
         if(EnemyCurrentStatus == EnemyStatusBox.Dead)
         {
-            passTimeAfterDead += Time.deltaTime;
-            if(passTimeAfterDead >= dataofenemy.enemyDeadAnimationTime)
+            while (passTimeAfterDead >= dataofenemy.enemyDeadAnimationTime)
             {
-                Debug.Log("enemyDie");
-                gameObject.SetActive(false);
+                passTimeAfterDead += Time.deltaTime;
             }
+            Debug.Log("enemyDie");
+            gameObject.SetActive(false);
         }
     }
 
