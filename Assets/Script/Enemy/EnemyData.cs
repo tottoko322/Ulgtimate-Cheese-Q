@@ -12,6 +12,7 @@ public class EnemyData : MonoBehaviour
     public float enemyChaseRange;
     public float enemyAttackRange;
     public float enemyCooltime;
+    public float enemyHitTiming;
     //public float enemyFixedTimeAttack;
     //public float enemyFixedTimeHurt;
     //public float enemyNondamageTime;
@@ -31,7 +32,7 @@ public class EnemyData : MonoBehaviour
     public Sprite[] enemyAttackAnimationSprites;
     public Sprite[] enemyStayAnimationSprites;
     public Sprite[] enemyHurtAnimationSprites;
-    public Sprite[] enemyDeadAnimationSprites;
+    public Sprite[] enemyDeadAnimationSprites;*/
     public Vector2[] enemyAttackActionForce;
-    public float[] enemyAttackActionInterval;*/
+    public float[] enemyAttackActionInterval;
 }

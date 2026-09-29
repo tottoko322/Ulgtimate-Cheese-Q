@@ -44,15 +44,17 @@ public class EnemyController : MonoBehaviour
     private float viewTimeAttackSprite;
     private float viewTimeStaySprite;
     private float viewTimeHurtSprite;
-    private float viewTimeDeadSprite;
+    private float viewTimeDeadSprite;*/
     private int attackActionPhase;
-    private float attackActionTime;*/
+    private float attackActionTime;
     
 
     //攻撃用
     private bool isInCoolTime;
     private float passTimeAfterAttackFixed;
     private float passTimeAfterAttackCool;
+    public bool willHitEnemyAttack;
+    private float passTimeAfterAttackHit;
 
     //被弾、死亡用
     public bool isDamaged;
@@ -80,6 +82,7 @@ public class EnemyController : MonoBehaviour
         //canBeRemoved = false;
         isInKnockBack = false;
         currentHP = dataofenemy.enemyHp;
+        willHitEnemyAttack = false;
     }
     void Update()
     {
@@ -93,12 +96,13 @@ public class EnemyController : MonoBehaviour
         CheckTime();
         ControlAnimation();
         Damage();
+        Attack();
         //Dead();
     }
     void FixedUpdate()
     {
         ChasePlayer();
-        //AttackAction();
+        AttackAction();
         KnockBack();
     }
 
@@ -131,6 +135,7 @@ public class EnemyController : MonoBehaviour
                 canChangeStatus = false;
                 passTimeAfterAttackFixed = 0f;
                 passTimeAfterAttackCool = 0f;
+                passTimeAfterAttackHit = 0f;
                 /*viewAttackSpriteNumber = 0;
                 viewTimeAttackSprite = 0f;
                 attackActionPhase = -1;//初回のアクションを起こすため
@@ -220,6 +225,101 @@ public class EnemyController : MonoBehaviour
             EnemyLatestStatu = EnemyCurrentStatus;
         }
     }
+    void ChasePlayer()
+    {
+        if(EnemyCurrentStatus == EnemyStatusBox.Chase)
+        {
+            if(distanceX < 0f)
+            {
+                enemyrb.linearVelocityX = -dataofenemy.enemySpeed;//左向き
+                if(transform.localScale.x > 0)
+                {
+                    transform.localScale *= -1;
+                }
+            }
+            else if(distanceX > 0f)
+            {
+                enemyrb.linearVelocityX = dataofenemy.enemySpeed;//右向き
+                if(transform.localScale.x < 0)
+                {
+                    transform.localScale *= -1;
+                }
+            }
+        }
+        else
+        {
+            enemyrb.linearVelocityX = 0f;
+        }
+    }
+    void AttackAction()
+    {
+
+        if(EnemyCurrentStatus == EnemyStatusBox.Attack && attackActionPhase < dataofenemy.enemyAttackActionInterval.Length - 1)
+        {
+            if(attackActionPhase == -1)
+            {
+                attackActionPhase ++ ;
+                enemyrb.AddForce(dataofenemy.enemyAttackActionForce[0],ForceMode2D.Impulse);
+            }
+            attackActionTime += Time.fixedDeltaTime;
+            if(attackActionTime >= dataofenemy.enemyAttackActionInterval[attackActionPhase])
+            {
+                attackActionPhase ++ ;
+                enemyrb.AddForce(dataofenemy.enemyAttackActionForce[attackActionPhase],ForceMode2D.Impulse);
+                attackActionTime = 0f;
+            }
+        }
+    }
+    void Attack()
+    {
+        if(EnemyCurrentStatus == EnemyStatusBox.Attack)
+        {
+            passTimeAfterAttackHit += Time.deltaTime;
+            if(passTimeAfterAttackHit >= dataofenemy.enemyHitTiming)
+            {
+                willHitEnemyAttack = true;
+            }
+        }
+    }
+    void KnockBack()
+    {
+        if(isInKnockBack)
+        {
+            enemyrb.AddForce(knockBack,ForceMode2D.Impulse);
+            isInKnockBack = false;
+        }
+    }
+    void BeforeDead()
+    {
+        if(currentHP <= 0)
+        {
+            EnemyCurrentStatus = EnemyStatusBox.Dead;
+            canChangeStatus = false;
+        }
+    }
+    void Dead()
+    {
+        if(EnemyCurrentStatus == EnemyStatusBox.Dead)
+        {
+            while (passTimeAfterDead >= dataofenemy.enemyDeadAnimationTime)
+            {
+                passTimeAfterDead += Time.deltaTime;
+            }
+            Debug.Log("enemyDie");
+            gameObject.SetActive(false);
+        }
+    }
+
+    //debug用
+    void Damage()
+    {
+        if(Keyboard.current.mKey.isPressed)
+        {
+            isDamaged = true;
+        }
+    }
+
+    //産廃
     /*void ChangeSprite()
     {
         if(EnemyCurrentStatus == EnemyStatusBox.Chase)//追跡アニメーション
@@ -323,86 +423,4 @@ public class EnemyController : MonoBehaviour
             }
         }
     }*/
-    void ChasePlayer()
-    {
-        if(EnemyCurrentStatus == EnemyStatusBox.Chase)
-        {
-            if(distanceX < 0f)
-            {
-                enemyrb.linearVelocityX = -dataofenemy.enemySpeed;//左向き
-                if(transform.localScale.x > 0)
-                {
-                    transform.localScale *= -1;
-                }
-            }
-            else if(distanceX > 0f)
-            {
-                enemyrb.linearVelocityX = dataofenemy.enemySpeed;//右向き
-                if(transform.localScale.x < 0)
-                {
-                    transform.localScale *= -1;
-                }
-            }
-        }
-        else
-        {
-            enemyrb.linearVelocityX = 0f;
-        }
-    }
-    /*void AttackAction()
-    {
-
-        if(EnemyCurrentStatus == EnemyStatusBox.Attack && attackActionPhase < dataofenemy.enemyAttackActionInterval.Length - 1)
-        {
-            if(attackActionPhase == -1)
-            {
-                attackActionPhase ++ ;
-                enemyrb.AddForce(dataofenemy.enemyAttackActionForce[0],ForceMode2D.Impulse);
-            }
-            attackActionTime += Time.fixedDeltaTime;
-            if(attackActionTime >= dataofenemy.enemyAttackActionInterval[attackActionPhase])
-            {
-                attackActionPhase ++ ;
-                enemyrb.AddForce(dataofenemy.enemyAttackActionForce[attackActionPhase],ForceMode2D.Impulse);
-                attackActionTime = 0f;
-            }
-        }
-    }*/
-    void KnockBack()
-    {
-        if(isInKnockBack)
-        {
-            enemyrb.AddForce(knockBack,ForceMode2D.Impulse);
-            isInKnockBack = false;
-        }
-    }
-    void BeforeDead()
-    {
-        if(currentHP <= 0)
-        {
-            EnemyCurrentStatus = EnemyStatusBox.Dead;
-            canChangeStatus = false;
-        }
-    }
-    void Dead()
-    {
-        if(EnemyCurrentStatus == EnemyStatusBox.Dead)
-        {
-            while (passTimeAfterDead >= dataofenemy.enemyDeadAnimationTime)
-            {
-                passTimeAfterDead += Time.deltaTime;
-            }
-            Debug.Log("enemyDie");
-            gameObject.SetActive(false);
-        }
-    }
-
-    //debug用
-    void Damage()
-    {
-        if(Keyboard.current.mKey.isPressed)
-        {
-            isDamaged = true;
-        }
-    }
 }
