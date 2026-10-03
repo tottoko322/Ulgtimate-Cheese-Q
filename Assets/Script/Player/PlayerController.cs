@@ -4,12 +4,12 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     public enum LocomotionState 
-    { 
+    {
         Grounded,
         Airborne,
         WallCling,
         ClimbingLedge
-    } 
+    }
 
     public LocomotionState CurrentLocomotionState { get; private set; } = LocomotionState.Grounded;
 
@@ -60,12 +60,14 @@ public class PlayerController : MonoBehaviour
     private Vector2 moveInput;
 
     private bool jumpPressed;
+    private bool canGroundJump;
     private bool jumpHeld;
     private bool hasUsedAirJump;
     private bool airJumpStateBeforeFastFalling;
     private bool isFastFalling;
     private bool stopFastFalling;
-    private bool isAtLedge;
+    private bool isAtLeftLedge;
+    private bool isAtRightLedge;
 
     private bool isGrounded;
     private bool isRightTouchingWall;
@@ -110,6 +112,9 @@ public class PlayerController : MonoBehaviour
         CompleteLedgeClimb();
         StartLedgeJump();
         //Debug.Log(CurrentLocomotionState);
+        //Debug.Log(previousState);
+        //Debug.Log(wallDirection);
+        //Debug.Log(isAtLeftLedge);
     }
 
     private void ReadInput() //入力取得
@@ -134,7 +139,7 @@ public class PlayerController : MonoBehaviour
         }
 
         //ジャンプの入力
-        if (CurrentLocomotionState == LocomotionState.Grounded || CurrentLocomotionState == LocomotionState.Airborne || CurrentLocomotionState == LocomotionState.ClimbingLedge)
+        if (canGroundJump || CurrentLocomotionState == LocomotionState.Airborne || CurrentLocomotionState == LocomotionState.ClimbingLedge)
         {
             if (Keyboard.current.spaceKey.wasPressedThisFrame)
             {
@@ -149,8 +154,9 @@ public class PlayerController : MonoBehaviour
         {
             wallKick = true;
         }
-        if (Keyboard.current.spaceKey.wasPressedThisFrame && CurrentLocomotionState == LocomotionState.Airborne && !hasUsedAirJump) //!hasUsedAirJumpはAirborneの時にSpaceキーを何度も押されるとcanWallKickがtrueになるため
+        if (Keyboard.current.spaceKey.wasPressedThisFrame && CurrentLocomotionState == LocomotionState.Airborne && wallKickRange)
         {
+            Debug.Log("canWallKick");
             canWallKick = true;
         }
 
@@ -171,10 +177,15 @@ public class PlayerController : MonoBehaviour
         Vector2 leftRayOrigin = new Vector2(transform.position.x -0.5f, transform.position.y -0.5f);
         Vector2 rightRayOrigin = new Vector2(transform.position.x +0.5f, transform.position.y -0.5f);
 
-        RaycastHit2D leftHit = Physics2D.Raycast(leftRayOrigin, Vector2.down, rayLength, groundLayer);
-        RaycastHit2D rightHit = Physics2D.Raycast(rightRayOrigin, Vector2.down, rayLength, groundLayer); //下面から下向きに2本
+        RaycastHit2D leftHit = Physics2D.Raycast(leftRayOrigin, Vector2.down, 0.1f, groundLayer);
+        RaycastHit2D rightHit = Physics2D.Raycast(rightRayOrigin, Vector2.down, 0.1f, groundLayer); //下面から下向きに2本
 
-        isGrounded = leftHit.collider != null || rightHit.collider != null; //どちらか片方が接地するとisGroundedがtrueへ
+        isGrounded = leftHit.collider != null || rightHit.collider != null; //どちらか片方が接地すると地面
+
+
+        RaycastHit2D groundhit = Physics2D.BoxCast(transform.position, new Vector2(1f, 1f), 0f, Vector2.down, rayLength, groundLayer);
+        //地上ジャンプの受け入れに使用
+        canGroundJump = groundhit.collider != null;
     }
 
     private void UpdateWallState() //壁の接触判定
@@ -197,7 +208,8 @@ public class PlayerController : MonoBehaviour
         isRightTouchingWall = (topRightHit.collider != null && bottomRightHit.collider != null);
         isLeftTouchingWall = (topLeftHit.collider != null && bottomLeftHit.collider != null);
 
-        isAtLedge = ((topLeftHit.collider == null && bottomLeftHit.collider != null) || (topRightHit.collider == null && bottomRightHit.collider != null));
+        isAtLeftLedge = topLeftHit.collider == null && bottomLeftHit.collider != null;
+        isAtRightLedge = topRightHit.collider == null && bottomRightHit.collider != null;
         //上端が壁に当たっていないかつ下端が壁に当たっているならば、壁上端
     }
 
@@ -208,6 +220,7 @@ public class PlayerController : MonoBehaviour
             CurrentLocomotionState = LocomotionState.Grounded;
             hasUsedAirJump = false; //空中ジャンプの復活
             isFastFalling = false; //急降下の復活
+            wallDirection = 0;
         }
         else if (isRightTouchingWall || isLeftTouchingWall) //isTouchingWallがtrueならば足場状態WallClingへ
         {
@@ -266,20 +279,20 @@ public class PlayerController : MonoBehaviour
 
     private void Jump() //ジャンプ
     {
-        if (CurrentLocomotionState == LocomotionState.Grounded || CurrentLocomotionState == LocomotionState.Airborne)
+        if (canGroundJump || CurrentLocomotionState == LocomotionState.Airborne)
         {
             if (jumpPressed)
             {
-                switch(CurrentLocomotionState)
+                if (canGroundJump)
                 {
-                    case LocomotionState.Grounded: //一回目のジャンプ
                     rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpPower);
 
                     jumpHoldTimer = 0f;
                     jumpPressed = false;
-                    break;
+                }
 
-                    case LocomotionState.Airborne:
+                else if (!canGroundJump && CurrentLocomotionState == LocomotionState.Airborne)
+                {
                     if (hasUsedAirJump == false && !wallKickRange) //二回目のジャンプ
                     {
                         rb.linearVelocity = new Vector2(rb.linearVelocity.x, airJumpPower);
@@ -290,13 +303,11 @@ public class PlayerController : MonoBehaviour
                         canWallKick = false;
 
                         ledgeJumpTimer = 0f; //
-                        break;
                     }
-                    else //それ以降
+                    else
                     {
                         jumpPressed = false;
                         //canWallKick = false;
-                        break;
                     }
                 }
             }
@@ -345,19 +356,19 @@ public class PlayerController : MonoBehaviour
             hasUsedAirJump = false; //空中ジャンプ回復
             isFastFalling = false; //急降下回復
             canWallKick = false;
-
-            if (isRightTouchingWall) //右の壁なら1
-            {
-                wallDirection = 1;
-            }
-            if (isLeftTouchingWall) //左の壁なら-1
-            {
-                wallDirection = -1;
-            }
         }
         else
         {
             rb.gravityScale = 1f;
+        }
+
+        if (isRightTouchingWall || isAtRightLedge) //右の壁なら1
+        {
+            wallDirection = 1;
+        }
+        if (isLeftTouchingWall || isAtLeftLedge) //左の壁なら-1
+        {
+            wallDirection = -1;
         }
     }
 
@@ -378,15 +389,14 @@ public class PlayerController : MonoBehaviour
             rb.linearVelocity = new Vector2(velocityX, rb.linearVelocity.y * detachWallMultiplier);
         }
 
-        if ((wallKick && moveInput.y >= 0) || (wallKickRange && canWallKick)) //壁キック
+        if ((wallKick && moveInput.y >= 0) || canWallKick) //壁キック
         {
+            Debug.Log("壁キック");
             float velocityX = -wallDirection * wallDetachForce;
             rb.linearVelocity = new Vector2(velocityX, wallKickForce);
 
             wallKick = false;
             canWallKick = false;
-            wallKickRange = false;
-            Debug.Log("壁キック");
         }
         else if (wallKick && moveInput.y < 0)
         {
@@ -396,7 +406,7 @@ public class PlayerController : MonoBehaviour
 
     private void StartLedgeClimb() //ClimbongLedgeへ状態変化
     {
-        if (CurrentLocomotionState == LocomotionState.Airborne && isAtLedge && moveInput.y > 0)
+        if (CurrentLocomotionState == LocomotionState.Airborne && (isAtLeftLedge||isAtRightLedge) && moveInput.y > 0)
         {
             canLedgeClimb = true;
         }
