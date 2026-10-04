@@ -5,6 +5,7 @@ public class WoodenBox : MonoBehaviour
     [SerializeField] private int durability;
     [SerializeField] private bool canDestroy;
     [SerializeField] private bool canPush;
+    [SerializeField] private bool canPassingThrough;
 
     public PolygonCollider2D col;
     private Rigidbody2D rb;
@@ -25,11 +26,15 @@ public class WoodenBox : MonoBehaviour
 
     void CanPush() //プレイヤーとの衝突の有無
     {
-        if (canPush)
+        if (canPush) //衝突、移動あり
         {
             col.enabled = true;
         }
-        else
+        else if (!canPush && !canPassingThrough) //衝突あり
+        {
+            rb.bodyType = RigidbodyType2D.Static;
+        }
+        else //衝突、移動なし
         {
             col.enabled = false;
             rb.gravityScale = 0f;

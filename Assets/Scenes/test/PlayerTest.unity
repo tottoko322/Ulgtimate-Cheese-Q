@@ -516,8 +516,8 @@ Transform:
   m_GameObject: {fileID: 422108639}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.56, y: -2.09, z: 0}
-  m_LocalScale: {x: 2, y: 1, z: 1}
+  m_LocalPosition: {x: -0.63, y: -1.78, z: 0}
+  m_LocalScale: {x: 2, y: 1.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -533,8 +533,8 @@ GameObject:
   - component: {fileID: 426343656}
   - component: {fileID: 426343655}
   - component: {fileID: 426343654}
-  - component: {fileID: 426343657}
   - component: {fileID: 426343658}
+  - component: {fileID: 426343659}
   m_Layer: 3
   m_Name: WoodenBox
   m_TagString: Untagged
@@ -637,14 +637,31 @@ Transform:
   m_GameObject: {fileID: 426343653}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.81, y: -2.36, z: 0}
+  m_LocalPosition: {x: 3.83, y: -2.47, z: 0}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!61 &426343657
-BoxCollider2D:
+--- !u!114 &426343658
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 426343653}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7082ca0ed3c69d64cb5b49d31e68bb44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WoodenBox
+  durability: 0
+  canDestroy: 0
+  canPush: 0
+  canPassingThrough: 0
+  col: {fileID: 426343659}
+--- !u!60 &426343659
+PolygonCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -653,7 +670,7 @@ BoxCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 6200000, guid: 0f11330704f51b948a1f74f8c3b37a9c, type: 2}
+  m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -687,24 +704,15 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
-  m_EdgeRadius: 0
---- !u!114 &426343658
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 426343653}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7082ca0ed3c69d64cb5b49d31e68bb44, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WoodenBox
-  durability: 0
-  canDestroy: 0
-  canPush: 1
-  col: {fileID: 426343657}
+  m_Points:
+    m_Paths:
+    - - {x: -0.5579365, y: 0.5266069}
+      - {x: -0.5579365, y: -0.5599316}
+      - {x: 0.528602, y: -0.5599316}
+      - {x: 0.5382174, y: -0.31954694}
+      - {x: 0.5382174, y: 0.37276077}
+      - {x: 0.528602, y: 0.5266069}
+  m_UseDelaunayMesh: 1
 --- !u!1 &568492164
 GameObject:
   m_ObjectHideFlags: 0
@@ -1085,8 +1093,8 @@ Transform:
   m_GameObject: {fileID: 934719868}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.05, y: -1.29, z: 0}
-  m_LocalScale: {x: 1.5, y: 1, z: 1}
+  m_LocalPosition: {x: 2.15, y: -2.61, z: 0}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -1231,10 +1239,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05fa7f0e16447314396dd8af133a20fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NonInteractiveObject
-  isAutoScroll: 1
+  isAutoScroll: 0
   autoScrollSpeed: 0.002
-  scrollSpeed: 0.43
-  isFixedYAxis: 1
+  scrollSpeed: 1
+  isFixedYAxis: 0
   tint: {r: 1, g: 1, b: 1, a: 1}
   opacity: 1
 --- !u!212 &1299324294
@@ -1305,7 +1313,7 @@ Transform:
   m_GameObject: {fileID: 1299324292}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 7.35, y: 1.3, z: 0}
+  m_LocalPosition: {x: 6.77, y: 1.32, z: 0}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1479,9 +1487,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05fa7f0e16447314396dd8af133a20fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NonInteractiveObject
-  isAutoScroll: 1
+  isAutoScroll: 0
   autoScrollSpeed: 0.001
-  scrollSpeed: 0.43
+  scrollSpeed: 1
   isFixedYAxis: 1
   tint: {r: 1, g: 1, b: 1, a: 1}
   opacity: 1
@@ -1553,7 +1561,7 @@ Transform:
   m_GameObject: {fileID: 1577977801}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.98, y: 0.63, z: 0}
+  m_LocalPosition: {x: 3, y: 0.94, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1800,8 +1808,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NonInteractiveObject
   isAutoScroll: 0
   autoScrollSpeed: 0
-  scrollSpeed: 0.2
-  isFixedYAxis: 1
+  scrollSpeed: 0.9
+  isFixedYAxis: 0
   tint: {r: 1, g: 1, b: 1, a: 1}
   opacity: 1
 --- !u!212 &1809954585
