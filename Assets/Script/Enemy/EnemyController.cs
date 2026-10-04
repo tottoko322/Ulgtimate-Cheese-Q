@@ -54,7 +54,7 @@ public class EnemyController : MonoBehaviour
     private float passTimeAfterAttackFixed;
     private float passTimeAfterAttackCool;
     public bool willHitEnemyAttack;
-    private float passTimeAfterAttackHit;
+    private float passFrameAfterAttackHit;
 
     //被弾、死亡用
     public bool isDamaged;
@@ -275,7 +275,7 @@ public class EnemyController : MonoBehaviour
         if(EnemyCurrentStatus == EnemyStatusBox.Attack)
         {
             passTimeAfterAttackHit += Time.deltaTime;
-            if(passTimeAfterAttackHit >= dataofenemy.enemyHitTiming)
+            if(passTimeAfterAttackHit == dataofenemy.enemyHitFrame)
             {
                 willHitEnemyAttack = true;
             }
