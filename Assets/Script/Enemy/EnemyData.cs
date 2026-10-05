@@ -11,8 +11,10 @@ public class EnemyData : MonoBehaviour
     public float enemySearchRange;
     public float enemyChaseRange;
     public float enemyAttackRange;
+    public float enemyHitRange;
+    public float enemyHitAngle;
     public float enemyCooltime;
-    public int enemyHitFrame;
+    public int[] enemyHitFrame;
     //public float enemyFixedTimeAttack;
     //public float enemyFixedTimeHurt;
     //public float enemyNondamageTime;

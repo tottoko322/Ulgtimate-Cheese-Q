@@ -53,7 +53,7 @@ public class EnemyController : MonoBehaviour
     private bool isInCoolTime;
     private float passTimeAfterAttackFixed;
     private float passTimeAfterAttackCool;
-    public bool willHitEnemyAttack;
+    public bool hasHitedEnemyAttack;
     private float passFrameAfterAttackHit;
 
     //被弾、死亡用
@@ -82,7 +82,7 @@ public class EnemyController : MonoBehaviour
         //canBeRemoved = false;
         isInKnockBack = false;
         currentHP = dataofenemy.enemyHp;
-        willHitEnemyAttack = false;
+        hasHitedEnemyAttack = false;
     }
     void Update()
     {
@@ -135,7 +135,7 @@ public class EnemyController : MonoBehaviour
                 canChangeStatus = false;
                 passTimeAfterAttackFixed = 0f;
                 passTimeAfterAttackCool = 0f;
-                passTimeAfterAttackHit = 0f;
+                passFrameAfterAttackHit = 0;
                 /*viewAttackSpriteNumber = 0;
                 viewTimeAttackSprite = 0f;
                 attackActionPhase = -1;//初回のアクションを起こすため
@@ -274,10 +274,13 @@ public class EnemyController : MonoBehaviour
     {
         if(EnemyCurrentStatus == EnemyStatusBox.Attack)
         {
-            passTimeAfterAttackHit += Time.deltaTime;
-            if(passTimeAfterAttackHit == dataofenemy.enemyHitFrame)
+            passFrameAfterAttackHit += Time.deltaTime;
+            for(int i = 0; i <= dataofenemy.enemyHitFrame.Length - 1; i++)
             {
-                willHitEnemyAttack = true;
+                if(passFrameAfterAttackHit == dataofenemy.enemyHitFrame[i])
+                {
+                    Collider2D hit = 
+                }
             }
         }
     }
