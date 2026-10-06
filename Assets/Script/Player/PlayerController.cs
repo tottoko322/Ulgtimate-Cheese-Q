@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float fallPower;
     [SerializeField] private float maxJumpHoldTime;
     [SerializeField] private float jumpHoldForce;
-    [SerializeField] private float rayLength;
+    [SerializeField] private float boxRayLength;
     private float jumpHoldTimer = 0f;
     private float ledgeJumpTimer = 0f;
 
@@ -115,6 +115,7 @@ public class PlayerController : MonoBehaviour
         //Debug.Log(previousState);
         //Debug.Log(wallDirection);
         //Debug.Log(isAtLeftLedge);
+        //Debug.Log(canGroundJump);
     }
 
     private void ReadInput() //入力取得
@@ -183,7 +184,7 @@ public class PlayerController : MonoBehaviour
         isGrounded = leftHit.collider != null || rightHit.collider != null; //どちらか片方が接地すると地面
 
 
-        RaycastHit2D groundhit = Physics2D.BoxCast(transform.position, new Vector2(1f, 1f), 0f, Vector2.down, rayLength, groundLayer);
+        RaycastHit2D groundhit = Physics2D.BoxCast(transform.position, new Vector2(1f, 1f), 0f, Vector2.down, boxRayLength, groundLayer);
         //地上ジャンプの受け入れに使用
         canGroundJump = groundhit.collider != null;
     }
@@ -285,6 +286,7 @@ public class PlayerController : MonoBehaviour
             {
                 if (canGroundJump)
                 {
+                    Debug.Log("地上ジャンプ");
                     rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpPower);
 
                     jumpHoldTimer = 0f;
