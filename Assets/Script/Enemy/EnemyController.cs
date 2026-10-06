@@ -50,6 +50,7 @@ public class EnemyController : MonoBehaviour
     
 
     //攻撃用
+    [SerializeField] LayerMask playerLayer;
     private bool isInCoolTime;
     private float passTimeAfterAttackFixed;
     private float passTimeAfterAttackCool;
@@ -279,7 +280,22 @@ public class EnemyController : MonoBehaviour
             {
                 if(passFrameAfterAttackHit == dataofenemy.enemyHitFrame[i])
                 {
-                    Collider2D hit = 
+                    Collider2D hit = Physics2D.OverlapCircle(transform.position,dataofenemy.enemyHitRange,playerLayer);
+                    distanceX = playertransform.position.x - transform.position.x;
+                    if(distanceX < 0)
+                    {
+                        if(hit != null && Vector2.Angle(transform.right,playertransform.position) >= 180 - dataofenemy.enemyHitAngle)
+                        {
+                            hasHitedEnemyAttack = true;
+                        }
+                    }
+                    else
+                    {
+                        if(hit != null && Vector2.Angle(transform.right,playertransform.position) <= dataofenemy.enemyHitAngle)
+                        {
+                            hasHitedEnemyAttack = true;
+                        }
+                    }
                 }
             }
         }
