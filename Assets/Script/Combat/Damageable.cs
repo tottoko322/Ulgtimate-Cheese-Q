@@ -16,4 +16,17 @@ public class Damageable : MonoBehaviour
             Debug.LogError("IDamageReceiverが見つかりません", this);
         }
     }
+
+    public void TakeDamage(float damage, Vector2 knockBack)
+    {
+        if (receiver == null || invincibleTimer > 0f)
+        {
+            return;
+        }
+
+        receiver.OnDamaged(damage, knockBack);
+
+        invincibleTimer = invincibleTime;
+    }
+    
 }
