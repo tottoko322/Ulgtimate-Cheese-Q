@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Damageable : MonoBehaviour
 {
-    [SerializeField] private float invincibleTime;
+    [SerializeField, Min(0f)] private float invincibleTime;
 
     private float invincibleTimer;
     private IDamageReceiver receiver;
@@ -17,6 +17,14 @@ public class Damageable : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        if (invincibleTimer > 0f)
+        {
+            invincibleTimer = Mathf.Max(0f, invincibleTimer - Time.deltaTime);
+        }
+    }
+
     public void TakeDamage(float damage, Vector2 knockBack)
     {
         if (receiver == null || invincibleTimer > 0f)
@@ -28,5 +36,6 @@ public class Damageable : MonoBehaviour
 
         invincibleTimer = invincibleTime;
     }
+
     
 }
