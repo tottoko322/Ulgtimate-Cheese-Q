@@ -26,7 +26,7 @@ public class Damageable : MonoBehaviour
 
     public void TakeDamage(float damage, Vector2 knockBack, float invincibleTime)
     {
-        if (receiver == null || invincibleTimer > 0f)
+        if (!isActiveAndEnabled || receiver == null || invincibleTimer > 0f)
         {
             return;
         }
@@ -34,6 +34,6 @@ public class Damageable : MonoBehaviour
         receiver.OnDamaged(damage, knockBack);
 
         invincibleTimer = Mathf.Max(0f, invincibleTime);
-    }
+    }    
     
 }
