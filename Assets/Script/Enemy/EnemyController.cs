@@ -65,7 +65,7 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private float currentHP;
     private float passTimeAfterHurtFixed;
     //private float passTimeAfterHurtNonDamage;
-    //private bool canBeRemoved;
+    private bool canBeRemoved;
     private bool isInKnockBack;
     private float passTimeAfterDead;
 
@@ -80,7 +80,7 @@ public class EnemyController : MonoBehaviour
         isInCoolTime = false;
         isDamaged = false;
         //canBeDamaged = true;
-        //canBeRemoved = false;
+        canBeRemoved = false;
         isInKnockBack = false;
         currentHP = dataofenemy.enemyHp;
         hasHitedEnemyAttack = false;
@@ -193,7 +193,7 @@ public class EnemyController : MonoBehaviour
     }
     void CheckDamage()
     {
-        if(isDamaged) //&& canBeDamaged)
+        if(isDamaged && EnemyCurrentStatus != EnemyStatusBox.Dead) //&& canBeDamaged)
         {
             EnemyCurrentStatus = EnemyStatusBox.Hurt;
             //何かでdamageの値を取得する(damagesystemからの取得を想定)
@@ -315,18 +315,19 @@ public class EnemyController : MonoBehaviour
             EnemyCurrentStatus = EnemyStatusBox.Dead;
             canChangeStatus = false;
         }
+        if(EnemyCurrentStatus == EnemyStatusBox.Dead)
+        {
+            passTimeAfterDead += Time.deltaTime;
+            if(passTimeAfterDead >= dataofenemy.enemyDeadAnimationTime)
+            {
+                Dead();
+            }
+        }
     }
     void Dead()
     {
-        if(EnemyCurrentStatus == EnemyStatusBox.Dead)
-        {
-            while (passTimeAfterDead >= dataofenemy.enemyDeadAnimationTime)
-            {
-                passTimeAfterDead += Time.deltaTime;
-            }
-            Debug.Log("enemyDie");
-            gameObject.SetActive(false);
-        }
+        Debug.Log("enemyDie");
+        gameObject.SetActive(false);
     }
 
     //debug用
