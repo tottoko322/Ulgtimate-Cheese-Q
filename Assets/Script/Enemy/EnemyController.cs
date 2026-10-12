@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class EnemyController : MonoBehaviour, IDamageable
+public class EnemyController : MonoBehaviour, IDamageReceiver
 {
     //状態保存用
     private enum EnemyStatusBox
@@ -20,12 +20,10 @@ public class EnemyController : MonoBehaviour, IDamageable
     //Data,Component取得
     [Header("Component取得")]
     [SerializeField] EnemyData dataofenemy;
-    [SerializeField] Damageable damagesystem;
     [SerializeField] Transform playertransform;
     [SerializeField] private Rigidbody2D enemyrb;
     private SpriteRenderer sr;
     [SerializeField] private Animator enemyanim;
-    [SerializeField] private Damageable dgsystem;
 
     //索敵用
     private float distanceX;
@@ -197,7 +195,6 @@ public class EnemyController : MonoBehaviour, IDamageable
         if(isDamaged && EnemyCurrentStatus != EnemyStatusBox.Dead) //&& canBeDamaged)
         {
             EnemyCurrentStatus = EnemyStatusBox.Hurt;
-            dgsystem.TakeDamage(damage, knockBack);
             //何かでdamageの値を取得する(damagesystemからの取得を想定)
             currentHP -= damage;
             isDamaged = false;
@@ -297,6 +294,12 @@ public class EnemyController : MonoBehaviour, IDamageable
                         {
                             hasHitedEnemyAttack = true;
                         }
+                    }
+                    if (hasHitedEnemyAttack)
+                    {
+                        Damageable target = hit.GetComponentInParent<Damageable>();
+                        target.TakeDamage(dataofenemy.enemyAttack,dataofenemy.enemyGiveKnockBack);
+                        break;
                     }
                 }
             }
