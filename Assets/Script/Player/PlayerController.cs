@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, IDamageReceiver
 {
     public enum LocomotionState
     {
@@ -468,6 +468,11 @@ public class PlayerController : MonoBehaviour
             jumpPressed = false;
             jumpHeld = false;
         }
+    }
+
+    public void OnDamaged(float damage, Vector2 knockBack)
+    {
+        
     }
 }
 
