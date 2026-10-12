@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    public enum LocomotionState 
+    public enum LocomotionState
     {
         Grounded,
         Airborne,
@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
     }
 
     public LocomotionState CurrentLocomotionState { get; private set; } = LocomotionState.Grounded;
+
 
     [Header("Ground Movement")]
     [SerializeField] private float groundMoveSpeed;
@@ -469,3 +470,4 @@ public class PlayerController : MonoBehaviour
         }
     }
 }
+

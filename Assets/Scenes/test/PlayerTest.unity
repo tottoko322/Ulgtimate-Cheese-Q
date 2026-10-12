@@ -406,7 +406,7 @@ Transform:
   m_GameObject: {fileID: 64982309}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.584, y: 0.132, z: 0}
+  m_LocalPosition: {x: -3.6, y: 0.132, z: 0}
   m_LocalScale: {x: 1, y: 6.9030294, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -443,8 +443,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EffectManager
   pl: {fileID: 0}
+  player: {fileID: 1745922055}
+  xOffset: -0.2
+  yOffset: -1
+  DisplayTime: 5
   scaleGrowUpSpeed: 1.01
-  scaleLimit: 5
+  scaleLimit: 3
+  endAngle: -30
+  rotateSpeed: 15
+  startTransparentTime: 0
+  transparentSpeed: 0.01
 --- !u!212 &279791952
 SpriteRenderer:
   serializedVersion: 2
@@ -494,12 +502,12 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 0a0641cbc360f4f43850a8f41dad44f2, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 19.692308, y: 11.076923}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -513,8 +521,8 @@ Transform:
   m_GameObject: {fileID: 279791950}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.07, y: 2.08, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 1}
+  m_LocalPosition: {x: -0.36, y: 2.59, z: 0}
+  m_LocalScale: {x: 0.8, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -952,7 +960,7 @@ Transform:
   m_GameObject: {fileID: 568492164}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.584, y: 3.631, z: 0}
+  m_LocalPosition: {x: -5.599, y: 3.631, z: 0}
   m_LocalScale: {x: 5, y: 0.092413254, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1684,9 +1692,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1745922059}
   - component: {fileID: 1745922058}
+  - component: {fileID: 1745922060}
   - component: {fileID: 1745922057}
   - component: {fileID: 1745922056}
-  - component: {fileID: 1745922060}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -1835,7 +1843,7 @@ Transform:
   m_GameObject: {fileID: 1745922055}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.43, y: -2.67, z: 0}
+  m_LocalPosition: {x: -0.14, y: -2.25, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
