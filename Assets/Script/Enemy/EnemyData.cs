@@ -15,6 +15,7 @@ public class EnemyData : MonoBehaviour
     public float enemyHitAngle;
     public float enemyCooltime;
     public float enemyHitTime;
+    public float enemyInvincibleTime;
     //public float enemyFixedTimeAttack;
     //public float enemyFixedTimeHurt;
     //public float enemyNondamageTime;

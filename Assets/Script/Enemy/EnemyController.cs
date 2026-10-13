@@ -59,8 +59,8 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
     //被弾、死亡用
     public bool isDamaged;
     //private bool canBeDamaged;
-    [SerializeField] private float damage;
-    private Vector2 knockBack;
+    [SerializeField] private float damage;//不要説
+    private Vector2 knockBack;//不要説
     [SerializeField] private float currentHP;
     private float passTimeAfterHurtFixed;
     //private float passTimeAfterHurtNonDamage;
@@ -88,8 +88,8 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
     {
         if(canChangeStatus)
         {
-            CheckDistance();
             BeforeDead();
+            CheckDistance();
         }
         //CheckDamage();
         CheckTime();
@@ -105,48 +105,53 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
         //KnockBack();
     }
 
+
+
     //関数
     void CheckDistance()//Stay,Detect,Chase,Attackへの変更
     {
-        distanceX = playertransform.position.x - transform.position.x;
-        distanceY = playertransform.position.y - transform.position.y;
-        //索敵範囲内か
-        if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemySearchRange*dataofenemy.enemySearchRange)
+        if(EnemyCurrentStatus != EnemyStatusBox.Dead)
         {
-            if(EnemyCurrentStatus == EnemyStatusBox.Stay)
+            distanceX = playertransform.position.x - transform.position.x;
+            distanceY = playertransform.position.y - transform.position.y;
+            //索敵範囲内か
+            if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemySearchRange*dataofenemy.enemySearchRange)
             {
-                passTimeAfterDetect = 0f;
-                EnemyCurrentStatus = EnemyStatusBox.Detect;
-                canChangeStatus = false;
+                if(EnemyCurrentStatus == EnemyStatusBox.Stay)
+                {
+                    passTimeAfterDetect = 0f;
+                    EnemyCurrentStatus = EnemyStatusBox.Detect;
+                    canChangeStatus = false;
+                }
+                else
+                {
+                    EnemyCurrentStatus = EnemyStatusBox.Chase;
+                    canChangeStatus = true;
+                }
             }
-            else
+            if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemyAttackRange*dataofenemy.enemyAttackRange)
             {
-                EnemyCurrentStatus = EnemyStatusBox.Chase;
+                if(!isInCoolTime)
+                {
+                    EnemyCurrentStatus = EnemyStatusBox.Attack;
+                    isInCoolTime = true;
+                    canChangeStatus = false;
+                    hasHitedEnemyAttack = false;
+                    attackActionPhase = 0;
+                    passTimeAfterAttackFixed = 0f;
+                    passTimeAfterAttackCool = 0f;
+                    passTimeAfterAttackHit = 0;
+                    /*viewAttackSpriteNumber = 0;
+                    viewTimeAttackSprite = 0f;
+                    attackActionPhase = -1;//初回のアクションを起こすため
+                    attackActionTime = 0f;*/
+                }
+            }
+            if(distanceX*distanceX + distanceY*distanceY > dataofenemy.enemyChaseRange*dataofenemy.enemyChaseRange)//追跡範囲内か
+            {
+                EnemyCurrentStatus = EnemyStatusBox.Stay;
                 canChangeStatus = true;
             }
-        }
-        if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemyAttackRange*dataofenemy.enemyAttackRange)
-        {
-            if(!isInCoolTime)
-            {
-                EnemyCurrentStatus = EnemyStatusBox.Attack;
-                isInCoolTime = true;
-                canChangeStatus = false;
-                hasHitedEnemyAttack = false;
-                attackActionPhase = 0;
-                passTimeAfterAttackFixed = 0f;
-                passTimeAfterAttackCool = 0f;
-                passTimeAfterAttackHit = 0;
-                /*viewAttackSpriteNumber = 0;
-                viewTimeAttackSprite = 0f;
-                attackActionPhase = -1;//初回のアクションを起こすため
-                attackActionTime = 0f;*/
-            }
-        }
-        if(distanceX*distanceX + distanceY*distanceY > dataofenemy.enemyChaseRange*dataofenemy.enemyChaseRange)//追跡範囲内か
-        {
-            EnemyCurrentStatus = EnemyStatusBox.Stay;
-            canChangeStatus = true;
         }
     }
     void CheckTime()
@@ -282,7 +287,7 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
                 if (hasHitedEnemyAttack)
                 {
                     Damageable target = hit.GetComponentInParent<Damageable>();
-                    target.TakeDamage(dataofenemy.enemyAttack,dataofenemy.enemyGiveKnockBack);
+                    target.TakeDamage(dataofenemy.enemyAttack, dataofenemy.enemyGiveKnockBack);
                 }
             }
         }
