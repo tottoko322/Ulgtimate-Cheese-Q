@@ -262,7 +262,7 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
             {
                 passTimeAfterAttackHit += Time.deltaTime;
             }
-            else
+            else if(!hasHitedEnemyAttack)
             {
                 Collider2D hit = Physics2D.OverlapCircle(transform.position,dataofenemy.enemyHitRange,playerLayer);
                 distanceX = playertransform.position.x - transform.position.x;
