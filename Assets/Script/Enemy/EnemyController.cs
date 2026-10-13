@@ -297,7 +297,6 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
         if(currentHP <= 0)
         {
             EnemyCurrentStatus = EnemyStatusBox.Dead;
-            canChangeStatus = false;
         }
         if(EnemyCurrentStatus == EnemyStatusBox.Dead)
         {
