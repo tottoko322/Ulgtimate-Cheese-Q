@@ -336,7 +336,19 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
     }
     public void OnDamaged(float dama, Vector2 knock)
     {
-        isDamaged = true;
+        if(EnemyCurrentStatus != EnemyStatusBox.Dead)
+        {
+            EnemyCurrentStatus = EnemyStatusBox.Hurt;
+            //何かでdamageの値を取得する(damagesystemからの取得を想定)
+            currentHP -= dama;
+            enemyrb.AddForce(knock,ForceMode2D.Impulse);
+            //canBeDamaged = false;
+            passTimeAfterHurtFixed = 0f;
+            //passTimeAfterHurtNonDamage = 0f;
+            /*viewHurtSpriteNumber = 0;
+            viewTimeHurtSprite = 0f;*/
+            canChangeStatus = false;
+        }
     }
 
     //debug用
