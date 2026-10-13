@@ -237,7 +237,6 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
     }
     void AttackAction()
     {
-
         if(EnemyCurrentStatus == EnemyStatusBox.Attack && attackActionPhase < dataofenemy.enemyAttackActionInterval.Length - 1)
         {
             if(attackActionPhase == -1)
@@ -268,14 +267,14 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
                 distanceX = playertransform.position.x - transform.position.x;
                 if(distanceX < 0)
                 {
-                    if(hit != null && Vector2.Angle(transform.right,playertransform.position) >= 180 - dataofenemy.enemyHitAngle)
+                    if(hit != null && Vector2.Angle(transform.right,playertransform.position - transform.position) >= 180 - dataofenemy.enemyHitAngle)
                     {
                         hasHitedEnemyAttack = true;
                     }
                 }
                 else
                 {
-                    if(hit != null && Vector2.Angle(transform.right,playertransform.position) <= dataofenemy.enemyHitAngle)
+                    if(hit != null && Vector2.Angle(transform.right,playertransform.position - transform.position) <= dataofenemy.enemyHitAngle)
                     {
                         hasHitedEnemyAttack = true;
                     }
