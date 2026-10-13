@@ -22,7 +22,7 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
     [SerializeField] EnemyData dataofenemy;
     [SerializeField] Transform playertransform;
     [SerializeField] private Rigidbody2D enemyrb;
-    private SpriteRenderer sr;
+    //private SpriteRenderer sr;
     [SerializeField] private Animator enemyanim;
 
     //索敵用
@@ -57,30 +57,30 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
     private float passTimeAfterAttackHit;
 
     //被弾、死亡用
-    public bool isDamaged;
+    //public bool isDamaged;
     //private bool canBeDamaged;
     [SerializeField] private float damage;//不要説
     private Vector2 knockBack;//不要説
     [SerializeField] private float currentHP;
     private float passTimeAfterHurtFixed;
     //private float passTimeAfterHurtNonDamage;
-    private bool canBeRemoved;
-    private bool isInKnockBack;
+    //private bool canBeRemoved;
+    //private bool isInKnockBack;
     private float passTimeAfterDead;
 
     //処理
     void Start()
     {
-        sr = GetComponent<SpriteRenderer>();
+        //sr = GetComponent<SpriteRenderer>();
         EnemyCurrentStatus = EnemyStatusBox.Stay;
         EnemyLatestStatu = EnemyStatusBox.Stay;
         //sr.sprite = dataofenemy.enemyStayAnimationSprites[0];
         canChangeStatus = true;
         isInCoolTime = false;
-        isDamaged = false;
+        //isDamaged = false;
         //canBeDamaged = true;
-        canBeRemoved = false;
-        isInKnockBack = false;
+        //canBeRemoved = false;
+        //isInKnockBack = false;
         currentHP = dataofenemy.enemyHp;
         hasHitedEnemyAttack = false;
     }
@@ -138,6 +138,7 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
                     canChangeStatus = false;
                     hasHitedEnemyAttack = false;
                     attackActionPhase = -1;
+                    attackActionTime = 0f;
                     passTimeAfterAttackFixed = 0f;
                     passTimeAfterAttackCool = 0f;
                     passTimeAfterAttackHit = 0;
@@ -334,7 +335,7 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
     {
         if(Keyboard.current.mKey.isPressed)
         {
-            isDamaged = true;
+            //isDamaged = true;
         }
     }
 
