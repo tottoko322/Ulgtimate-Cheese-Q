@@ -137,7 +137,7 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
                     isInCoolTime = true;
                     canChangeStatus = false;
                     hasHitedEnemyAttack = false;
-                    attackActionPhase = 0;
+                    attackActionPhase = -1;
                     passTimeAfterAttackFixed = 0f;
                     passTimeAfterAttackCool = 0f;
                     passTimeAfterAttackHit = 0;
