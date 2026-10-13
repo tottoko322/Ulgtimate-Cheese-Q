@@ -54,7 +54,7 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
     private float passTimeAfterAttackFixed;
     private float passTimeAfterAttackCool;
     public bool hasHitedEnemyAttack;
-    private float passFrameAfterAttackHit;
+    private float passTimeAfterAttackHit;
 
     //被弾、死亡用
     public bool isDamaged;
@@ -91,8 +91,7 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
             CheckDistance();
             BeforeDead();
         }
-        Dead();
-        CheckDamage();
+        //CheckDamage();
         CheckTime();
         ControlAnimation();
         Damage();
@@ -103,7 +102,7 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
     {
         ChasePlayer();
         AttackAction();
-        KnockBack();
+        //KnockBack();
     }
 
     //関数
@@ -133,9 +132,11 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
                 EnemyCurrentStatus = EnemyStatusBox.Attack;
                 isInCoolTime = true;
                 canChangeStatus = false;
+                hasHitedEnemyAttack = false;
+                attackActionPhase = 0;
                 passTimeAfterAttackFixed = 0f;
                 passTimeAfterAttackCool = 0f;
-                passFrameAfterAttackHit = 0;
+                passTimeAfterAttackHit = 0;
                 /*viewAttackSpriteNumber = 0;
                 viewTimeAttackSprite = 0f;
                 attackActionPhase = -1;//初回のアクションを起こすため
@@ -189,23 +190,6 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
                 canBeDamaged = true;
             }
         }*/
-    }
-    void CheckDamage()
-    {
-        if(isDamaged && EnemyCurrentStatus != EnemyStatusBox.Dead) //&& canBeDamaged)
-        {
-            EnemyCurrentStatus = EnemyStatusBox.Hurt;
-            //何かでdamageの値を取得する(damagesystemからの取得を想定)
-            currentHP -= damage;
-            isDamaged = false;
-            //canBeDamaged = false;
-            isInKnockBack = true;
-            passTimeAfterHurtFixed = 0f;
-            //passTimeAfterHurtNonDamage = 0f;
-            /*viewHurtSpriteNumber = 0;
-            viewTimeHurtSprite = 0f;*/
-            canChangeStatus = false;
-        }
     }
     void ControlAnimation()
     {
@@ -274,43 +258,34 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
     {
         if(EnemyCurrentStatus == EnemyStatusBox.Attack)
         {
-            passFrameAfterAttackHit += Time.deltaTime;
-            for(int i = 0; i <= dataofenemy.enemyHitFrame.Length - 1; i++)
+            if(passTimeAfterAttackHit < dataofenemy.enemyHitTime)
             {
-                if(passFrameAfterAttackHit == dataofenemy.enemyHitFrame[i])
+                passTimeAfterAttackHit += Time.deltaTime;
+            }
+            else
+            {
+                Collider2D hit = Physics2D.OverlapCircle(transform.position,dataofenemy.enemyHitRange,playerLayer);
+                distanceX = playertransform.position.x - transform.position.x;
+                if(distanceX < 0)
                 {
-                    Collider2D hit = Physics2D.OverlapCircle(transform.position,dataofenemy.enemyHitRange,playerLayer);
-                    distanceX = playertransform.position.x - transform.position.x;
-                    if(distanceX < 0)
+                    if(hit != null && Vector2.Angle(transform.right,playertransform.position) >= 180 - dataofenemy.enemyHitAngle)
                     {
-                        if(hit != null && Vector2.Angle(transform.right,playertransform.position) >= 180 - dataofenemy.enemyHitAngle)
-                        {
-                            hasHitedEnemyAttack = true;
-                        }
-                    }
-                    else
-                    {
-                        if(hit != null && Vector2.Angle(transform.right,playertransform.position) <= dataofenemy.enemyHitAngle)
-                        {
-                            hasHitedEnemyAttack = true;
-                        }
-                    }
-                    if (hasHitedEnemyAttack)
-                    {
-                        Damageable target = hit.GetComponentInParent<Damageable>();
-                        target.TakeDamage(dataofenemy.enemyAttack,dataofenemy.enemyGiveKnockBack);
-                        break;
+                        hasHitedEnemyAttack = true;
                     }
                 }
+                else
+                {
+                    if(hit != null && Vector2.Angle(transform.right,playertransform.position) <= dataofenemy.enemyHitAngle)
+                    {
+                        hasHitedEnemyAttack = true;
+                    }
+                }
+                if (hasHitedEnemyAttack)
+                {
+                    Damageable target = hit.GetComponentInParent<Damageable>();
+                    target.TakeDamage(dataofenemy.enemyAttack,dataofenemy.enemyGiveKnockBack);
+                }
             }
-        }
-    }
-    void KnockBack()
-    {
-        if(isInKnockBack)
-        {
-            enemyrb.AddForce(knockBack,ForceMode2D.Impulse);
-            isInKnockBack = false;
         }
     }
     void BeforeDead()
@@ -462,6 +437,31 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
             {
                 canBeRemoved = true;
             }
+        }
+    }*/
+    /*void CheckDamage()
+    {
+        if(isDamaged && EnemyCurrentStatus != EnemyStatusBox.Dead) //&& canBeDamaged)
+        {
+            EnemyCurrentStatus = EnemyStatusBox.Hurt;
+            //何かでdamageの値を取得する(damagesystemからの取得を想定)
+            currentHP -= damage;
+            isDamaged = false;
+            //canBeDamaged = false;
+            isInKnockBack = true;
+            passTimeAfterHurtFixed = 0f;
+            //passTimeAfterHurtNonDamage = 0f;
+            viewHurtSpriteNumber = 0;
+            viewTimeHurtSprite = 0f;
+            canChangeStatus = false;
+        }
+    }*/
+    /*void KnockBack()
+    {
+        if(isInKnockBack)
+        {
+            enemyrb.AddForce(knockBack,ForceMode2D.Impulse);
+            isInKnockBack = false;
         }
     }*/
 }
