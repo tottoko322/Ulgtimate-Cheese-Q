@@ -288,7 +288,7 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
                 if (hasHitedEnemyAttack)
                 {
                     Damageable target = hit.GetComponentInParent<Damageable>();
-                    target.TakeDamage(dataofenemy.enemyAttack, dataofenemy.enemyGiveKnockBack);
+                    target.TakeDamage(dataofenemy.enemyAttack, dataofenemy.enemyGiveKnockBack,dataofenemy.enemyAttackInvincibleTime);
                 }
             }
         }
