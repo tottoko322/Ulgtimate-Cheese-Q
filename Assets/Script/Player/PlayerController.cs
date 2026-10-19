@@ -20,7 +20,7 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
     }
 
     public LocomotionState CurrentLocomotionState { get; private set; } = LocomotionState.Grounded;
-    public ActionState CurrentActionState { get; private set; }
+    public ActionState CurrentActionState { get; private set; } = ActionState.Nomal;
 
 
     [Header("Ground Movement")]
@@ -65,7 +65,14 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
     [SerializeField] private float ledgeJumpHorizontalPower;
     [SerializeField] private float ledgeJumpInputWindow; //ledgejumpの受け入れ時間
 
+    [Header("Attack")]
     [SerializeField] private float playerHp;
+    [SerializeField] private float attackRange;
+    [SerializeField] private Vector2 attackPosition;
+    [SerializeField] private float playerAttackDamage;
+    [SerializeField] private Vector2 playerGiveKnockBack;
+    [SerializeField] private float playerAttackInvincibleTime;
+    [SerializeField] private LayerMask enemyLayer;
 
     private int wallDirection = 0;
 
@@ -92,6 +99,8 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
     private bool wallKickRange;
 
     private bool isKnockBack;
+    private bool isAttack;
+    private bool hasAttacked;
 
     [SerializeField] private LayerMask groundLayer;
     private Rigidbody2D rb;
@@ -111,7 +120,11 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
         UpdateGroundState();
         UpdateWallState();
         UpdateLocomotionState();
+
+        //Debug.Log(isAttack);
         UpdateActionState();
+
+        Attack();
 
         HandleGroundedMovement();
         HandleAirMovement();
@@ -126,11 +139,14 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
         HandleLedgeClimb();
         CompleteLedgeClimb();
         StartLedgeJump();
+        //Debug.Log($"isAttack: {isAttack}, ActionState: {CurrentActionState}");
         //Debug.Log(CurrentLocomotionState);
+        //Debug.Log(CurrentActionState);
         //Debug.Log(previousState);
         //Debug.Log(wallDirection);
         //Debug.Log(isAtLeftLedge);
         //Debug.Log(canGroundJump);
+        //Debug.Log(isAttack);
     }
 
     private void ReadInput() //入力取得
@@ -140,9 +156,11 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
             return;
         }
 
-        if (Mouse.current.leftButton.wasPressedThisFrame)
+        if (Keyboard.current.mKey.wasPressedThisFrame)
         {
-            
+            isAttack = true;
+
+            hasAttacked = false;
         }
 
         //左右移動、ジャンプ、壁離れの入力
@@ -200,6 +218,10 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
 
     private void UpdateGroundState() //接地判定
     {
+        if (isKnockBack)
+        {
+            return;
+        }
         Vector2 leftRayOrigin = new Vector2(transform.position.x -0.5f, transform.position.y -0.5f);
         Vector2 rightRayOrigin = new Vector2(transform.position.x +0.5f, transform.position.y -0.5f);
 
@@ -216,6 +238,10 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
 
     private void UpdateWallState() //壁の接触判定
     {
+        if (isKnockBack)
+        {
+            return;
+        }
         Vector2 topLeftRayOrigin = new Vector2(transform.position.x -0.5f, transform.position.y +0.5f); //左上
         Vector2 topRightRayOrigin = new Vector2(transform.position.x +0.5f, transform.position.y +0.5f); //右上
         Vector2 bottomLeftRayOrigin = new Vector2(transform.position.x -0.5f, transform.position.y -0.5f); //左下
@@ -278,7 +304,44 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
         {
             CurrentActionState = ActionState.Dead;
         }
+        else if (isAttack)
+        {
+            CurrentActionState = ActionState.Attacking;
+        }
+        else
+        {
+            CurrentActionState = ActionState.Nomal;
+        }
     }
+
+    private void Attack()
+    {
+        if (CurrentActionState != ActionState.Attacking)
+        {
+            return;
+        }
+
+        if (hasAttacked)
+        {
+            return;
+        }
+
+        hasAttacked = true;
+
+        Collider2D hit = Physics2D.OverlapCircle((Vector2)transform.position+attackPosition, attackRange, enemyLayer);
+
+        if (hit != null)
+        {
+            Damageable target = hit.GetComponentInParent<Damageable>();
+            //target.TakeDamage(playerAttackDamage, playerGiveKnockBack, playerAttackInvincibleTime); //エネミーを置いていないのでエラーが出てしまう。一旦コメントアウトしてます。
+            Debug.Log(playerAttackDamage);
+        }
+
+        isAttack = false;
+    }
+
+    private void OnDrawGizmosSelected()
+     { Gizmos.DrawWireSphere( (Vector2)transform.position+attackPosition, attackRange ); }
     private void HandleGroundedMovement() //地面での左右移動
     {
         if (CurrentLocomotionState == LocomotionState.Grounded)
@@ -514,7 +577,7 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
 
         playerHp -= damage;
 
-        if(playerHp > 0)
+        if (playerHp > 0)
         {
             rb.linearVelocity = knockBack;
 
@@ -522,4 +585,3 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
         }
     }
 }
-

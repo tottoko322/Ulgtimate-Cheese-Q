@@ -500,7 +500,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 3
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 0a0641cbc360f4f43850a8f41dad44f2, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -521,7 +521,7 @@ Transform:
   m_GameObject: {fileID: 279791950}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.36, y: 2.59, z: 0}
+  m_LocalPosition: {x: -0.82, y: 1.91, z: 0}
   m_LocalScale: {x: 0.8, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -650,7 +650,7 @@ GameObject:
   - component: {fileID: 426343654}
   - component: {fileID: 426343658}
   - component: {fileID: 426343659}
-  m_Layer: 3
+  m_Layer: 8
   m_Name: WoodenBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -752,7 +752,7 @@ Transform:
   m_GameObject: {fileID: 426343653}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.83, y: -2.47, z: 0}
+  m_LocalPosition: {x: 0.43, y: -2.18, z: 0}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -772,7 +772,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WoodenBox
   durability: 0
   canDestroy: 0
-  canPush: 0
+  canPush: 1
   canPassingThrough: 0
   col: {fileID: 426343659}
 --- !u!60 &426343659
@@ -1844,7 +1844,7 @@ Transform:
   m_GameObject: {fileID: 1745922055}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.14, y: -2.25, z: 0}
+  m_LocalPosition: {x: -1.76, y: -2.14, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1889,6 +1889,15 @@ MonoBehaviour:
   ledgeJumpPower: 10
   ledgeJumpHorizontalPower: 6
   ledgeJumpInputWindow: 5
+  playerHp: 100
+  attackRange: 1
+  attackPosition: {x: 1, y: 0.5}
+  playerAttackDamage: 5
+  playerGiveKnockBack: {x: 0, y: 0}
+  playerAttackInvincibleTime: 0
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 256
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
