@@ -11,7 +11,16 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
         ClimbingLedge
     }
 
+    public enum ActionState
+    {
+        Nomal,
+        Attacking,
+        Hurt,
+        Dead
+    }
+
     public LocomotionState CurrentLocomotionState { get; private set; } = LocomotionState.Grounded;
+    public ActionState CurrentActionState { get; private set; }
 
 
     [Header("Ground Movement")]
@@ -56,6 +65,8 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
     [SerializeField] private float ledgeJumpHorizontalPower;
     [SerializeField] private float ledgeJumpInputWindow; //ledgejumpの受け入れ時間
 
+    [SerializeField] private float playerHp;
+
     private int wallDirection = 0;
 
     private Vector2 moveInput;
@@ -80,6 +91,8 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
     private bool canWallKick;
     private bool wallKickRange;
 
+    private bool isKnockBack;
+
     [SerializeField] private LayerMask groundLayer;
     private Rigidbody2D rb;
 
@@ -98,6 +111,7 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
         UpdateGroundState();
         UpdateWallState();
         UpdateLocomotionState();
+        UpdateActionState();
 
         HandleGroundedMovement();
         HandleAirMovement();
@@ -121,6 +135,16 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
 
     private void ReadInput() //入力取得
     {
+        if (CurrentActionState == ActionState.Dead || isKnockBack) //死亡orノックバックで入力できない
+        {
+            return;
+        }
+
+        if (Mouse.current.leftButton.wasPressedThisFrame)
+        {
+            
+        }
+
         //左右移動、ジャンプ、壁離れの入力
         moveInput = Vector2.zero;
         if (Keyboard.current.dKey.isPressed)
@@ -223,10 +247,14 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
             hasUsedAirJump = false; //空中ジャンプの復活
             isFastFalling = false; //急降下の復活
             wallDirection = 0;
+
+            isKnockBack = false; //地面につくとノックバック終わり
         }
         else if (isRightTouchingWall || isLeftTouchingWall) //isTouchingWallがtrueならば足場状態WallClingへ
         {
             CurrentLocomotionState = LocomotionState.WallCling;
+
+            isKnockBack = false; //壁につくとノックバック終わり
         }
         else //isGrounded,isTouchingWallがfalseならば足場状態Airborneへ
         {
@@ -244,6 +272,13 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
         }
     }
 
+    private void UpdateActionState() //行動状態更新
+    {
+        if (playerHp <= 0)
+        {
+            CurrentActionState = ActionState.Dead;
+        }
+    }
     private void HandleGroundedMovement() //地面での左右移動
     {
         if (CurrentLocomotionState == LocomotionState.Grounded)
@@ -472,7 +507,19 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
 
     public void OnDamaged(float damage, Vector2 knockBack)
     {
-        
+        if (CurrentActionState == ActionState.Dead)
+        {
+            return;
+        }
+
+        playerHp -= damage;
+
+        if(playerHp > 0)
+        {
+            rb.linearVelocity = knockBack;
+
+            isKnockBack = true;
+        }
     }
 }
 
