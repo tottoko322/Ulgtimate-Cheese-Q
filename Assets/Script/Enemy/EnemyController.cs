@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -59,14 +60,19 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
     //被弾、死亡用
     //public bool isDamaged;
     //private bool canBeDamaged;
-    [SerializeField] private float damage;//不要説
-    private Vector2 knockBack;//不要説
     [SerializeField] private float currentHP;
     private float passTimeAfterHurtFixed;
     //private float passTimeAfterHurtNonDamage;
     //private bool canBeRemoved;
     //private bool isInKnockBack;
     private float passTimeAfterDead;
+
+    //デバック用。
+    [SerializeField] Damageable debugenmy; 
+    [SerializeField] private float damage;
+    [SerializeField] private Vector2 knockBack;
+    [SerializeField] private float invincible;
+
 
     //処理
     void Start()
@@ -336,6 +342,7 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
         if(Keyboard.current.mKey.isPressed)
         {
             //isDamaged = true;
+            debugenmy.TakeDamage(damage,knockBack,invincible);
         }
     }
 
