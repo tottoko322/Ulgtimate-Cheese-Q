@@ -294,7 +294,10 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
                 if (hasHitedEnemyAttack)
                 {
                     Damageable target = hit.GetComponentInParent<Damageable>();
-                    target.TakeDamage(dataofenemy.enemyAttack, dataofenemy.enemyGiveKnockBack,dataofenemy.enemyAttackInvincibleTime);
+                    if(target != null)
+                    {
+                        target.TakeDamage(dataofenemy.enemyAttack, dataofenemy.enemyGiveKnockBack,dataofenemy.enemyAttackInvincibleTime);
+                    }
                 }
             }
         }
@@ -339,7 +342,7 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
     //debug用
     void Damage()
     {
-        if(Keyboard.current.mKey.isPressed)
+        if(Keyboard.current.mKey.wasPressedThisFrame)
         {
             //isDamaged = true;
             debugenmy.TakeDamage(damage,knockBack,invincible);
