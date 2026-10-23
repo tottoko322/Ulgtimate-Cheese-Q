@@ -143,6 +143,7 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
             {
                 if(!isInCoolTime)
                 {
+                    enemyrb.linearVelocityX = 0f;
                     EnemyCurrentStatus = EnemyStatusBox.Attack;
                     isInCoolTime = true;
                     canChangeStatus = false;
@@ -160,6 +161,7 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
             }
             if(distanceX*distanceX + distanceY*distanceY > dataofenemy.enemyChaseRange*dataofenemy.enemyChaseRange)//追跡範囲内か
             {
+                enemyrb.linearVelocityX = 0f;
                 EnemyCurrentStatus = EnemyStatusBox.Stay;
                 canChangeStatus = true;
             }
@@ -246,10 +248,6 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
                 }
             }
         }
-        else
-        {
-            enemyrb.linearVelocityX = 0f;
-        }
     }
     void AttackAction()
     {
@@ -320,6 +318,7 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
     {
         if(EnemyCurrentStatus != EnemyStatusBox.Dead)
         {
+            enemyrb.linearVelocityX = 0f;
             EnemyCurrentStatus = EnemyStatusBox.Hurt;
             //何かでdamageの値を取得する(damagesystemからの取得を想定)
             currentHP -= dama;
