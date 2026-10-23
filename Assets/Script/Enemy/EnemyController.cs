@@ -89,6 +89,10 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
         //isInKnockBack = false;
         currentHP = dataofenemy.enemyHp;
         hasHitedEnemyAttack = false;
+        if(dataofenemy.enemyAttackActionForce.Length != dataofenemy.enemyAttackActionInterval.Length)
+        {
+            Debug.Log("Check EnemyData on Enemy.");
+        }
     }
     void Update()
     {
@@ -277,21 +281,11 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
             {
                 Collider2D hit = Physics2D.OverlapCircle(transform.position,dataofenemy.enemyHitRange,playerLayer);
                 distanceX = playertransform.position.x - transform.position.x;
-                if(distanceX < 0)
+                if(hit != null && Vector2.Angle(transform.right,playertransform.position - transform.position) <= dataofenemy.enemyHitAngle)
                 {
-                    if(hit != null && Vector2.Angle(transform.right,playertransform.position - transform.position) >= 180 - dataofenemy.enemyHitAngle)
-                    {
-                        hasHitedEnemyAttack = true;
-                    }
+                    hasHitedEnemyAttack = true;
                 }
-                else
-                {
-                    if(hit != null && Vector2.Angle(transform.right,playertransform.position - transform.position) <= dataofenemy.enemyHitAngle)
-                    {
-                        hasHitedEnemyAttack = true;
-                    }
-                }
-                if (hasHitedEnemyAttack)
+                if(hasHitedEnemyAttack)
                 {
                     Damageable target = hit.GetComponentInParent<Damageable>();
                     if(target != null)
