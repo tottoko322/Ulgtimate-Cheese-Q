@@ -2,13 +2,14 @@ using UnityEngine;
 
 public class NonInteractiveObject : MonoBehaviour
 {
-    [Header("Scroll")]
+    [Header("AutoScroll")]
     [SerializeField] private bool isAutoScroll;
     [SerializeField] private float autoScrollSpeed;
 
-    [Header("Parallax")]
-    [SerializeField] private float scrollSpeed;
+    [Header("FollowingScroll")]
+    [SerializeField] private bool isfollowingPlayer;
     [SerializeField] private bool isFixedYAxis;
+    [SerializeField] private float scrollSpeed;
 
     [Header("Appearance")]
     [SerializeField] private Color tint = Color.white;
@@ -55,7 +56,7 @@ public class NonInteractiveObject : MonoBehaviour
 
     void ScrollSpeed() //視差
     {
-        if (isAutoScroll)
+        if (isAutoScroll || !isfollowingPlayer)
         {
             return;
         }
