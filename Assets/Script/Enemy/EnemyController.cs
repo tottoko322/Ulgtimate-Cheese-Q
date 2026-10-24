@@ -89,6 +89,10 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
         //isInKnockBack = false;
         currentHP = dataofenemy.enemyHp;
         hasHitedEnemyAttack = false;
+        if(dataofenemy.enemyAttackActionForce.Length != dataofenemy.enemyAttackActionInterval.Length)
+        {
+            Debug.Log("Check EnemyData on Enemy.");
+        }
     }
     void Update()
     {
@@ -139,6 +143,7 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
             {
                 if(!isInCoolTime)
                 {
+                    enemyrb.linearVelocityX = 0f;
                     EnemyCurrentStatus = EnemyStatusBox.Attack;
                     isInCoolTime = true;
                     canChangeStatus = false;
@@ -156,6 +161,7 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
             }
             if(distanceX*distanceX + distanceY*distanceY > dataofenemy.enemyChaseRange*dataofenemy.enemyChaseRange)//追跡範囲内か
             {
+                enemyrb.linearVelocityX = 0f;
                 EnemyCurrentStatus = EnemyStatusBox.Stay;
                 canChangeStatus = true;
             }
@@ -242,10 +248,6 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
                 }
             }
         }
-        else
-        {
-            enemyrb.linearVelocityX = 0f;
-        }
     }
     void AttackAction()
     {
@@ -277,24 +279,17 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
             {
                 Collider2D hit = Physics2D.OverlapCircle(transform.position,dataofenemy.enemyHitRange,playerLayer);
                 distanceX = playertransform.position.x - transform.position.x;
-                if(distanceX < 0)
+                if(hit != null && Vector2.Angle(transform.right,playertransform.position - transform.position) <= dataofenemy.enemyHitAngle)
                 {
-                    if(hit != null && Vector2.Angle(transform.right,playertransform.position - transform.position) >= 180 - dataofenemy.enemyHitAngle)
-                    {
-                        hasHitedEnemyAttack = true;
-                    }
+                    hasHitedEnemyAttack = true;
                 }
-                else
-                {
-                    if(hit != null && Vector2.Angle(transform.right,playertransform.position - transform.position) <= dataofenemy.enemyHitAngle)
-                    {
-                        hasHitedEnemyAttack = true;
-                    }
-                }
-                if (hasHitedEnemyAttack)
+                if(hasHitedEnemyAttack)
                 {
                     Damageable target = hit.GetComponentInParent<Damageable>();
-                    target.TakeDamage(dataofenemy.enemyAttack, dataofenemy.enemyGiveKnockBack,dataofenemy.enemyAttackInvincibleTime);
+                    if(target != null)
+                    {
+                        target.TakeDamage(dataofenemy.enemyAttack, dataofenemy.enemyGiveKnockBack,dataofenemy.enemyAttackInvincibleTime);
+                    }
                 }
             }
         }
@@ -323,6 +318,7 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
     {
         if(EnemyCurrentStatus != EnemyStatusBox.Dead)
         {
+            enemyrb.linearVelocityX = 0f;
             EnemyCurrentStatus = EnemyStatusBox.Hurt;
             //何かでdamageの値を取得する(damagesystemからの取得を想定)
             currentHP -= dama;
@@ -339,7 +335,7 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
     //debug用
     void Damage()
     {
-        if(Keyboard.current.mKey.isPressed)
+        if(Keyboard.current.mKey.wasPressedThisFrame)
         {
             //isDamaged = true;
             debugenmy.TakeDamage(damage,knockBack,invincible);
