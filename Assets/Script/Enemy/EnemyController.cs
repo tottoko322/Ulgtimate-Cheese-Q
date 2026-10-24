@@ -1,35 +1,41 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class EnemyController : MonoBehaviour
+public class EnemyController : MonoBehaviour, IDamageReceiver
 {
     //状態保存用
     private enum EnemyStatusBox
     {
         Stay,
+        Detect,
         Chase,
         Attack,
         Hurt,
         Dead
     }
-    private EnemyStatusBox EnemyCurrentStatus = EnemyStatusBox.Stay;
+    [SerializeField] private EnemyStatusBox EnemyCurrentStatus;
+    [SerializeField] private EnemyStatusBox EnemyLatestStatu;
+    private bool canChangeStatus;
 
     //Data,Component取得
+    [Header("Component取得")]
     [SerializeField] EnemyData dataofenemy;
-    [SerializeField] Damageable damagesystem;
     [SerializeField] Transform playertransform;
-    private Rigidbody2D enemyrb;
-    private SpriteRenderer sr;
+    [SerializeField] private Rigidbody2D enemyrb;
+    //private SpriteRenderer sr;
+    [SerializeField] private Animator enemyanim;
 
     //索敵用
     private float distanceX;
     private float distanceY;
+    private float passTimeAfterDetect;
 
     //移動用
     
 
     //アニメーション用
-    private int viewMoveSpriteNumber;
+    /*private int viewMoveSpriteNumber;
     private int viewAttackSpriteNumber;
     private int viewStaySpriteNumber;
     private int viewHurtSpriteNumber;
@@ -38,149 +44,181 @@ public class EnemyController : MonoBehaviour
     private float viewTimeAttackSprite;
     private float viewTimeStaySprite;
     private float viewTimeHurtSprite;
-    private float viewTimeDeadSprite;
+    private float viewTimeDeadSprite;*/
+    private int attackActionPhase;
+    private float attackActionTime;
     
 
     //攻撃用
+    [SerializeField] LayerMask playerLayer;
     private bool isInCoolTime;
-    private float passTimeAfterAttack;
+    private float passTimeAfterAttackFixed;
+    private float passTimeAfterAttackCool;
+    public bool hasHitedEnemyAttack;
+    private float passTimeAfterAttackHit;
 
     //被弾、死亡用
-    public bool isDamaged;
-    private bool canBeDamaged;
-    private float damage;
-    private Vector2 knockBack;
+    //public bool isDamaged;
+    //private bool canBeDamaged;
     [SerializeField] private float currentHP;
-    private float passTimeAfterHurt;
-    private bool canBeRemoved;
-    private bool canKnockBack;
+    private float passTimeAfterHurtFixed;
+    //private float passTimeAfterHurtNonDamage;
+    //private bool canBeRemoved;
+    //private bool isInKnockBack;
+    private float passTimeAfterDead;
+
+    //デバック用。
+    [SerializeField] Damageable debugenmy; 
+    [SerializeField] private float damage;
+    [SerializeField] private Vector2 knockBack;
+    [SerializeField] private float invincible;
+
 
     //処理
     void Start()
     {
-        sr = GetComponent<SpriteRenderer>();
-        sr.sprite = dataofenemy.enemyStayAnimationSprites[0];
+        //sr = GetComponent<SpriteRenderer>();
+        EnemyCurrentStatus = EnemyStatusBox.Stay;
+        EnemyLatestStatu = EnemyStatusBox.Stay;
+        //sr.sprite = dataofenemy.enemyStayAnimationSprites[0];
+        canChangeStatus = true;
         isInCoolTime = false;
-        isDamaged = false;
-        canBeDamaged = true;
-        canBeRemoved = false;
+        //isDamaged = false;
+        //canBeDamaged = true;
+        //canBeRemoved = false;
+        //isInKnockBack = false;
         currentHP = dataofenemy.enemyHp;
+        hasHitedEnemyAttack = false;
     }
     void Update()
     {
-        Damage();
-        //硬直やクールタイムなどの時間管理
+        if(canChangeStatus)
+        {
+            BeforeDead();
+            CheckDistance();
+        }
+        //CheckDamage();
         CheckTime();
-        //被弾検知、
-        CheckDamage();
-        //索敵範囲内かの判定
-        CheckDistance();
-        //追跡処理
-        ChasePlayer();
-        //攻撃処理
-        //アニメーション処理
-        ChangeSprite();
-        Dead();
+        ControlAnimation();
+        Damage();
+        Attack();
+        //Dead();
     }
     void FixedUpdate()
     {
-        KnockBack();
+        ChasePlayer();
+        AttackAction();
+        //KnockBack();
     }
 
+
+
     //関数
-    void CheckDistance()
+    void CheckDistance()//Stay,Detect,Chase,Attackへの変更
     {
-        distanceX = playertransform.position.x - transform.position.x;
-        distanceY = playertransform.position.y - transform.position.y;
-        if(EnemyCurrentStatus == EnemyStatusBox.Stay)//索敵範囲内か
+        if(EnemyCurrentStatus != EnemyStatusBox.Dead)
         {
+            distanceX = playertransform.position.x - transform.position.x;
+            distanceY = playertransform.position.y - transform.position.y;
+            //索敵範囲内か
             if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemySearchRange*dataofenemy.enemySearchRange)
             {
-                EnemyCurrentStatus = EnemyStatusBox.Chase;
+                if(EnemyCurrentStatus == EnemyStatusBox.Stay)
+                {
+                    passTimeAfterDetect = 0f;
+                    EnemyCurrentStatus = EnemyStatusBox.Detect;
+                    canChangeStatus = false;
+                }
+                else
+                {
+                    EnemyCurrentStatus = EnemyStatusBox.Chase;
+                    canChangeStatus = true;
+                }
             }
-        }
-        if(EnemyCurrentStatus == EnemyStatusBox.Chase)
-        {
             if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemyAttackRange*dataofenemy.enemyAttackRange)
             {
                 if(!isInCoolTime)
                 {
                     EnemyCurrentStatus = EnemyStatusBox.Attack;
                     isInCoolTime = true;
-                    passTimeAfterAttack = 0f;
+                    canChangeStatus = false;
+                    hasHitedEnemyAttack = false;
+                    attackActionPhase = -1;
+                    attackActionTime = 0f;
+                    passTimeAfterAttackFixed = 0f;
+                    passTimeAfterAttackCool = 0f;
+                    passTimeAfterAttackHit = 0;
+                    /*viewAttackSpriteNumber = 0;
+                    viewTimeAttackSprite = 0f;
+                    attackActionPhase = -1;//初回のアクションを起こすため
+                    attackActionTime = 0f;*/
                 }
             }
-            else if(distanceX*distanceX + distanceY*distanceY > dataofenemy.enemyChaseRange*dataofenemy.enemyChaseRange)//追跡範囲内か
+            if(distanceX*distanceX + distanceY*distanceY > dataofenemy.enemyChaseRange*dataofenemy.enemyChaseRange)//追跡範囲内か
             {
                 EnemyCurrentStatus = EnemyStatusBox.Stay;
+                canChangeStatus = true;
             }
         }
     }
     void CheckTime()
     {
+        if(EnemyCurrentStatus == EnemyStatusBox.Detect)
+        {
+            passTimeAfterDetect += Time.deltaTime;
+            if(passTimeAfterDetect >= dataofenemy.enemyDetectAnimationTime)
+            {
+                canChangeStatus = true;
+            }
+        }
         if(isInCoolTime)//硬直やクールタイムがアニメーションの表示時間より短い場合のでバックログを追加予定
         {
-            passTimeAfterAttack += Time.deltaTime;
-            if(EnemyCurrentStatus == EnemyStatusBox.Attack && passTimeAfterAttack > dataofenemy.enemyFixedTimeAttack)
-            {
-                EnemyCurrentStatus = EnemyStatusBox.Stay;
-            }
-            if(passTimeAfterAttack >= dataofenemy.enemyCooltime)
+            passTimeAfterAttackCool += Time.deltaTime;
+            if(passTimeAfterAttackCool >= dataofenemy.enemyCooltime)
             {
                 isInCoolTime = false;
-                passTimeAfterAttack = 0f;
-                viewAttackSpriteNumber = 0;
+            }
+        }
+        if(EnemyCurrentStatus == EnemyStatusBox.Attack)
+        {
+            passTimeAfterAttackFixed += Time.deltaTime;
+            if(passTimeAfterAttackFixed >= dataofenemy.enemyAttackAnimationTime)
+            {
+                canChangeStatus = true;
             }
         }
         if(EnemyCurrentStatus == EnemyStatusBox.Hurt)
         {
-            passTimeAfterHurt += Time.deltaTime;
-            if(passTimeAfterHurt >= dataofenemy.enemyFixedTimeHurt)
+            passTimeAfterHurtFixed += Time.deltaTime;
+            if(passTimeAfterHurtFixed >= dataofenemy.enemyHurtAnimationTime)
             {
-                EnemyCurrentStatus = EnemyStatusBox.Stay;
-                if(canBeDamaged)
-                {
-                    passTimeAfterHurt = 0f;
-                }
+                canChangeStatus = true;
             }
         }
-        if(!canBeDamaged)
+        /*if(!canBeDamaged)
         {
-            if(passTimeAfterHurt >= dataofenemy.enemyNondamageTime)
+            if(passTimeAfterHurtNonDamage >= dataofenemy.enemyNondamageTime)
             {
                 canBeDamaged = true;
-                if(EnemyCurrentStatus != EnemyStatusBox.Hurt)
-                {
-                        passTimeAfterHurt = 0f;
-                }
             }
-            else if(EnemyCurrentStatus != EnemyStatusBox.Hurt)
-            {
-                passTimeAfterHurt += Time.deltaTime;
-            }
-        }
+        }*/
     }
-    void CheckDamage()
+    void ControlAnimation()
     {
-        if(isDamaged && canBeDamaged)
+        if(EnemyLatestStatu != EnemyCurrentStatus)
         {
-            EnemyCurrentStatus = EnemyStatusBox.Hurt;
-            //何かでdamageの値を取得する(damagesystemからの取得を想定)
-            currentHP -= damage;
-            isDamaged = false;
-            canBeDamaged = false;
-            canKnockBack = true;
-            passTimeAfterHurt = 0f;
-            viewHurtSpriteNumber = 0;
-            viewTimeHurtSprite = 0f;
-            if(currentHP <= 0f)
+            string enemyAnimationTrigger = EnemyCurrentStatus switch
             {
-                EnemyCurrentStatus = EnemyStatusBox.Dead;
-            }
-        }
-        else if (!canBeDamaged)
-        {
-            isDamaged = false;
+                EnemyStatusBox.Stay => "StayTrigger",
+                EnemyStatusBox.Detect => "DetectTrigger",
+                EnemyStatusBox.Chase => "ChaseTrigger",
+                EnemyStatusBox.Attack => "AttackTrigger",
+                EnemyStatusBox.Hurt => "HurtTrigger",
+                EnemyStatusBox.Dead => "DeadTrigger",
+                _ => "ChaseStatus"//趣味。バグったときは動いていてほしい()
+            };
+            enemyanim.SetTrigger(enemyAnimationTrigger);
+            EnemyLatestStatu = EnemyCurrentStatus;
         }
     }
     void ChasePlayer()
@@ -189,15 +227,127 @@ public class EnemyController : MonoBehaviour
         {
             if(distanceX < 0f)
             {
-                transform.Translate(Vector3.left*dataofenemy.enemySpeed*Time.deltaTime);
+                enemyrb.linearVelocityX = -dataofenemy.enemySpeed;//左向き
+                if(transform.localScale.x > 0)
+                {
+                    transform.localScale *= -1;
+                }
             }
             else if(distanceX > 0f)
             {
-                transform.Translate(Vector3.right*dataofenemy.enemySpeed*Time.deltaTime);
+                enemyrb.linearVelocityX = dataofenemy.enemySpeed;//右向き
+                if(transform.localScale.x < 0)
+                {
+                    transform.localScale *= -1;
+                }
+            }
+        }
+        else
+        {
+            enemyrb.linearVelocityX = 0f;
+        }
+    }
+    void AttackAction()
+    {
+        if(EnemyCurrentStatus == EnemyStatusBox.Attack && attackActionPhase < dataofenemy.enemyAttackActionInterval.Length - 1)
+        {
+            if(attackActionPhase == -1)
+            {
+                attackActionPhase ++ ;
+                enemyrb.AddForce(dataofenemy.enemyAttackActionForce[0],ForceMode2D.Impulse);
+            }
+            attackActionTime += Time.fixedDeltaTime;
+            if(attackActionTime >= dataofenemy.enemyAttackActionInterval[attackActionPhase])
+            {
+                attackActionPhase ++ ;
+                enemyrb.AddForce(dataofenemy.enemyAttackActionForce[attackActionPhase],ForceMode2D.Impulse);
+                attackActionTime = 0f;
             }
         }
     }
-    void ChangeSprite()
+    void Attack()
+    {
+        if(EnemyCurrentStatus == EnemyStatusBox.Attack)
+        {
+            if(passTimeAfterAttackHit < dataofenemy.enemyHitTime)
+            {
+                passTimeAfterAttackHit += Time.deltaTime;
+            }
+            else if(!hasHitedEnemyAttack)
+            {
+                Collider2D hit = Physics2D.OverlapCircle(transform.position,dataofenemy.enemyHitRange,playerLayer);
+                distanceX = playertransform.position.x - transform.position.x;
+                if(distanceX < 0)
+                {
+                    if(hit != null && Vector2.Angle(transform.right,playertransform.position - transform.position) >= 180 - dataofenemy.enemyHitAngle)
+                    {
+                        hasHitedEnemyAttack = true;
+                    }
+                }
+                else
+                {
+                    if(hit != null && Vector2.Angle(transform.right,playertransform.position - transform.position) <= dataofenemy.enemyHitAngle)
+                    {
+                        hasHitedEnemyAttack = true;
+                    }
+                }
+                if (hasHitedEnemyAttack)
+                {
+                    Damageable target = hit.GetComponentInParent<Damageable>();
+                    target.TakeDamage(dataofenemy.enemyAttack, dataofenemy.enemyGiveKnockBack,dataofenemy.enemyAttackInvincibleTime);
+                }
+            }
+        }
+    }
+    void BeforeDead()
+    {
+        if(currentHP <= 0)
+        {
+            EnemyCurrentStatus = EnemyStatusBox.Dead;
+        }
+        if(EnemyCurrentStatus == EnemyStatusBox.Dead)
+        {
+            passTimeAfterDead += Time.deltaTime;
+            if(passTimeAfterDead >= dataofenemy.enemyDeadAnimationTime)
+            {
+                Dead();
+            }
+        }
+    }
+    void Dead()
+    {
+        Debug.Log("enemyDie");
+        gameObject.SetActive(false);
+    }
+    public void OnDamaged(float dama, Vector2 knock)
+    {
+        if(EnemyCurrentStatus != EnemyStatusBox.Dead)
+        {
+            EnemyCurrentStatus = EnemyStatusBox.Hurt;
+            //何かでdamageの値を取得する(damagesystemからの取得を想定)
+            currentHP -= dama;
+            enemyrb.AddForce(knock,ForceMode2D.Impulse);
+            //canBeDamaged = false;
+            passTimeAfterHurtFixed = 0f;
+            //passTimeAfterHurtNonDamage = 0f;
+            /*viewHurtSpriteNumber = 0;
+            viewTimeHurtSprite = 0f;*/
+            canChangeStatus = false;
+        }
+    }
+
+    //debug用
+    void Damage()
+    {
+        if(Keyboard.current.mKey.isPressed)
+        {
+            //isDamaged = true;
+            debugenmy.TakeDamage(damage,knockBack,invincible);
+        }
+    }
+
+    //産廃
+    /*void ChangeSprite()
     {
         if(EnemyCurrentStatus == EnemyStatusBox.Chase)//追跡アニメーション
         {
@@ -299,29 +449,30 @@ public class EnemyController : MonoBehaviour
                 canBeRemoved = true;
             }
         }
-    }
-    void KnockBack()
+    }*/
+    /*void CheckDamage()
     {
-        if (canKnockBack)
+        if(isDamaged && EnemyCurrentStatus != EnemyStatusBox.Dead) //&& canBeDamaged)
+        {
+            EnemyCurrentStatus = EnemyStatusBox.Hurt;
+            //何かでdamageの値を取得する(damagesystemからの取得を想定)
+            currentHP -= damage;
+            isDamaged = false;
+            //canBeDamaged = false;
+            isInKnockBack = true;
+            passTimeAfterHurtFixed = 0f;
+            //passTimeAfterHurtNonDamage = 0f;
+            viewHurtSpriteNumber = 0;
+            viewTimeHurtSprite = 0f;
+            canChangeStatus = false;
+        }
+    }*/
+    /*void KnockBack()
+    {
+        if(isInKnockBack)
         {
             enemyrb.AddForce(knockBack,ForceMode2D.Impulse);
+            isInKnockBack = false;
         }
-    }
-    void Dead()
-    {
-        if (canBeRemoved)
-        {
-            gameObject.SetActive(false);
-        }
-    }
-
-    //debug用
-    void Damage()
-    {
-        if (Keyboard.current.aKey.isPressed)
-        {
-            isDamaged = true;
-            damage = 10f;
-        }
-    }
+    }*/
 }
