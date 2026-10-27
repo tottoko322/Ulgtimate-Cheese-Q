@@ -3,13 +3,14 @@ using UnityEngine;
 public class EnemyData : MonoBehaviour
 {
     //能力値
-    [Header("能力値")]
+    [Header("hp/追跡関係")]
     public float enemyHp;
-    public float enemyAttack;
-    public Vector2 enemyGiveKnockBack;
     public float enemySpeed;
     public float enemySearchRange;
     public float enemyChaseRange;
+    [Header("攻撃関係")]
+    public float enemyAttack;
+    public Vector2 enemyGiveKnockBack;
     public float enemyAttackRange;
     public float enemyHitRange;
     public float enemyHitAngle;

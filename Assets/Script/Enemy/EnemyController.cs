@@ -18,13 +18,6 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
     [SerializeField] private EnemyStatusBox EnemyLatestStatu;
     private bool canChangeStatus;
 
-    //Data,Component取得
-    [Header("Component取得")]
-    [SerializeField] EnemyData dataofenemy;
-    [SerializeField] Transform playertransform;
-    [SerializeField] private Rigidbody2D enemyrb;
-    //private SpriteRenderer sr;
-    [SerializeField] private Animator enemyanim;
 
     //索敵用
     private float distanceX;
@@ -67,7 +60,16 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
     //private bool isInKnockBack;
     private float passTimeAfterDead;
 
+    //Data,Component取得
+    [Header("Component取得")]
+    [SerializeField] EnemyData dataofenemy;
+    [SerializeField] Transform playertransform;
+    [SerializeField] private Rigidbody2D enemyrb;
+    //private SpriteRenderer sr;
+    [SerializeField] private Animator enemyanim;
+    
     //デバック用。
+    [Header("デバック用")]
     [SerializeField] Damageable debugenmy; 
     [SerializeField] private float damage;
     [SerializeField] private Vector2 knockBack;
