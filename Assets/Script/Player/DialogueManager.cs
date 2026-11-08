@@ -8,7 +8,9 @@ using Unity.VisualScripting;
 public class DialogueManager : MonoBehaviour
 {
     [SerializeField] private SignScript sS;
-    private bool wasFrontSign;
+
+    [SerializeField] private RectTransform mainCharacter;
+    [SerializeField] private RectTransform enemyCharacter;
 
     [System.Serializable]
     public class DialogueEvent
@@ -18,10 +20,22 @@ public class DialogueManager : MonoBehaviour
         public bool[] isMainCharacter; // 主人公キャラかどうか (true:左, false:右)
     }
 
-    public TMP_Text dialogueText;  // テキスト表示
+    [SerializeField] private float nextLetterTime;
+
+    [Header("AppearanceNotDialogue")]
+    [SerializeField] private Color tint = Color.white;
+    [SerializeField, Range(0f,1f)] private float opacity;
+
+    [Header("Sprite")]
     public Image MainCharacterImage;  // 主人公キャラの画像
-    public Image EnCharacterImage; // 敵キャラの画像
-    public Button checkButton; // 会話開始ボタン
+    public Image EnemyCharacterImage; // 敵キャラの画像
+
+    [Header("PositionInDialogue")]
+    [SerializeField] private float xPosition;
+    [SerializeField] private float yPosition;
+
+
+    public TMP_Text dialogueText;  // テキスト表示
     public GameObject dialogueUI; // UI全体
 
     public DialogueEvent[] dialogueEvents; // 会話データ
@@ -29,28 +43,26 @@ public class DialogueManager : MonoBehaviour
     private int currentSentenceIndex = 0; // 現在のセリフ
     private bool isTyping = false; // 文字表示中フラグ
 
-    private bool isDialogue;
+    private bool isDialogue; //会話中
+    private Vector2 beginningEnemyPosition;
+    private Vector2 beginningMainPosition;
 
     void Start()
     {
         dialogueUI.SetActive(false);
-        checkButton.gameObject.SetActive(false);
-        checkButton.onClick.AddListener(StartDialogue);
+
+        beginningEnemyPosition = enemyCharacter.anchoredPosition;
+        beginningMainPosition = mainCharacter.anchoredPosition;
     }
 
     void Update()
     {
-        if (sS.isFrontSign != wasFrontSign)
+        if (sS.isFrontSign && !isDialogue)
         {
-            if (sS.isFrontSign && !isDialogue) //会話中は看板に近づいてもチェックボタンを表示しない
+            if (Keyboard.current.jKey.wasPressedThisFrame)
             {
-                DisplayCheckButton();
+                StartDialogue();
             }
-            else
-            {
-                HideCheckButton();
-            }
-            wasFrontSign = sS.isFrontSign;
         }
 
         if (Keyboard.current.kKey.wasPressedThisFrame)
@@ -64,21 +76,10 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    void DisplayCheckButton()
-    {
-        checkButton.gameObject.SetActive(true);
-    }
-
-    void HideCheckButton()
-    {
-        checkButton.gameObject.SetActive(false);
-    }
-
     void StartDialogue()
     {
         isDialogue = true;
 
-        checkButton.gameObject.SetActive(false);
         dialogueUI.SetActive(true);
         currentDialogueIndex = 0;
         currentSentenceIndex = 0;
@@ -97,7 +98,7 @@ public class DialogueManager : MonoBehaviour
         foreach (char letter in sentence.ToCharArray())
         {
             dialogueText.text += letter;
-            yield return new WaitForSeconds(0.05f); // 文字送り速度
+            yield return new WaitForSeconds(nextLetterTime); // 文字送り速度
         }
 
         isTyping = false;
@@ -150,13 +151,23 @@ public class DialogueManager : MonoBehaviour
             {
                 MainCharacterImage.sprite = charSprite;
                 MainCharacterImage.color = new Color(1f, 1f, 1f, 1f); // 主人公を明るく
-                EnCharacterImage.color = new Color(1f, 1f, 1f, 0.5f); // 敵を薄く
+
+                tint.a = opacity;
+                EnemyCharacterImage.color = tint; //敵を暗く
+
+                mainCharacter.anchoredPosition = beginningMainPosition + new Vector2(xPosition, yPosition);
+                enemyCharacter.anchoredPosition = beginningEnemyPosition;
             }
             else
             {
-                EnCharacterImage.sprite = charSprite;
-                EnCharacterImage.color = new Color(1f, 1f, 1f, 1f); // 敵を明るく
-                MainCharacterImage.color = new Color(1f, 1f, 1f, 0.5f); // 主人公を薄く
+                EnemyCharacterImage.sprite = charSprite;
+                EnemyCharacterImage.color = new Color(1f, 1f, 1f, 1f); // 敵を明るく
+
+                tint.a = opacity;
+                MainCharacterImage.color = tint; //主人公を暗く
+
+                enemyCharacter.anchoredPosition = beginningEnemyPosition + new Vector2(-xPosition, yPosition);
+                mainCharacter.anchoredPosition = beginningMainPosition;
             }
         }
     }
