@@ -94,7 +94,7 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
     private bool canLedgeClimb;
     private bool hasLedgeJumped;
 
-    private bool wallKick;
+    private bool isWallKick;
     private bool canWallKick;
     private bool wallKickRange;
 
@@ -105,9 +105,35 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
     [SerializeField] private LayerMask groundLayer;
     private Rigidbody2D rb;
 
+
+    [SerializeField] private InputActionAsset inputActions;
+    private InputActionMap keyControl;
+
+    private InputAction attack;
+    private InputAction moveRight;
+    private InputAction moveLeft;
+    private InputAction jump;
+    private InputAction wallUp;
+    private InputAction wallDown;
+    private InputAction wallKick;
+    private InputAction fastFall;
+    private InputAction stopFastFall;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+
+        keyControl = inputActions.FindActionMap("KeyControl", true);
+
+        attack = keyControl.FindAction("Attack", true);
+        moveRight = keyControl.FindAction("MoveRight", true);
+        moveLeft = keyControl.FindAction("MoveLeft", true);
+        jump = keyControl.FindAction("Jump", true);
+        wallUp = keyControl.FindAction("WallUp", true);
+        wallDown = keyControl.FindAction("WallDown", true);
+        wallKick = keyControl.FindAction("WallKick", true);
+        fastFall = keyControl.FindAction("FastFall", true);
+        stopFastFall = keyControl.FindAction("StopFastFall", true);
     }
 
     void Update()
@@ -156,7 +182,7 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
             return;
         }
 
-        if (Keyboard.current.mKey.wasPressedThisFrame)
+        if (attack.WasPressedThisFrame())
         {
             isAttack = true;
 
@@ -165,19 +191,19 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
 
         //左右移動、ジャンプ、壁離れの入力
         moveInput = Vector2.zero;
-        if (Keyboard.current.dKey.isPressed)
+        if (moveRight.IsPressed())
         {
             moveInput.x += 1;
         }
-        if (Keyboard.current.aKey.isPressed)
+        if (moveLeft.IsPressed())
         {
             moveInput.x -= 1;
         }
-        if (Keyboard.current.wKey.isPressed)
+        if (wallUp.IsPressed())
         {
             moveInput.y += 1;
         }
-        if (Keyboard.current.sKey.isPressed)
+        if (wallDown.IsPressed())
         {
             moveInput.y -= 1;
         }
@@ -185,7 +211,7 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
         //ジャンプの入力
         if (canGroundJump || CurrentLocomotionState == LocomotionState.Airborne || CurrentLocomotionState == LocomotionState.ClimbingLedge)
         {
-            if (Keyboard.current.spaceKey.wasPressedThisFrame)
+            if (jump.WasPressedThisFrame())
             {
                 jumpPressed = true;
             }
@@ -194,23 +220,23 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
         }
 
         //壁キックの入力
-        if (Keyboard.current.spaceKey.wasPressedThisFrame && CurrentLocomotionState == LocomotionState.WallCling)
+        if (wallKick.WasPressedThisFrame() && CurrentLocomotionState == LocomotionState.WallCling)
         {
-            wallKick = true;
+            isWallKick = true;
         }
-        if (Keyboard.current.spaceKey.wasPressedThisFrame && CurrentLocomotionState == LocomotionState.Airborne && wallKickRange)
+        if (wallKick.WasPressedThisFrame() && CurrentLocomotionState == LocomotionState.Airborne && wallKickRange)
         {
             Debug.Log("canWallKick");
             canWallKick = true;
         }
 
         //急降下の入力
-        if (Keyboard.current.sKey.wasPressedThisFrame)
+        if (fastFall.WasPressedThisFrame())
         {
             isFastFalling = true;
             airJumpStateBeforeFastFalling = hasUsedAirJump; //急降下前の空中ジャンプの使用の有無の記録
         }
-        if (Keyboard.current.wKey.wasPressedThisFrame && isFastFalling)
+        if (stopFastFall.WasPressedThisFrame() && isFastFalling)
         {
             stopFastFalling = true;
         }
@@ -307,6 +333,7 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
         else if (isAttack)
         {
             CurrentActionState = ActionState.Attacking;
+            Debug.Log("アタック");
         }
         else
         {
@@ -490,18 +517,18 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
             rb.linearVelocity = new Vector2(velocityX, rb.linearVelocity.y * detachWallMultiplier);
         }
 
-        if ((wallKick && moveInput.y >= 0) || canWallKick) //壁キック
+        if ((isWallKick && moveInput.y >= 0) || canWallKick) //壁キック
         {
             Debug.Log("壁キック");
             float velocityX = -wallDirection * wallDetachForce;
             rb.linearVelocity = new Vector2(velocityX, wallKickForce);
 
-            wallKick = false;
+            isWallKick = false;
             canWallKick = false;
         }
-        else if (wallKick && moveInput.y < 0)
+        else if (isWallKick && moveInput.y < 0)
         {
-            wallKick = false;
+            isWallKick = false;
         }
     }
 
