@@ -216,7 +216,7 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
                 jumpPressed = true;
             }
 
-            jumpHeld = Keyboard.current.spaceKey.isPressed;
+            jumpHeld = jump.IsPressed();
         }
 
         //壁キックの入力
