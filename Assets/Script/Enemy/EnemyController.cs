@@ -47,6 +47,7 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
     private float viewTimeDeadSprite;*/
     private int attackActionPhase;
     private float attackActionTime;
+    private int adjustFace;//1or-1。
     
 
     //攻撃用
@@ -138,6 +139,11 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
                     EnemyCurrentStatus = EnemyStatusBox.Chase;
                     canChangeStatus = true;
                 }
+            }
+            else if(EnemyCurrentStatus == EnemyStatusBox.Detect)
+            {
+                EnemyCurrentStatus = EnemyStatusBox.Stay;
+                canChangeStatus = true;
             }
             if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemyAttackRange*dataofenemy.enemyAttackRange)
             {
@@ -237,6 +243,7 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
                 if(transform.localScale.x > 0)
                 {
                     transform.localScale *= -1;
+                    adjustFace = -1;//スプライト左向き想定。
                 }
             }
             else if(distanceX > 0f)
@@ -245,6 +252,7 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
                 if(transform.localScale.x < 0)
                 {
                     transform.localScale *= -1;
+                    adjustFace = 1;
                 }
             }
         }
@@ -256,13 +264,13 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
             if(attackActionPhase == -1)
             {
                 attackActionPhase ++ ;
-                enemyrb.AddForce(dataofenemy.enemyAttackActionForce[0],ForceMode2D.Impulse);
+                enemyrb.AddForce(dataofenemy.enemyAttackActionForce[0]*adjustFace,ForceMode2D.Impulse);
             }
             attackActionTime += Time.fixedDeltaTime;
             if(attackActionTime >= dataofenemy.enemyAttackActionInterval[attackActionPhase])
             {
                 attackActionPhase ++ ;
-                enemyrb.AddForce(dataofenemy.enemyAttackActionForce[attackActionPhase],ForceMode2D.Impulse);
+                enemyrb.AddForce(dataofenemy.enemyAttackActionForce[attackActionPhase]*adjustFace,ForceMode2D.Impulse);
                 attackActionTime = 0f;
             }
         }
