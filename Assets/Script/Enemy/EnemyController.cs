@@ -239,18 +239,18 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
             if(distanceX < 0f)
             {
                 enemyrb.linearVelocityX = -dataofenemy.enemySpeed;//左向き
-                if(transform.localScale.x > 0)
+                if(transform.localScale.x < 0)
                 {
-                    transform.localScale *= -1;
+                    transform.localScale *= new Vector2(-1,1);
                     adjustFace = -1;//スプライト左向き想定。
                 }
             }
             else if(distanceX > 0f)
             {
                 enemyrb.linearVelocityX = dataofenemy.enemySpeed;//右向き
-                if(transform.localScale.x < 0)
+                if(transform.localScale.x > 0)
                 {
-                    transform.localScale *= -1;
+                    transform.localScale *= new Vector2(-1,1);
                     adjustFace = 1;
                 }
             }
