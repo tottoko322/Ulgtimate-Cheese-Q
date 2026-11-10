@@ -4,7 +4,21 @@ using UnityEngine.InputSystem;
 
 public class EnemyController : MonoBehaviour, IDamageReceiver
 {
-    //状態保存用
+    [Header("Componentなどの取得(変更非推奨)")]
+    [SerializeField] EnemyData dataofenemy;
+    [SerializeField] Transform playertransform;
+    [SerializeField] private Rigidbody2D enemyrb;
+    //private SpriteRenderer sr;
+    [SerializeField] private Animator enemyanim;
+    [SerializeField] LayerMask playerLayer;
+
+    [Header("状態確認(変更非推奨)")]
+    [SerializeField] private EnemyStatusBox EnemyCurrentStatus;
+    [SerializeField] private EnemyStatusBox EnemyLatestStatu;
+    [SerializeField] private float currentHP;
+
+
+    //全体制御。
     private enum EnemyStatusBox
     {
         Stay,
@@ -14,25 +28,27 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
         Hurt,
         Dead
     }
-    [SerializeField] private EnemyStatusBox EnemyCurrentStatus;
-    [SerializeField] private EnemyStatusBox EnemyLatestStatu;
     private bool canChangeStatus;
 
-    //Data,Component取得
-    [Header("Component取得")]
-    [SerializeField] EnemyData dataofenemy;
-    [SerializeField] Transform playertransform;
-    [SerializeField] private Rigidbody2D enemyrb;
-    //private SpriteRenderer sr;
-    [SerializeField] private Animator enemyanim;
-
-    //索敵用
+    //移動制御。
     private float distanceX;
     private float distanceY;
     private float passTimeAfterDetect;
 
-    //移動用
-    
+    //攻撃制御。
+    private bool isInCoolTime;
+    public bool hasHitedEnemyAttack;
+    private int adjustFace;//1or-1。
+    private int attackActionPhase;
+    private float attackActionTime;
+    private float passTimeAfterAttackFixed;
+    private float passTimeAfterAttackCool;
+    private float passTimeAfterAttackHit;
+
+    //被弾死亡制御。
+    private float passTimeAfterHurtFixed;
+    private float passTimeAfterDead;
+
 
     //アニメーション用
     /*private int viewMoveSpriteNumber;
@@ -45,30 +61,14 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
     private float viewTimeStaySprite;
     private float viewTimeHurtSprite;
     private float viewTimeDeadSprite;*/
-    private int attackActionPhase;
-    private float attackActionTime;
-    private int adjustFace;//1or-1。
-    
-
-    //攻撃用
-    [SerializeField] LayerMask playerLayer;
-    private bool isInCoolTime;
-    private float passTimeAfterAttackFixed;
-    private float passTimeAfterAttackCool;
-    public bool hasHitedEnemyAttack;
-    private float passTimeAfterAttackHit;
-
     //被弾、死亡用
     //public bool isDamaged;
     //private bool canBeDamaged;
-    [SerializeField] private float currentHP;
-    private float passTimeAfterHurtFixed;
     //private float passTimeAfterHurtNonDamage;
     //private bool canBeRemoved;
     //private bool isInKnockBack;
-    private float passTimeAfterDead;
 
-    //デバック用。
+    [Header("デバック用(プレイヤーの攻撃システムが有る場合debugenmyは空に)")]
     [SerializeField] Damageable debugenmy; 
     [SerializeField] private float damage;
     [SerializeField] private Vector2 knockBack;
@@ -343,6 +343,7 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
     //debug用
     void Damage()
     {
+        if(debugenmy == null)return;
         if(Keyboard.current.mKey.wasPressedThisFrame)
         {
             //isDamaged = true;
