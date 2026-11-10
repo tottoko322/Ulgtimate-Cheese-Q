@@ -273,8 +273,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 111ad7613bda4bb4ab66191aef14ae9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
-  EnemyCurrentStatus: 0
-  EnemyLatestStatu: 0
   dataofenemy: {fileID: 443669135}
   playertransform: {fileID: 1202132498}
   enemyrb: {fileID: 443669133}
@@ -282,8 +280,10 @@ MonoBehaviour:
   playerLayer:
     serializedVersion: 2
     m_Bits: 128
-  hasHitedEnemyAttack: 0
+  EnemyCurrentStatus: 0
+  EnemyLatestStatu: 0
   currentHP: 0
+  hasHitedEnemyAttack: 0
   debugenmy: {fileID: 443669140}
   damage: 1
   knockBack: {x: 1, y: 2}
@@ -301,26 +301,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   enemyHp: 100
+  enemySpeed: 1
   enemyAttack: 1
   enemyGiveKnockBack: {x: 2, y: 1}
-  enemySpeed: 1
-  enemySearchRange: 7
-  enemyChaseRange: 10
-  enemyAttackRange: 3
-  enemyHitRange: 0
-  enemyHitAngle: 0
-  enemyCooltime: 7
-  enemyHitTime: 4
   enemyAttackInvincibleTime: 1
-  enemyDetectAnimationTime: 1
-  enemyAttackAnimationTime: 1
-  enemyHurtAnimationTime: 1
-  enemyDeadAnimationTime: 1
+  enemySearchRange: 10
+  enemyChaseRange: 15
+  enemyAttackRange: 5
+  enemyHitRange: 1
+  enemyHitAngle: 180
+  enemyHitTime: 0.3
+  enemyCooltime: 1
+  enemyDetectAnimationTime: 0.3
+  enemyAttackAnimationTime: 0.5
+  enemyHurtAnimationTime: 0.3
+  enemyDeadAnimationTime: 0
   enemyAttackActionForce:
   - {x: 0, y: 0}
-  - {x: -5, y: 0}
+  - {x: 3, y: 0}
   enemyAttackActionInterval:
-  - 3
+  - 0.1
   - 0
 --- !u!212 &443669136
 SpriteRenderer:
@@ -371,15 +371,15 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 99c6d2a9cb0e3584e8837185d0d40ec1, type: 3}
+  m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 10.8, y: 19.2}
+  m_Size: {x: 40, y: 20}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
 --- !u!4 &443669137
 Transform:
@@ -434,8 +434,8 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 10.8, y: 19.2}
-    newSize: {x: 10.8, y: 19.2}
+    oldSize: {x: 40, y: 20}
+    newSize: {x: 40, y: 20}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
@@ -571,12 +571,12 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 661b269d6684a8f43ac3a79966e091fc, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 4601b1924613f3e49b0d234798f75b2c, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 10.8, y: 19.2}
+  m_Size: {x: 40, y: 20}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -634,8 +634,8 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 10.8, y: 19.2}
-    newSize: {x: 10.8, y: 19.2}
+    oldSize: {x: 40, y: 20}
+    newSize: {x: 40, y: 20}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
