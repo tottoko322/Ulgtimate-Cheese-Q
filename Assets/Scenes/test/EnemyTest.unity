@@ -312,15 +312,15 @@ MonoBehaviour:
   enemyHitAngle: 180
   enemyHitTime: 0.3
   enemyCooltime: 1
-  enemyDetectAnimationTime: 0.3
+  enemyDetectAnimationTime: 0.5
   enemyAttackAnimationTime: 0.5
   enemyHurtAnimationTime: 0.3
   enemyDeadAnimationTime: 0
   enemyAttackActionForce:
   - {x: 0, y: 0}
-  - {x: 3, y: 0}
+  - {x: 10, y: 0}
   enemyAttackActionInterval:
-  - 0.1
+  - 0.075
   - 0
 --- !u!212 &443669136
 SpriteRenderer:
@@ -371,7 +371,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 4601b1924613f3e49b0d234798f75b2c, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -379,7 +379,7 @@ SpriteRenderer:
   m_Size: {x: 40, y: 20}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
 --- !u!4 &443669137
 Transform:
@@ -412,7 +412,7 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -488,7 +488,7 @@ GameObject:
   - component: {fileID: 1202132497}
   - component: {fileID: 1202132496}
   - component: {fileID: 1202132499}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Player_test
   m_TagString: Untagged
   m_Icon: {fileID: 0}
