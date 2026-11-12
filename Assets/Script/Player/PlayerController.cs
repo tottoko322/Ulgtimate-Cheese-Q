@@ -407,7 +407,7 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
                 rb.AddForce(Vector2.down * fallPower, ForceMode2D.Impulse);
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Max(rb.linearVelocity.y, -fastFallSpeed));
 
-                Debug.Log("落下調節");
+                //Debug.Log("落下調節");
 
                 jumpReleased = false;
             }

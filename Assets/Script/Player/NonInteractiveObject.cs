@@ -3,17 +3,22 @@ using UnityEngine;
 public class NonInteractiveObject : MonoBehaviour
 {
     [Header("AutoScroll")]
-    [SerializeField] private bool isAutoScroll;
-    [SerializeField] private float autoScrollSpeed;
+    [SerializeField] private bool isSideAutoScroll; //横スクロールか否か
+    [SerializeField] private float sideAutoScrollSpeed; //横スクロールの速度
 
+    [SerializeField] private bool isVerticalAutoScroll; //縦スクロールか否か
+    [SerializeField] private float verticalAutoScrollSpeed; //縦スクロールの速度
+    
     [Header("FollowingScroll")]
-    [SerializeField] private bool isfollowingPlayer;
-    [SerializeField] private bool isFixedYAxis;
-    [SerializeField] private float scrollSpeed;
+    [SerializeField] private bool isfollowingPlayer; //プレイヤーを追従するか否か
+    [SerializeField] private float followingSpeed; //プレイヤーを追従する速度
+    [SerializeField] private bool isFixedYAxis; //プレイヤーを追従する際、Y軸を固定するか否か
+    [SerializeField] private float fixedYAxisRange; //isFixedYAxisがtrueのときY軸固定に範囲を持たせる
+    
 
     [Header("Appearance")]
-    [SerializeField] private Color tint = Color.white;
-    [SerializeField, Range(0f,1f)] private float opacity;
+    [SerializeField] private Color tint = Color.white; //オブジェクトの色を指定
+    [SerializeField, Range(0f,1f)] private float opacity; //オブジェクトの透明度
 
     private Transform mainCamera;
 
@@ -48,31 +53,32 @@ public class NonInteractiveObject : MonoBehaviour
 
     void IsAutoScroll()
     {
-        if (isAutoScroll)
+        if (isSideAutoScroll)
         {
-            transform.position -= new Vector3(autoScrollSpeed, 0f, 0f);
+            transform.position -= new Vector3(sideAutoScrollSpeed, 0f, 0f);
+        }
+
+        if (isVerticalAutoScroll)
+        {
+            transform.position += new Vector3(0f, verticalAutoScrollSpeed, 0f);
         }
     }
 
     void ScrollSpeed() //視差
     {
-        if (isAutoScroll || !isfollowingPlayer)
+        if (isSideAutoScroll || isVerticalAutoScroll || !isfollowingPlayer)
         {
             return;
         }
 
-        if (!isFixedYAxis)
-        {
-            Vector3 cameraMovement = mainCamera.position - startCameraPosition;
+        Vector3 cameraMovement = mainCamera.position - startCameraPosition;
+        Vector3 targetPosition = cameraMovement + startObjectPosition;
 
-            transform.position = cameraMovement * scrollSpeed + startObjectPosition;
+        if (isFixedYAxis)
+        {
+            targetPosition.y = Mathf.Clamp(targetPosition.y,startObjectPosition.y - fixedYAxisRange,startObjectPosition.y + fixedYAxisRange);
         }
 
-        else
-        {
-            Vector3 cameraMovement = mainCamera.position - startCameraPosition;
-
-            transform.position = new Vector3(cameraMovement.x * scrollSpeed + startObjectPosition.x, transform.position.y, cameraMovement.z * scrollSpeed + startObjectPosition.z);
-        }
+        transform.position = Vector3.MoveTowards(transform.position, targetPosition, followingSpeed * Time.deltaTime);
     }
 }

@@ -2356,11 +2356,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05fa7f0e16447314396dd8af133a20fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NonInteractiveObject
-  isAutoScroll: 0
-  autoScrollSpeed: 0
+  isSideAutoScroll: 0
+  sideAutoScrollSpeed: 0
+  isVerticalAutoScroll: 0
+  verticalAutoScrollSpeed: 0
   isfollowingPlayer: 0
+  followingSpeed: 0
   isFixedYAxis: 1
-  scrollSpeed: 0
+  fixedYAxisRange: 0
   tint: {r: 1, g: 1, b: 1, a: 1}
   opacity: 1
 --- !u!212 &422108641
@@ -4517,11 +4520,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05fa7f0e16447314396dd8af133a20fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NonInteractiveObject
-  isAutoScroll: 0
-  autoScrollSpeed: 0
+  isSideAutoScroll: 0
+  sideAutoScrollSpeed: 0
+  isVerticalAutoScroll: 0
+  verticalAutoScrollSpeed: 0
   isfollowingPlayer: 0
+  followingSpeed: 0
   isFixedYAxis: 1
-  scrollSpeed: 0
+  fixedYAxisRange: 0
   tint: {r: 1, g: 1, b: 1, a: 1}
   opacity: 0.7
 --- !u!212 &934719870
@@ -5014,7 +5020,7 @@ Transform:
   m_GameObject: {fileID: 1005665286}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.06, y: -2.21, z: 0}
+  m_LocalPosition: {x: 4.34, y: 1.58, z: 0}
   m_LocalScale: {x: 1.9859166, y: 2.014941, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5718,11 +5724,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05fa7f0e16447314396dd8af133a20fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NonInteractiveObject
-  isAutoScroll: 0
-  autoScrollSpeed: 0
+  isSideAutoScroll: 0
+  sideAutoScrollSpeed: 0
+  isVerticalAutoScroll: 0
+  verticalAutoScrollSpeed: 0
   isfollowingPlayer: 0
+  followingSpeed: 0
   isFixedYAxis: 0
-  scrollSpeed: 0.43
+  fixedYAxisRange: 0
   tint: {r: 1, g: 1, b: 1, a: 1}
   opacity: 0.1
 --- !u!1 &1299324292
@@ -5755,11 +5764,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05fa7f0e16447314396dd8af133a20fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NonInteractiveObject
-  isAutoScroll: 0
-  autoScrollSpeed: 0.002
+  isSideAutoScroll: 0
+  sideAutoScrollSpeed: 0
+  isVerticalAutoScroll: 0
+  verticalAutoScrollSpeed: 0
   isfollowingPlayer: 0
+  followingSpeed: 0
   isFixedYAxis: 0
-  scrollSpeed: 1
+  fixedYAxisRange: 0
   tint: {r: 1, g: 1, b: 1, a: 1}
   opacity: 1
 --- !u!212 &1299324294
@@ -7009,11 +7021,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05fa7f0e16447314396dd8af133a20fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NonInteractiveObject
-  isAutoScroll: 0
-  autoScrollSpeed: 0.001
+  isSideAutoScroll: 0
+  sideAutoScrollSpeed: 0
+  isVerticalAutoScroll: 0
+  verticalAutoScrollSpeed: 0
   isfollowingPlayer: 1
+  followingSpeed: 0
   isFixedYAxis: 1
-  scrollSpeed: 1
+  fixedYAxisRange: 0
   tint: {r: 1, g: 1, b: 1, a: 1}
   opacity: 1
 --- !u!212 &1577977803
@@ -8014,11 +8029,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05fa7f0e16447314396dd8af133a20fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NonInteractiveObject
-  isAutoScroll: 0
-  autoScrollSpeed: 0
-  isfollowingPlayer: 0
+  isSideAutoScroll: 1
+  sideAutoScrollSpeed: 0.003
+  isVerticalAutoScroll: 0
+  verticalAutoScrollSpeed: -0.003
+  isfollowingPlayer: 1
+  followingSpeed: 10
   isFixedYAxis: 0
-  scrollSpeed: 0.9
+  fixedYAxisRange: 2
   tint: {r: 1, g: 1, b: 1, a: 1}
   opacity: 1
 --- !u!212 &1809954585
@@ -8089,7 +8107,7 @@ Transform:
   m_GameObject: {fileID: 1809954583}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.56, y: 1.05, z: 0}
+  m_LocalPosition: {x: 1.87, y: 1.8, z: 0}
   m_LocalScale: {x: 2, y: 3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
