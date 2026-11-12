@@ -79,6 +79,7 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
     private Vector2 moveInput;
 
     private bool jumpPressed;
+    private bool jumpReleased;
     private bool canGroundJump;
     private bool jumpHeld;
     private bool hasUsedAirJump;
@@ -217,6 +218,11 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
             }
 
             jumpHeld = jump.IsPressed();
+
+            if (jump.WasReleasedThisFrame())
+            {
+                jumpReleased = true;
+            }
         }
 
         //壁キックの入力
@@ -396,10 +402,14 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
                 break;
             }
 
-            if (rb.linearVelocity.y < 0f && isFastFalling != true) //落下速度の調節
+            if (jumpReleased && isFastFalling != true) //落下速度の調節
             {
-                rb.AddForce(Vector2.down * fallPower, ForceMode2D.Force);
+                rb.AddForce(Vector2.down * fallPower, ForceMode2D.Impulse);
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Max(rb.linearVelocity.y, -fastFallSpeed));
+
+                Debug.Log("落下調節");
+
+                jumpReleased = false;
             }
         }
     }
@@ -412,7 +422,7 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
             {
                 if (canGroundJump)
                 {
-                    Debug.Log("地上ジャンプ");
+                    //Debug.Log("地上ジャンプ");
                     rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpPower);
 
                     jumpHoldTimer = 0f;

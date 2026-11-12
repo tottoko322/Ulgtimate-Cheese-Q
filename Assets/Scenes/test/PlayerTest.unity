@@ -7559,7 +7559,7 @@ MonoBehaviour:
   groundMoveSpeed: 6
   jumpPower: 3
   airJumpPower: 5
-  fallPower: 10
+  fallPower: 2
   maxJumpHoldTime: 0.2
   jumpHoldForce: 15
   boxRayLength: 0.4
