@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 9d31a894e1d8ec346a9f40938a7f604a
+guid: 4601b1924613f3e49b0d234798f75b2c
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 2001858015017421665
-    second: kari_hito_jet_1_0
+      213: -8627856577983448289
+    second: enemy red move_1_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,7 +46,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: kari_hito_jet_1_0
+      name: enemy red move_1_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 1080
-        height: 1920
+        width: 4000
+        height: 2000
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 16bc1e3224708cb10800000000000000
-      internalID: 2001858015017421665
+      spriteID: f1b77489722b34880800000000000000
+      internalID: -8627856577983448289
       vertices: []
       indices: 
       edges: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      kari_hito_jet_1_0: 2001858015017421665
+      enemy red move_1_0: -8627856577983448289
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

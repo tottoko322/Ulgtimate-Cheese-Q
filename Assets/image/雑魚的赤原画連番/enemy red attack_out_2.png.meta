@@ -1,16 +1,10 @@
 fileFormatVersion: 2
-guid: 08a7b04f8efb1ce499e65f2735d91a9d
+guid: 8ff6a57079c54e440a42e322aa695608
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 9195597833671516438
-    second: "\u96D1\u732A\u8272_0"
-  - first:
-      213: -9109689085963589021
-    second: "\u96D1\u732A\u8272_1"
-  - first:
-      213: 2804375112181932946
-    second: "\u96D1\u732A\u8272_2"
+      213: -3862200117370404435
+    second: enemy red attack_out_2_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -106,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: "\u96D1\u732A\u8272_0"
+      name: enemy red attack_out_2_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 871
-        height: 488
+        width: 4000
+        height: 2000
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -121,52 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 611a75562835d9f70800000000000000
-      internalID: 9195597833671516438
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: "\u96D1\u732A\u8272_1"
-      rect:
-        serializedVersion: 2
-        x: 900
-        y: 266
-        width: 37
-        height: 75
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 36a23e0aa02e39180800000000000000
-      internalID: -9109689085963589021
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: "\u96D1\u732A\u8272_2"
-      rect:
-        serializedVersion: 2
-        x: 933
-        y: 164
-        width: 12
-        height: 58
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 293ec8a6e442be620800000000000000
-      internalID: 2804375112181932946
+      spriteID: da14aa0c475b66ac0800000000000000
+      internalID: -3862200117370404435
       vertices: []
       indices: 
       edges: []
@@ -185,9 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      "\u96D1\u732A\u8272_0": 9195597833671516438
-      "\u96D1\u732A\u8272_1": -9109689085963589021
-      "\u96D1\u732A\u8272_2": 2804375112181932946
+      enemy red attack_out_2_0: -3862200117370404435
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

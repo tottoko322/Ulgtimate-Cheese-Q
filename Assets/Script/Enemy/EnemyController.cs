@@ -1,10 +1,23 @@
-using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class EnemyController : MonoBehaviour, IDamageReceiver
 {
-    //状態保存用
+    [Header("Componentなどの取得(変更非推奨)")]
+    [SerializeField] EnemyData dataofenemy;
+    [SerializeField] Transform playertransform;
+    [SerializeField] private Rigidbody2D enemyrb;
+    //private SpriteRenderer sr;
+    [SerializeField] private Animator enemyanim;
+    [SerializeField] LayerMask playerLayer;
+
+    [Header("状態確認(変更非推奨)")]
+    [SerializeField] private EnemyStatusBox EnemyCurrentStatus;
+    [SerializeField] private EnemyStatusBox EnemyLatestStatu;
+    [SerializeField] private float currentHP;
+
+
+    //全体制御。
     private enum EnemyStatusBox
     {
         Stay,
@@ -14,25 +27,27 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
         Hurt,
         Dead
     }
-    [SerializeField] private EnemyStatusBox EnemyCurrentStatus;
-    [SerializeField] private EnemyStatusBox EnemyLatestStatu;
     private bool canChangeStatus;
 
-    //Data,Component取得
-    [Header("Component取得")]
-    [SerializeField] EnemyData dataofenemy;
-    [SerializeField] Transform playertransform;
-    [SerializeField] private Rigidbody2D enemyrb;
-    //private SpriteRenderer sr;
-    [SerializeField] private Animator enemyanim;
-
-    //索敵用
+    //移動制御。
     private float distanceX;
     private float distanceY;
     private float passTimeAfterDetect;
 
-    //移動用
-    
+    //攻撃制御。
+    private bool isInCoolTime;
+    public bool hasHitedEnemyAttack;
+    private int adjustFace;//1or-1。
+    private int attackActionPhase;
+    private float attackActionTime;
+    private float passTimeAfterAttackFixed;
+    private float passTimeAfterAttackCool;
+    private float passTimeAfterAttackHit;
+
+    //被弾死亡制御。
+    private float passTimeAfterHurtFixed;
+    private float passTimeAfterDead;
+
 
     //アニメーション用
     /*private int viewMoveSpriteNumber;
@@ -45,29 +60,14 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
     private float viewTimeStaySprite;
     private float viewTimeHurtSprite;
     private float viewTimeDeadSprite;*/
-    private int attackActionPhase;
-    private float attackActionTime;
-    
-
-    //攻撃用
-    [SerializeField] LayerMask playerLayer;
-    private bool isInCoolTime;
-    private float passTimeAfterAttackFixed;
-    private float passTimeAfterAttackCool;
-    public bool hasHitedEnemyAttack;
-    private float passTimeAfterAttackHit;
-
     //被弾、死亡用
     //public bool isDamaged;
     //private bool canBeDamaged;
-    [SerializeField] private float currentHP;
-    private float passTimeAfterHurtFixed;
     //private float passTimeAfterHurtNonDamage;
     //private bool canBeRemoved;
     //private bool isInKnockBack;
-    private float passTimeAfterDead;
 
-    //デバック用。
+    [Header("デバック用(プレイヤーの攻撃システムが有る場合debugenmyは空に)")]
     [SerializeField] Damageable debugenmy; 
     [SerializeField] private float damage;
     [SerializeField] private Vector2 knockBack;
@@ -138,6 +138,11 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
                     EnemyCurrentStatus = EnemyStatusBox.Chase;
                     canChangeStatus = true;
                 }
+            }
+            else if(EnemyCurrentStatus == EnemyStatusBox.Detect)
+            {
+                EnemyCurrentStatus = EnemyStatusBox.Stay;
+                canChangeStatus = true;
             }
             if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemyAttackRange*dataofenemy.enemyAttackRange)
             {
@@ -234,17 +239,19 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
             if(distanceX < 0f)
             {
                 enemyrb.linearVelocityX = -dataofenemy.enemySpeed;//左向き
-                if(transform.localScale.x > 0)
+                if(transform.localScale.x < 0)
                 {
-                    transform.localScale *= -1;
+                    transform.localScale *= new Vector2(-1,1);
+                    adjustFace = -1;//スプライト左向き想定。
                 }
             }
             else if(distanceX > 0f)
             {
                 enemyrb.linearVelocityX = dataofenemy.enemySpeed;//右向き
-                if(transform.localScale.x < 0)
+                if(transform.localScale.x > 0)
                 {
-                    transform.localScale *= -1;
+                    transform.localScale *= new Vector2(-1,1);
+                    adjustFace = 1;
                 }
             }
         }
@@ -256,13 +263,13 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
             if(attackActionPhase == -1)
             {
                 attackActionPhase ++ ;
-                enemyrb.AddForce(dataofenemy.enemyAttackActionForce[0],ForceMode2D.Impulse);
+                enemyrb.AddForce(dataofenemy.enemyAttackActionForce[0]*adjustFace,ForceMode2D.Impulse);
             }
             attackActionTime += Time.fixedDeltaTime;
             if(attackActionTime >= dataofenemy.enemyAttackActionInterval[attackActionPhase])
             {
                 attackActionPhase ++ ;
-                enemyrb.AddForce(dataofenemy.enemyAttackActionForce[attackActionPhase],ForceMode2D.Impulse);
+                enemyrb.AddForce(dataofenemy.enemyAttackActionForce[attackActionPhase]*adjustFace,ForceMode2D.Impulse);
                 attackActionTime = 0f;
             }
         }
@@ -335,6 +342,7 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
     //debug用
     void Damage()
     {
+        if(debugenmy == null)return;
         if(Keyboard.current.mKey.wasPressedThisFrame)
         {
             //isDamaged = true;
