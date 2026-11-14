@@ -120,9 +120,14 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
     private InputAction fastFall;
     private InputAction stopFastFall;
 
+    private Animator anim;
+    private bool moveGround;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+
+        anim = GetComponent<Animator>();
 
         keyControl = inputActions.FindActionMap("KeyControl", true);
 
@@ -174,6 +179,8 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
         //Debug.Log(isAtLeftLedge);
         //Debug.Log(canGroundJump);
         //Debug.Log(isAttack);
+
+        UpdateAnimation();
     }
 
     private void ReadInput() //入力取得
@@ -344,6 +351,72 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
         else
         {
             CurrentActionState = ActionState.Nomal;
+        }
+    }
+
+    private void UpdateAnimation() //アニメーションの更新
+    {
+        //地上での走り
+        if (moveInput.x != 0 && CurrentLocomotionState == LocomotionState.Grounded)
+        {
+            transform.localScale = new Vector3(moveInput.x, 1, 1);
+            anim.SetBool("Run", true);
+        }
+        else
+        {
+            transform.localScale = new Vector3(1, 1, 1);
+            anim.SetBool("Run", false);
+        }
+
+        //壁待機、上下移動
+        if (isAtLeftLedge || isAtRightLedge)
+        {
+            transform.localScale = new Vector3(-wallDirection, 1, 1);
+            anim.SetBool("WallSlide", true);
+        }
+        else if (moveInput.y == 0 && CurrentLocomotionState == LocomotionState.WallCling)
+        {
+            transform.localScale = new Vector3(-wallDirection, 1, 1);
+            anim.SetBool("WallSlide", false);
+            anim.SetBool("Wall", true);
+            anim.SetBool("WallRun", false);
+        }
+        else if (moveInput.y != 0 && CurrentLocomotionState == LocomotionState.WallCling)
+        {
+            transform.localScale = new Vector3(-wallDirection, moveInput.y, 1);
+            anim.SetBool("WallRun", true);
+        }
+        else
+        {
+            anim.SetBool("WallRun", false);
+            anim.SetBool("Wall", false);
+        }
+
+        //ジャンプ
+        if (rb.linearVelocityY > 0 && CurrentLocomotionState == LocomotionState.Airborne)
+        {
+            anim.SetBool("Jump", true);
+            anim.SetBool("Fall", false);
+        }
+        else if (rb.linearVelocityY <= 0 && CurrentLocomotionState == LocomotionState.Airborne)
+        {
+            anim.SetBool("Fall", true);
+            Debug.Log("Fall");
+        }
+        else
+        {
+            anim.SetBool("Jump", false);
+            anim.SetBool("Fall", false);
+        }
+
+        //急落下
+        if (isFastFalling && CurrentLocomotionState == LocomotionState.Airborne)
+        {
+            anim.SetBool("FastFall", true);
+        }
+        else
+        {
+            anim.SetBool("FastFall", false);
         }
     }
 
