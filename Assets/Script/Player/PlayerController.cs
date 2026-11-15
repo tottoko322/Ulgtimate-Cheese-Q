@@ -172,7 +172,7 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
         CompleteLedgeClimb();
         StartLedgeJump();
         //Debug.Log($"isAttack: {isAttack}, ActionState: {CurrentActionState}");
-        //Debug.Log(CurrentLocomotionState);
+        Debug.Log(CurrentLocomotionState);
         //Debug.Log(CurrentActionState);
         //Debug.Log(previousState);
         //Debug.Log(wallDirection);
@@ -373,9 +373,10 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
         {
             transform.localScale = new Vector3(1, 1, 1);
             anim.SetBool("Run", false);
+            anim.SetBool("WallSlide", false);
         }
 
-        //壁待機、上下移動
+        //壁ずり、壁待機、上下移動
         if (isAtLeftLedge || isAtRightLedge)
         {
             transform.localScale = new Vector3(-wallDirection, 1, 1);
@@ -404,8 +405,9 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
         {
             anim.SetBool("Jump", true);
             anim.SetBool("Fall", false);
+            anim.SetBool("WallSlide", false);
         }
-        else if (rb.linearVelocityY <= 0 && CurrentLocomotionState == LocomotionState.Airborne)
+        else if (rb.linearVelocityY <= 0 && CurrentLocomotionState == LocomotionState.Airborne && (!isAtLeftLedge && !isAtRightLedge))
         {
             //transform.localScale = new Vector3(moveInput.x, 1, 1);
             anim.SetBool("Fall", true);
