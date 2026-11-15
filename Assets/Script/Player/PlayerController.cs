@@ -400,6 +400,7 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
         }
         else if (rb.linearVelocityY <= 0 && CurrentLocomotionState == LocomotionState.Airborne)
         {
+            //transform.localScale = new Vector3(moveInput.x, 1, 1);
             anim.SetBool("Fall", true);
             Debug.Log("Fall");
         }

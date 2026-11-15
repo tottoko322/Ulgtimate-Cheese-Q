@@ -47,25 +47,35 @@ public class DialogueManager : MonoBehaviour
     private Vector2 beginningEnemyPosition;
     private Vector2 beginningMainPosition;
 
+    [SerializeField] private InputActionAsset inputActions; //キーコンフィグ
+    private InputActionMap keyControl;
+
+    private InputAction startDialogue;
+    private InputAction nextDialogue;
+
     void Start()
     {
         dialogueUI.SetActive(false);
 
         beginningEnemyPosition = enemyCharacter.anchoredPosition;
         beginningMainPosition = mainCharacter.anchoredPosition;
+
+        keyControl = inputActions.FindActionMap("KeyControl", true);
+        startDialogue = keyControl.FindAction("StartDialogue", true);
+        nextDialogue = keyControl.FindAction("NextDialogue", true);
     }
 
     void Update()
     {
         if (sS.isFrontSign && !isDialogue)
         {
-            if (Keyboard.current.jKey.wasPressedThisFrame)
+            if (startDialogue.WasPressedThisFrame())
             {
                 StartDialogue();
             }
         }
 
-        if (Keyboard.current.kKey.wasPressedThisFrame)
+        if (nextDialogue.WasPressedThisFrame())
         {
             if (!isDialogue) //会話が開始されていないとダメ
             {
