@@ -9913,7 +9913,7 @@ MonoBehaviour:
   ledgeJumpPower: 10
   ledgeJumpHorizontalPower: 6
   ledgeJumpInputWindow: 5
-  playerHp: 100
+  playerHp: 0
   attackRange: 1
   attackPosition: {x: 1, y: 0.5}
   playerAttackDamage: 5
