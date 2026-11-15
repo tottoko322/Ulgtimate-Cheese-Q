@@ -24,55 +24,55 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
 
 
     [Header("Ground Movement")]
-    [SerializeField] private float groundMoveSpeed;
+    [SerializeField] private float groundMoveSpeed; //地上での左右移動の速度
 
     [Header("Jump")]
-    [SerializeField] private float jumpPower; 
-    [SerializeField] private float airJumpPower;
-    [SerializeField] private float fallPower;
-    [SerializeField] private float maxJumpHoldTime;
-    [SerializeField] private float jumpHoldForce;
-    [SerializeField] private float boxRayLength;
+    [SerializeField] private float jumpPower; //ジャンプ時に上向きに加える力の大きさ
+    [SerializeField] private float airJumpPower; //空中ジャンプ時に上向きに加える力の大きさ
+    [SerializeField] private float fallPower; //ジャンプボタンを離したときに下向きに加える力の大きさ
+    [SerializeField] private float maxJumpHoldTime; //ジャンプの高さ調節時に上向きに力を与え続ける時間(値が大きいと高く、長く飛ぶ)
+    [SerializeField] private float jumpHoldForce; //ジャンプの高さ調節時に上向きに加える力の大きさ
+    [SerializeField] private float boxRayLength; //地上ジャンプの受け入れためのbox(プレイヤーの下面から出ている)の大きさ
     private float jumpHoldTimer = 0f;
     private float ledgeJumpTimer = 0f;
 
     [Header("Air Movement")]
-    [SerializeField] private float airMoveSpeed; 
-    [SerializeField] private float airAcceleration;
-    [SerializeField] private float airDeceleration;
+    [SerializeField] private float airMoveSpeed; //空中でのmax移動速度
+    [SerializeField] private float airAcceleration; //max移動速度への加速度
+    [SerializeField] private float airDeceleration; //空気抵抗、慣性みたいなもの
 
     [Header("Fast Fall")]
-    [SerializeField] private float fastFallSpeed;
-    [SerializeField] private float slowDownFallMultiplier;
+    [SerializeField] private float fastFallSpeed; //急降下時の速度
+    [SerializeField, Range(0, 1)] private float slowDownFallMultiplier; //急降下キャンセル時の速度の落とし具合(0~1の値。1でそのままの速度)
 
     [Header("Wall")]
-    [SerializeField] private float wallMoveSpeed;
-    [SerializeField] private float wallDetachForce;
-    [SerializeField] private float wallKickForce;
-    [SerializeField] private float wallRayLength;
-    [SerializeField] private float detachWallMultiplier;
+    [SerializeField] private float wallMoveSpeed; //壁での上下移動の速度
+    [SerializeField] private float wallDetachForce; //壁から離れるときに与える力の大きさ
+    [SerializeField] private float wallKickForce; //壁キック時に上向きに与える力の大きさ
+    [SerializeField] private float wallRayLength; //壁キックを受け入れるためのrayの長さ
+    [SerializeField, Range(0, 1)] private float detachWallMultiplier; //壁から離れるときのプレイヤーのy方向の速度の落とし具合(0~1の値。1でそのままの速度)
     [SerializeField] private LayerMask climbableWallLayer;
 
     [Header("Ledge Climb")] 
-    [SerializeField] private float ledgeClimbUpSpeed; 
-    [SerializeField] private float ledgeClimbForwardSpeed;
-    [SerializeField] private float ledgeJumpUpTime;
-    [SerializeField] private float ledgeJumpHorizontalTime;
+    [SerializeField] private float ledgeClimbUpSpeed; //崖のぼりの時に上向きに加える力の大きさ
+    [SerializeField] private float ledgeClimbForwardSpeed; //崖のぼりの時に横向きに加える力の大きさ
+    [SerializeField] private float ledgeJumpUpTime; //崖のぼりの時の上昇する時間
+    [SerializeField] private float ledgeJumpHorizontalTime; //崖のぼりの時の横向きに移動する時間
     private float ledgeClimbDuration;
 
     [Header("Ledge Jump")] 
-    [SerializeField] private float ledgeJumpPower;
-    [SerializeField] private float ledgeJumpHorizontalPower;
+    [SerializeField] private float ledgeJumpPower; //崖のぼりキャンセル時に上向きに加える力の大きさ
+    [SerializeField] private float ledgeJumpHorizontalPower; //崖のぼりキャンセル時に横向きに加える力の大きさ
     [SerializeField] private float ledgeJumpInputWindow; //ledgejumpの受け入れ時間
 
     [Header("Attack")]
-    [SerializeField] private float playerHp;
-    [SerializeField] private float attackRange;
-    [SerializeField] private Vector2 attackPosition;
-    [SerializeField] private float playerAttackDamage;
-    [SerializeField] private Vector2 playerGiveKnockBack;
-    [SerializeField] private float playerAttackInvincibleTime;
-    [SerializeField] private LayerMask enemyLayer;
+    [SerializeField] private float playerHp; //プレイヤーのHP
+    [SerializeField] private float attackRange; //攻撃範囲(円)の半径の大きさ
+    [SerializeField] private Vector2 attackPosition; //攻撃範囲(円)の中心位置
+    [SerializeField] private float playerAttackDamage; //プレイヤーが与えるダメージの大きさ
+    [SerializeField] private Vector2 playerGiveKnockBack; //プレイヤーが与えるノックバックの大きさ
+    [SerializeField] private float playerAttackInvincibleTime; //
+    [SerializeField] private LayerMask enemyLayer; //
 
     private int wallDirection = 0;
 
@@ -121,7 +121,6 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
     private InputAction stopFastFall;
 
     private Animator anim;
-    private bool moveGround;
 
     void Start()
     {

@@ -7,12 +7,12 @@ public class CameraController : MonoBehaviour
     [SerializeField] private Transform Player;
 
     [Header("Look Ahead")]
-    [SerializeField] private float horizontalLookAhead;
-    [SerializeField] private float verticalLookAhead;
+    [SerializeField] private float horizontalLookAhead; //x方向の先読み
+    [SerializeField] private float verticalLookAhead; //y方向の先読み
 
     [Header("Camera Movement")]
-    [SerializeField] private float horizontalSmoothTime;
-    [SerializeField] private float verticalSmoothTime;
+    [SerializeField] private float horizontalSmoothTime; //横方向のカメラの追尾する時間(値が小さいと早く追尾)
+    [SerializeField] private float verticalSmoothTime; //縦方向のカメラの追尾する時間
 
     private Vector3 cameraPosition;
     private Vector3 lookAhead;

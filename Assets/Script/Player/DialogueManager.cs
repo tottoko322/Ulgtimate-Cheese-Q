@@ -20,19 +20,19 @@ public class DialogueManager : MonoBehaviour
         public bool[] isMainCharacter; // 主人公キャラかどうか (true:左, false:右)
     }
 
-    [SerializeField] private float nextLetterTime;
+    [SerializeField] private float nextLetterTime; //文字が出てくる時間(値が小さいと早い)
 
     [Header("AppearanceNotDialogue")]
-    [SerializeField] private Color tint = Color.white;
-    [SerializeField, Range(0f,1f)] private float opacity;
+    [SerializeField] private Color tint = Color.white; //相手が話しているときの自分の色
+    [SerializeField, Range(0f,1f)] private float opacity; //相手が話しているときの自分の透明度
 
     [Header("Sprite")]
     public Image MainCharacterImage;  // 主人公キャラの画像
     public Image EnemyCharacterImage; // 敵キャラの画像
 
     [Header("PositionInDialogue")]
-    [SerializeField] private float xPosition;
-    [SerializeField] private float yPosition;
+    [SerializeField] private float xPosition; //話すときどれくらいx座標が増えるか
+    [SerializeField] private float yPosition; //話すときどれくらいy座標が増えるか
 
 
     public TMP_Text dialogueText;  // テキスト表示
