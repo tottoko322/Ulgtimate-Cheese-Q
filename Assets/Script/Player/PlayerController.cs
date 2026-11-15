@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -341,6 +342,7 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
         if (playerHp <= 0)
         {
             CurrentActionState = ActionState.Dead;
+            Debug.Log("死亡");
         }
         else if (isAttack)
         {
@@ -355,6 +357,12 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
 
     private void UpdateAnimation() //アニメーションの更新
     {
+        //死亡
+        if (CurrentActionState == ActionState.Dead)
+        {
+            anim.SetBool("Death", true);
+        }
+
         //地上での走り
         if (moveInput.x != 0 && CurrentLocomotionState == LocomotionState.Grounded)
         {
@@ -401,7 +409,7 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
         {
             //transform.localScale = new Vector3(moveInput.x, 1, 1);
             anim.SetBool("Fall", true);
-            Debug.Log("Fall");
+            //Debug.Log("Fall");
         }
         else
         {
@@ -417,6 +425,26 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
         else
         {
             anim.SetBool("FastFall", false);
+        }
+
+        //アタック
+        if (CurrentActionState == ActionState.Attacking)
+        {
+            anim.SetBool("Attack1", true);
+        }
+        else
+        {
+            anim.SetBool("Attack1", false);
+        }
+
+        //アタックを受けた
+        if (CurrentActionState == ActionState.Hurt)
+        {
+            anim.SetBool("Hit", true);
+        }
+        else if (CurrentLocomotionState == LocomotionState.Grounded && CurrentLocomotionState == LocomotionState.WallCling)
+        {
+            anim.SetBool("Hit", false);
         }
     }
 
