@@ -505,15 +505,19 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
                 break;
             }
 
-            if (jumpReleased && isFastFalling != true) //落下速度の調節
+            if (jumpReleased && !isFastFalling && rb.linearVelocityY > 0) //落下速度の調節
             {
                 rb.AddForce(Vector2.down * fallPower, ForceMode2D.Impulse);
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Max(rb.linearVelocity.y, -fastFallSpeed));
 
-                //Debug.Log("落下調節");
+                Debug.Log("落下調節");
 
                 jumpReleased = false;
             }
+        }
+        else
+        {
+            jumpReleased = false;
         }
     }
 

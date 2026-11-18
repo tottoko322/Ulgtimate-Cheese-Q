@@ -12,8 +12,10 @@ public class NonInteractiveObject : MonoBehaviour
     [Header("FollowingScroll")]
     [SerializeField] private bool isfollowingPlayer; //プレイヤーを追従するか否か
     [SerializeField] private float followingSpeed; //プレイヤーを追従する速度
-    [SerializeField] private bool isFixedYAxis; //プレイヤーを追従する際、Y軸を固定するか否か
-    [SerializeField] private float fixedYAxisRange; //isFixedYAxisがtrueのときY軸固定に範囲を持たせる
+    //[SerializeField] private bool isFixedYAxis; //プレイヤーを追従する際、Y軸を固定するか否か
+    //[SerializeField] private float fixedYAxisRange; //isFixedYAxisがtrueのときY軸固定に範囲を持たせる
+    [SerializeField, Range(0f, 1f)] private float parallaxRatioX; //X軸について、カメラ移動に対する背景の移動割合
+    [SerializeField, Range(0f, 1f)] private float parallaxRatioY; //Y軸について、カメラ移動に対する背景の移動割合
     
 
     [Header("Appearance")]
@@ -53,15 +55,17 @@ public class NonInteractiveObject : MonoBehaviour
 
     void IsAutoScroll()
     {
+        Vector3 autoMove = Vector3.zero;
         if (isSideAutoScroll)
         {
-            transform.position -= new Vector3(sideAutoScrollSpeed, 0f, 0f);
+            autoMove.x -= sideAutoScrollSpeed;
         }
 
         if (isVerticalAutoScroll)
         {
-            transform.position += new Vector3(0f, verticalAutoScrollSpeed, 0f);
+            autoMove.y += verticalAutoScrollSpeed;
         }
+        transform.position += autoMove * Time.deltaTime;
     }
 
     void ScrollSpeed() //視差
@@ -72,12 +76,14 @@ public class NonInteractiveObject : MonoBehaviour
         }
 
         Vector3 cameraMovement = mainCamera.position - startCameraPosition;
-        Vector3 targetPosition = cameraMovement + startObjectPosition;
+        //Vector3 targetPosition = cameraMovement + startObjectPosition;
 
-        if (isFixedYAxis)
-        {
-            targetPosition.y = Mathf.Clamp(targetPosition.y,startObjectPosition.y - fixedYAxisRange,startObjectPosition.y + fixedYAxisRange);
-        }
+        Vector3 targetPosition = startObjectPosition + new Vector3(cameraMovement.x * parallaxRatioX, cameraMovement.y * parallaxRatioY, 0f);
+        
+        //if (isFixedYAxis)
+        //{
+        //    targetPosition.y = Mathf.Clamp(targetPosition.y,startObjectPosition.y - fixedYAxisRange,startObjectPosition.y + fixedYAxisRange);
+        //}
 
         transform.position = Vector3.MoveTowards(transform.position, targetPosition, followingSpeed * Time.deltaTime);
     }
