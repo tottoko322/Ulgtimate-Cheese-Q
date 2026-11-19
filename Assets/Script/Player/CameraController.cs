@@ -7,18 +7,35 @@ public class CameraController : MonoBehaviour
     [SerializeField] private Transform Player;
 
     [Header("Look Ahead")]
-    [SerializeField] private float horizontalLookAhead;
-    [SerializeField] private float verticalLookAhead;
+    [SerializeField] private float horizontalLookAhead; //x方向の先読み
+    [SerializeField] private float verticalLookAhead; //y方向の先読み
 
     [Header("Camera Movement")]
-    [SerializeField] private float horizontalSmoothTime;
-    [SerializeField] private float verticalSmoothTime;
+    [SerializeField] private float horizontalSmoothTime; //横方向のカメラの追尾する時間(値が小さいと早く追尾)
+    [SerializeField] private float verticalSmoothTime; //縦方向のカメラの追尾する時間
 
     private Vector3 cameraPosition;
     private Vector3 lookAhead;
     private float horizontalVelocity;
     private float verticalVelocity;
 
+    [SerializeField] private InputActionAsset inputActions; //キーコンフィグ
+    private InputActionMap keyControl;
+
+    private InputAction moveRightCamera;
+    private InputAction moveLeftCamera;
+    private InputAction moveUpCamera;
+    private InputAction moveDownCamera;
+
+    void Start()
+    {
+        keyControl = inputActions.FindActionMap("KeyControl", true);
+        moveRightCamera = keyControl.FindAction("MoveRight", true);
+        moveLeftCamera = keyControl.FindAction("MoveLeft", true);
+        moveUpCamera = keyControl.FindAction("WallUp", true);
+        moveDownCamera = keyControl.FindAction("WallDown", true);
+    }
+    
     void Update()
     {
         CameraReadInput();
@@ -33,20 +50,20 @@ public class CameraController : MonoBehaviour
     {
         lookAhead = Vector3.zero;
 
-        if (Keyboard.current.dKey.isPressed)
+        if (moveRightCamera.IsPressed())
         {
             lookAhead.x += horizontalLookAhead;
         }
-        if (Keyboard.current.aKey.isPressed)
+        if (moveLeftCamera.IsPressed())
         {
             lookAhead.x -= horizontalLookAhead;
         }
 
-        if (Keyboard.current.wKey.isPressed)
+        if (moveUpCamera.IsPressed())
         {
             lookAhead.y += verticalLookAhead;
         }
-        if (Keyboard.current.sKey.isPressed)
+        if (moveDownCamera.IsPressed())
         {
             lookAhead.y -= verticalLookAhead;
         }
