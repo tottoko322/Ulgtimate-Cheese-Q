@@ -29,6 +29,10 @@ public class EnemyData : MonoBehaviour
     [Header("攻撃アニメーション時の力の調整")]
     public Vector2[] enemyAttackActionForce;
     public float[] enemyAttackActionInterval;
+    [Header("出現オブジェクト設定")]
+    public GameObject[] enemyAttackObj;
+    public Vector2[] enemyObjPopPosition;
+    public float[] enemyObjPopTiming;
 
 
     //public float enemyFixedTimeAttack;
