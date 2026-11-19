@@ -37,7 +37,7 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
     //攻撃制御。
     private bool isInCoolTime;
     public bool hasHitedEnemyAttack;
-    private int adjustFace;//1or-1。
+    private int adjustFace=-1;//1or-1。
     private int attackActionPhase;
     private float attackActionTime;
     private float passTimeAfterAttackFixed;

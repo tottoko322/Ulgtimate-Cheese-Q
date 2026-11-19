@@ -306,7 +306,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 4601b1924613f3e49b0d234798f75b2c, type: 3}
+  m_Sprite: {fileID: 4808953464800377223, guid: 93c0b26440b7d4940997d5de485d8c1e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -369,7 +369,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 40, y: 20}
+    oldSize: {x: 12.809999, y: 15.049999}
     newSize: {x: 40, y: 20}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -523,6 +523,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 34472840325801380, guid: e9425cbdf28fb994eb7ae1267f74266a, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 4808953464800377223, guid: 93c0b26440b7d4940997d5de485d8c1e, type: 3}
     - target: {fileID: 5228479328842022671, guid: e9425cbdf28fb994eb7ae1267f74266a, type: 3}
       propertyPath: playertransform
       value: 
@@ -566,6 +570,42 @@ PrefabInstance:
     - target: {fileID: 6202294442659869915, guid: e9425cbdf28fb994eb7ae1267f74266a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6600283132805539086, guid: e9425cbdf28fb994eb7ae1267f74266a, type: 3}
+      propertyPath: enemyHitTime
+      value: 0.8333333
+      objectReference: {fileID: 0}
+    - target: {fileID: 6600283132805539086, guid: e9425cbdf28fb994eb7ae1267f74266a, type: 3}
+      propertyPath: enemyCooltime
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6600283132805539086, guid: e9425cbdf28fb994eb7ae1267f74266a, type: 3}
+      propertyPath: enemyHitRange
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6600283132805539086, guid: e9425cbdf28fb994eb7ae1267f74266a, type: 3}
+      propertyPath: enemyHurtAnimationTime
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6600283132805539086, guid: e9425cbdf28fb994eb7ae1267f74266a, type: 3}
+      propertyPath: enemyAttackAnimationTime
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6600283132805539086, guid: e9425cbdf28fb994eb7ae1267f74266a, type: 3}
+      propertyPath: enemyDetectAnimationTime
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6600283132805539086, guid: e9425cbdf28fb994eb7ae1267f74266a, type: 3}
+      propertyPath: enemyAttackActionForce.Array.data[1].x
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 6600283132805539086, guid: e9425cbdf28fb994eb7ae1267f74266a, type: 3}
+      propertyPath: enemyAttackActionForce.Array.data[1].y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6600283132805539086, guid: e9425cbdf28fb994eb7ae1267f74266a, type: 3}
+      propertyPath: 'enemyAttackActionInterval.Array.data[0]'
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 7393284672050839887, guid: e9425cbdf28fb994eb7ae1267f74266a, type: 3}
       propertyPath: m_Name
