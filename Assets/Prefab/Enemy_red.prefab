@@ -87,7 +87,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 4601b1924613f3e49b0d234798f75b2c, type: 3}
+  m_Sprite: {fileID: 4808953464800377223, guid: 93c0b26440b7d4940997d5de485d8c1e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -117,19 +117,19 @@ MonoBehaviour:
   enemySearchRange: 10
   enemyChaseRange: 15
   enemyAttackRange: 5
-  enemyHitRange: 1
+  enemyHitRange: 2
   enemyHitAngle: 180
-  enemyHitTime: 0.3
-  enemyCooltime: 1
-  enemyDetectAnimationTime: 0.5
-  enemyAttackAnimationTime: 0.5
-  enemyHurtAnimationTime: 0.3
+  enemyHitTime: 0.8333333
+  enemyCooltime: 2
+  enemyDetectAnimationTime: 0
+  enemyAttackAnimationTime: 1.5
+  enemyHurtAnimationTime: 0.5
   enemyDeadAnimationTime: 0
   enemyAttackActionForce:
   - {x: 0, y: 0}
-  - {x: 10, y: 0}
+  - {x: 7, y: 0}
   enemyAttackActionInterval:
-  - 0.075
+  - 0.5
   - 0
 --- !u!114 &5228479328842022671
 MonoBehaviour:
@@ -235,7 +235,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 40, y: 20}
+    oldSize: {x: 12.809999, y: 15.049999}
     newSize: {x: 40, y: 20}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
