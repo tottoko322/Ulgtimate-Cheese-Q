@@ -1,47 +1,63 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, IDamageReceiver
 {
-    public enum LocomotionState 
-    { 
+    public enum LocomotionState
+    {
         Grounded,
         Airborne,
         WallCling,
         ClimbingLedge
-    } 
+    }
+
+    public enum ActionState
+    {
+        Nomal,
+        Attacking,
+        Hurt,
+        Dead
+    }
 
     public LocomotionState CurrentLocomotionState { get; private set; } = LocomotionState.Grounded;
+    public ActionState CurrentActionState { get; private set; } = ActionState.Nomal;
+
 
     [Header("Ground Movement")]
-    [SerializeField] private float groundMoveSpeed = 6f;
+    [SerializeField] private float groundMoveSpeed;
 
     [Header("Jump")]
-    [SerializeField] private float jumpPower = 5f; 
-    [SerializeField] private float airJumpPower = 5f;
-    [SerializeField] private float maxJumpHoldTime = 0.2f;
-    [SerializeField] private float jumpHoldForce = 5f;
+    [SerializeField] private float jumpPower; 
+    [SerializeField] private float airJumpPower;
+    [SerializeField] private float fallPower;
+    [SerializeField] private float maxJumpHoldTime;
+    [SerializeField] private float jumpHoldForce;
+    [SerializeField] private float boxRayLength;
     private float jumpHoldTimer = 0f;
     private float ledgeJumpTimer = 0f;
 
     [Header("Air Movement")]
-    [SerializeField] private float airMoveSpeed = 6f; 
-    [SerializeField] private float airAcceleration = 30f;
-    [SerializeField] private float airDeceleration = 5f;
+    [SerializeField] private float airMoveSpeed; 
+    [SerializeField] private float airAcceleration;
+    [SerializeField] private float airDeceleration;
 
     [Header("Fast Fall")]
-    [SerializeField] private float fastFallSpeed = 6f;
+    [SerializeField] private float fastFallSpeed;
+    [SerializeField] private float slowDownFallMultiplier;
 
     [Header("Wall")]
-    [SerializeField] private float wallMoveSpeed = 6f;
-    [SerializeField] private float wallDetachForce = 6f;
+    [SerializeField] private float wallMoveSpeed;
+    [SerializeField] private float wallDetachForce;
     [SerializeField] private float wallKickForce;
+    [SerializeField] private float wallRayLength;
+    [SerializeField] private float detachWallMultiplier;
     [SerializeField] private LayerMask climbableWallLayer;
 
     [Header("Ledge Climb")] 
     [SerializeField] private float ledgeClimbUpSpeed; 
     [SerializeField] private float ledgeClimbForwardSpeed;
-    [SerializeField] private float ledgeClimbFallPower;
+    [SerializeField] private float ledgeJumpUpTime;
+    [SerializeField] private float ledgeJumpHorizontalTime;
     private float ledgeClimbDuration;
 
     [Header("Ledge Jump")] 
@@ -49,22 +65,42 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float ledgeJumpHorizontalPower;
     [SerializeField] private float ledgeJumpInputWindow; //ledgejumpの受け入れ時間
 
+    [Header("Attack")]
+    [SerializeField] private float playerHp;
+    [SerializeField] private float attackRange;
+    [SerializeField] private Vector2 attackPosition;
+    [SerializeField] private float playerAttackDamage;
+    [SerializeField] private Vector2 playerGiveKnockBack;
+    [SerializeField] private float playerAttackInvincibleTime;
+    [SerializeField] private LayerMask enemyLayer;
+
     private int wallDirection = 0;
 
     private Vector2 moveInput;
 
-    private bool jumpPressed = false;
-    private bool jumpReleased = false;
-    private bool jumpHeld = false;
-    private bool hasUsedAirJump = false;
-    private bool isFastFalling = false;
-    private bool isAtLedge = false;
+    private bool jumpPressed;
+    private bool canGroundJump;
+    private bool jumpHeld;
+    private bool hasUsedAirJump;
+    private bool airJumpStateBeforeFastFalling;
+    private bool isFastFalling;
+    private bool stopFastFalling;
+    private bool isAtLeftLedge;
+    private bool isAtRightLedge;
 
-    private bool isGrounded = false;
-    private bool isRightTouchingWall = false;
-    private bool isLeftTouchingWall = false;
-    private bool canLedgeClimb = false;
-    private bool hasLedgeJumped = false;
+    private bool isGrounded;
+    private bool isRightTouchingWall;
+    private bool isLeftTouchingWall;
+    private bool canLedgeClimb;
+    private bool hasLedgeJumped;
+
+    private bool wallKick;
+    private bool canWallKick;
+    private bool wallKickRange;
+
+    private bool isKnockBack;
+    private bool isAttack;
+    private bool hasAttacked;
 
     [SerializeField] private LayerMask groundLayer;
     private Rigidbody2D rb;
@@ -85,6 +121,11 @@ public class PlayerController : MonoBehaviour
         UpdateWallState();
         UpdateLocomotionState();
 
+        //Debug.Log(isAttack);
+        UpdateActionState();
+
+        Attack();
+
         HandleGroundedMovement();
         HandleAirMovement();
 
@@ -98,11 +139,30 @@ public class PlayerController : MonoBehaviour
         HandleLedgeClimb();
         CompleteLedgeClimb();
         StartLedgeJump();
-        Debug.Log(CurrentLocomotionState);
+        //Debug.Log($"isAttack: {isAttack}, ActionState: {CurrentActionState}");
+        //Debug.Log(CurrentLocomotionState);
+        //Debug.Log(CurrentActionState);
+        //Debug.Log(previousState);
+        //Debug.Log(wallDirection);
+        //Debug.Log(isAtLeftLedge);
+        //Debug.Log(canGroundJump);
+        //Debug.Log(isAttack);
     }
 
     private void ReadInput() //入力取得
     {
+        if (CurrentActionState == ActionState.Dead || isKnockBack) //死亡orノックバックで入力できない
+        {
+            return;
+        }
+
+        if (Keyboard.current.mKey.wasPressedThisFrame)
+        {
+            isAttack = true;
+
+            hasAttacked = false;
+        }
+
         //左右移動、ジャンプ、壁離れの入力
         moveInput = Vector2.zero;
         if (Keyboard.current.dKey.isPressed)
@@ -123,40 +183,65 @@ public class PlayerController : MonoBehaviour
         }
 
         //ジャンプの入力
-        if (CurrentLocomotionState == LocomotionState.Grounded || CurrentLocomotionState == LocomotionState.Airborne || CurrentLocomotionState == LocomotionState.ClimbingLedge)
+        if (canGroundJump || CurrentLocomotionState == LocomotionState.Airborne || CurrentLocomotionState == LocomotionState.ClimbingLedge)
         {
-            if (Keyboard.current.wKey.wasPressedThisFrame)
+            if (Keyboard.current.spaceKey.wasPressedThisFrame)
             {
                 jumpPressed = true;
             }
-            if (Keyboard.current.wKey.wasReleasedThisFrame)
-            {
-                jumpReleased = true;
-            }
 
-            jumpHeld = Keyboard.current.wKey.isPressed;
+            jumpHeld = Keyboard.current.spaceKey.isPressed;
+        }
+
+        //壁キックの入力
+        if (Keyboard.current.spaceKey.wasPressedThisFrame && CurrentLocomotionState == LocomotionState.WallCling)
+        {
+            wallKick = true;
+        }
+        if (Keyboard.current.spaceKey.wasPressedThisFrame && CurrentLocomotionState == LocomotionState.Airborne && wallKickRange)
+        {
+            Debug.Log("canWallKick");
+            canWallKick = true;
         }
 
         //急降下の入力
         if (Keyboard.current.sKey.wasPressedThisFrame)
         {
             isFastFalling = true;
+            airJumpStateBeforeFastFalling = hasUsedAirJump; //急降下前の空中ジャンプの使用の有無の記録
+        }
+        if (Keyboard.current.wKey.wasPressedThisFrame && isFastFalling)
+        {
+            stopFastFalling = true;
         }
     }
 
     private void UpdateGroundState() //接地判定
     {
+        if (isKnockBack)
+        {
+            return;
+        }
         Vector2 leftRayOrigin = new Vector2(transform.position.x -0.5f, transform.position.y -0.5f);
         Vector2 rightRayOrigin = new Vector2(transform.position.x +0.5f, transform.position.y -0.5f);
 
         RaycastHit2D leftHit = Physics2D.Raycast(leftRayOrigin, Vector2.down, 0.1f, groundLayer);
         RaycastHit2D rightHit = Physics2D.Raycast(rightRayOrigin, Vector2.down, 0.1f, groundLayer); //下面から下向きに2本
 
-        isGrounded = leftHit.collider != null || rightHit.collider != null; //どちらか片方が接地するとisGroundedがtrueへ
+        isGrounded = leftHit.collider != null || rightHit.collider != null; //どちらか片方が接地すると地面
+
+
+        RaycastHit2D groundhit = Physics2D.BoxCast(transform.position, new Vector2(1f, 1f), 0f, Vector2.down, boxRayLength, groundLayer);
+        //地上ジャンプの受け入れに使用
+        canGroundJump = groundhit.collider != null;
     }
 
     private void UpdateWallState() //壁の接触判定
     {
+        if (isKnockBack)
+        {
+            return;
+        }
         Vector2 topLeftRayOrigin = new Vector2(transform.position.x -0.5f, transform.position.y +0.5f); //左上
         Vector2 topRightRayOrigin = new Vector2(transform.position.x +0.5f, transform.position.y +0.5f); //右上
         Vector2 bottomLeftRayOrigin = new Vector2(transform.position.x -0.5f, transform.position.y -0.5f); //左下
@@ -167,10 +252,16 @@ public class PlayerController : MonoBehaviour
         RaycastHit2D bottomLeftHit = Physics2D.Raycast(bottomLeftRayOrigin, Vector2.left, 0.1f, climbableWallLayer); //左下から左へ
         RaycastHit2D bottomRightHit = Physics2D.Raycast(bottomRightRayOrigin, Vector2.right, 0.1f, climbableWallLayer); //右下から右へ
 
-        isRightTouchingWall = (topRightHit.collider != null || bottomRightHit.collider != null);
-        isLeftTouchingWall = (topLeftHit.collider != null || bottomLeftHit.collider != null);
+        Vector2 halfRayOrigin = new Vector2(transform.position.x +0.5f * wallDirection, transform.position.y);
+        RaycastHit2D halftHit = Physics2D.Raycast(halfRayOrigin, Vector2.right * wallDirection, wallRayLength, climbableWallLayer);
 
-        isAtLedge = ((topLeftHit.collider == null && bottomLeftHit.collider != null) || (topRightHit.collider == null && bottomRightHit.collider != null));
+        wallKickRange = halftHit.collider != null;
+
+        isRightTouchingWall = (topRightHit.collider != null && bottomRightHit.collider != null);
+        isLeftTouchingWall = (topLeftHit.collider != null && bottomLeftHit.collider != null);
+
+        isAtLeftLedge = topLeftHit.collider == null && bottomLeftHit.collider != null;
+        isAtRightLedge = topRightHit.collider == null && bottomRightHit.collider != null;
         //上端が壁に当たっていないかつ下端が壁に当たっているならば、壁上端
     }
 
@@ -181,10 +272,15 @@ public class PlayerController : MonoBehaviour
             CurrentLocomotionState = LocomotionState.Grounded;
             hasUsedAirJump = false; //空中ジャンプの復活
             isFastFalling = false; //急降下の復活
+            wallDirection = 0;
+
+            isKnockBack = false; //地面につくとノックバック終わり
         }
         else if (isRightTouchingWall || isLeftTouchingWall) //isTouchingWallがtrueならば足場状態WallClingへ
         {
             CurrentLocomotionState = LocomotionState.WallCling;
+
+            isKnockBack = false; //壁につくとノックバック終わり
         }
         else //isGrounded,isTouchingWallがfalseならば足場状態Airborneへ
         {
@@ -202,6 +298,50 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void UpdateActionState() //行動状態更新
+    {
+        if (playerHp <= 0)
+        {
+            CurrentActionState = ActionState.Dead;
+        }
+        else if (isAttack)
+        {
+            CurrentActionState = ActionState.Attacking;
+        }
+        else
+        {
+            CurrentActionState = ActionState.Nomal;
+        }
+    }
+
+    private void Attack()
+    {
+        if (CurrentActionState != ActionState.Attacking)
+        {
+            return;
+        }
+
+        if (hasAttacked)
+        {
+            return;
+        }
+
+        hasAttacked = true;
+
+        Collider2D hit = Physics2D.OverlapCircle((Vector2)transform.position+attackPosition, attackRange, enemyLayer);
+
+        if (hit != null)
+        {
+            Damageable target = hit.GetComponentInParent<Damageable>();
+            //target.TakeDamage(playerAttackDamage, playerGiveKnockBack, playerAttackInvincibleTime); //エネミーを置いていないのでエラーが出てしまう。一旦コメントアウトしてます。
+            Debug.Log(playerAttackDamage);
+        }
+
+        isAttack = false;
+    }
+
+    private void OnDrawGizmosSelected()
+     { Gizmos.DrawWireSphere( (Vector2)transform.position+attackPosition, attackRange ); }
     private void HandleGroundedMovement() //地面での左右移動
     {
         if (CurrentLocomotionState == LocomotionState.Grounded)
@@ -210,7 +350,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void HandleAirMovement() //空中での左右移動
+    private void HandleAirMovement() //空中移動
     {
         if (CurrentLocomotionState == LocomotionState.Airborne)
         {
@@ -228,65 +368,84 @@ public class PlayerController : MonoBehaviour
                 rb.linearVelocity = new Vector2(Mathf.MoveTowards(rb.linearVelocity.x, airMoveSpeed, airAcceleration * Time.fixedDeltaTime), rb.linearVelocity.y);
                 break;
             }
+
+            if (rb.linearVelocity.y < 0f && isFastFalling != true) //落下速度の調節
+            {
+                rb.AddForce(Vector2.down * fallPower, ForceMode2D.Force);
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Max(rb.linearVelocity.y, -fastFallSpeed));
+            }
         }
     }
 
     private void Jump() //ジャンプ
     {
-        if (CurrentLocomotionState == LocomotionState.Grounded || CurrentLocomotionState == LocomotionState.Airborne)
+        if (canGroundJump || CurrentLocomotionState == LocomotionState.Airborne)
         {
             if (jumpPressed)
             {
-                switch(CurrentLocomotionState)
+                if (canGroundJump)
                 {
-                    case LocomotionState.Grounded: //一回目のジャンプ
+                    Debug.Log("地上ジャンプ");
                     rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpPower);
+
                     jumpHoldTimer = 0f;
                     jumpPressed = false;
-                    break;
+                }
 
-                    case LocomotionState.Airborne:
-                    if (hasUsedAirJump == false) //二回目のジャンプ
+                else if (!canGroundJump && CurrentLocomotionState == LocomotionState.Airborne)
+                {
+                    if (hasUsedAirJump == false && !wallKickRange) //二回目のジャンプ
                     {
                         rb.linearVelocity = new Vector2(rb.linearVelocity.x, airJumpPower);
+
                         jumpHoldTimer = 0f;
                         jumpPressed = false;
                         hasUsedAirJump = true;
+                        canWallKick = false;
 
                         ledgeJumpTimer = 0f; //
-                        break;
                     }
-                    else //それ以降
+                    else
                     {
                         jumpPressed = false;
-                        break;
+                        //canWallKick = false;
                     }
                 }
-            }
-
-            if (jumpReleased) //wキーを離すと
-            {
-                if (rb.linearVelocity.y > 0)
-                {
-                    rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * 0.4f); //y方向の速度0.4倍
-                }
-                jumpReleased = false;
             }
 
             if (jumpHeld && jumpHoldTimer < maxJumpHoldTime && rb.linearVelocity.y > 0) //高さ調節
             {
+                //Debug.Log("高さ調節");
                 rb.AddForce(Vector2.up * jumpHoldForce, ForceMode2D.Force);
                 jumpHoldTimer += Time.fixedDeltaTime;
             }
         }
     }
 
-    private void StartFastFall() //急降下
+    private void StartFastFall() //急降下について
     {
-        if (isFastFalling && CurrentLocomotionState == LocomotionState.Airborne)
+        //Debug.Log(stopFastFalling);
+        if (isFastFalling && CurrentLocomotionState == LocomotionState.Airborne) //急降下
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Min(rb.linearVelocity.y, -fastFallSpeed));
             hasUsedAirJump = true;//急降下中のジャンプを無くす
+
+            //Debug.Log(stopFastFalling);
+
+            if (stopFastFalling) //急降下の解除
+            {
+                //Debug.Log("stopFastFalling");
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * slowDownFallMultiplier);
+
+                isFastFalling = false;
+                stopFastFalling = false;
+
+                if (airJumpStateBeforeFastFalling == false) //空中ジャンプが使用されていないとき、空中ジャンプの回復
+                {
+                    hasUsedAirJump = false;
+                    Debug.Log("ジャンプ回復");
+                }
+            }
         }
     }
 
@@ -297,19 +456,20 @@ public class PlayerController : MonoBehaviour
             rb.gravityScale = 0f;
             hasUsedAirJump = false; //空中ジャンプ回復
             isFastFalling = false; //急降下回復
-
-            if (isRightTouchingWall) //右の壁なら1
-            {
-                wallDirection = 1;
-            }
-            if (isLeftTouchingWall) //左の壁なら-1
-            {
-                wallDirection = -1;
-            }
+            canWallKick = false;
         }
         else
         {
             rb.gravityScale = 1f;
+        }
+
+        if (isRightTouchingWall || isAtRightLedge) //右の壁なら1
+        {
+            wallDirection = 1;
+        }
+        if (isLeftTouchingWall || isAtLeftLedge) //左の壁なら-1
+        {
+            wallDirection = -1;
         }
     }
 
@@ -318,28 +478,36 @@ public class PlayerController : MonoBehaviour
         if (CurrentLocomotionState == LocomotionState.WallCling)
         {
             float velocityY = moveInput.y * wallMoveSpeed;
-            rb.linearVelocity = new Vector2(0f, velocityY); //x方向の速度0,y方向の速度はvelocityY
+            rb.linearVelocity = new Vector2(0f, velocityY);
         }
     }
 
     private void DetachFromWall() //壁から離れるor壁キック
     {
-        if (CurrentLocomotionState == LocomotionState.WallCling && moveInput.y <= 0)
+        if (CurrentLocomotionState == LocomotionState.WallCling && moveInput.x == -wallDirection) //壁から離れる
         {
             float velocityX = moveInput.x * wallDetachForce;
-            rb.linearVelocity = new Vector2(velocityX, rb.linearVelocity.y); //x方向に速度velocityX,y方向の速度はそのまま
+            rb.linearVelocity = new Vector2(velocityX, rb.linearVelocity.y * detachWallMultiplier);
         }
 
-        else if (CurrentLocomotionState == LocomotionState.WallCling && moveInput.y > 0)
+        if ((wallKick && moveInput.y >= 0) || canWallKick) //壁キック
         {
-            float velocityX = moveInput.x * wallDetachForce;
+            Debug.Log("壁キック");
+            float velocityX = -wallDirection * wallDetachForce;
             rb.linearVelocity = new Vector2(velocityX, wallKickForce);
+
+            wallKick = false;
+            canWallKick = false;
+        }
+        else if (wallKick && moveInput.y < 0)
+        {
+            wallKick = false;
         }
     }
 
     private void StartLedgeClimb() //ClimbongLedgeへ状態変化
     {
-        if (CurrentLocomotionState == LocomotionState.WallCling && isAtLedge && moveInput.y > 0)
+        if (CurrentLocomotionState == LocomotionState.Airborne && (isAtLeftLedge||isAtRightLedge) && moveInput.y > 0)
         {
             canLedgeClimb = true;
         }
@@ -356,11 +524,11 @@ public class PlayerController : MonoBehaviour
         {
             ledgeClimbDuration += Time.fixedDeltaTime; //上方向に速度を加える時間のタイマー
  
-            if (ledgeClimbDuration < 0.25) //ある一定時間まで上方向に上昇
+            if (ledgeClimbDuration < ledgeJumpUpTime) //ある一定時間まで上方向に上昇
             {
                 rb.linearVelocity = new Vector2(0f, ledgeClimbUpSpeed);
             }
-            else if (0.25 <= ledgeClimbDuration && ledgeClimbDuration < 0.4)
+            else if (ledgeJumpUpTime <= ledgeClimbDuration && ledgeClimbDuration < ledgeJumpHorizontalTime)
             {
                 rb.linearVelocity = new Vector2(wallDirection * ledgeClimbForwardSpeed, rb.linearVelocity.y);
             }
@@ -395,9 +563,25 @@ public class PlayerController : MonoBehaviour
             ledgeJumpTimer = 0f;
 
             //通常ジャンプをした後と同じ状況にする
-            jumpReleased = false;
             jumpPressed = false;
             jumpHeld = false;
+        }
+    }
+
+    public void OnDamaged(float damage, Vector2 knockBack)
+    {
+        if (CurrentActionState == ActionState.Dead)
+        {
+            return;
+        }
+
+        playerHp -= damage;
+
+        if (playerHp > 0)
+        {
+            rb.linearVelocity = knockBack;
+
+            isKnockBack = true;
         }
     }
 }
