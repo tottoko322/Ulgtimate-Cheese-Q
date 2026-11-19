@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 661b269d6684a8f43ac3a79966e091fc
+guid: c279276871581c542bd2a19c91aec28d
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 3596294201944676847
-    second: kari_hito_1_0
+      213: 5750065421629396860
+    second: enemy red attack_in_1_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: kari_hito_1_0
+      name: enemy red attack_in_1_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 1080
-        height: 1920
+        width: 4000
+        height: 2000
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: fe995bec58a98e130800000000000000
-      internalID: 3596294201944676847
+      spriteID: c771a7b29065ccf40800000000000000
+      internalID: 5750065421629396860
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      kari_hito_1_0: 3596294201944676847
+      enemy red attack_in_1_0: 5750065421629396860
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
