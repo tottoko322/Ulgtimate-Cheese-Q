@@ -3003,8 +3003,8 @@ MonoBehaviour:
   verticalAutoScrollSpeed: 0
   isfollowingPlayer: 0
   followingSpeed: 0
-  isFixedYAxis: 1
-  fixedYAxisRange: 0
+  parallaxRatioX: 0
+  parallaxRatioY: 0
   tint: {r: 1, g: 1, b: 1, a: 1}
   opacity: 1
 --- !u!212 &422108641
@@ -5669,8 +5669,8 @@ MonoBehaviour:
   verticalAutoScrollSpeed: 0
   isfollowingPlayer: 0
   followingSpeed: 0
-  isFixedYAxis: 1
-  fixedYAxisRange: 0
+  parallaxRatioX: 0
+  parallaxRatioY: 0
   tint: {r: 1, g: 1, b: 1, a: 1}
   opacity: 0.7
 --- !u!212 &934719870
@@ -7648,8 +7648,8 @@ MonoBehaviour:
   verticalAutoScrollSpeed: 0
   isfollowingPlayer: 0
   followingSpeed: 0
-  isFixedYAxis: 0
-  fixedYAxisRange: 0
+  parallaxRatioX: 0
+  parallaxRatioY: 0
   tint: {r: 1, g: 1, b: 1, a: 1}
   opacity: 0.1
 --- !u!1 &1299324292
@@ -7688,8 +7688,8 @@ MonoBehaviour:
   verticalAutoScrollSpeed: 0
   isfollowingPlayer: 0
   followingSpeed: 0
-  isFixedYAxis: 0
-  fixedYAxisRange: 0
+  parallaxRatioX: 0
+  parallaxRatioY: 0
   tint: {r: 1, g: 1, b: 1, a: 1}
   opacity: 1
 --- !u!212 &1299324294
@@ -9067,8 +9067,8 @@ MonoBehaviour:
   verticalAutoScrollSpeed: 0
   isfollowingPlayer: 1
   followingSpeed: 0
-  isFixedYAxis: 1
-  fixedYAxisRange: 0
+  parallaxRatioX: 0
+  parallaxRatioY: 0
   tint: {r: 1, g: 1, b: 1, a: 1}
   opacity: 1
 --- !u!212 &1577977803
@@ -9913,7 +9913,7 @@ MonoBehaviour:
   ledgeJumpPower: 10
   ledgeJumpHorizontalPower: 6
   ledgeJumpInputWindow: 5
-  playerHp: 0
+  playerHp: 100
   attackRange: 1
   attackPosition: {x: 1, y: 0.5}
   playerAttackDamage: 5
@@ -9922,6 +9922,8 @@ MonoBehaviour:
   enemyLayer:
     serializedVersion: 2
     m_Bits: 256
+  evasionDistance: 3
+  evasionSpeed: 6
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -10619,14 +10621,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05fa7f0e16447314396dd8af133a20fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NonInteractiveObject
-  isSideAutoScroll: 1
+  isSideAutoScroll: 0
   sideAutoScrollSpeed: 0.003
   isVerticalAutoScroll: 0
   verticalAutoScrollSpeed: -0.003
   isfollowingPlayer: 1
   followingSpeed: 10
-  isFixedYAxis: 0
-  fixedYAxisRange: 2
+  parallaxRatioX: 1
+  parallaxRatioY: 0.5
   tint: {r: 1, g: 1, b: 1, a: 1}
   opacity: 1
 --- !u!212 &1809954585
@@ -11772,7 +11774,7 @@ Transform:
   m_GameObject: {fileID: 1932794387}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.21, y: -2.2600002, z: 0}
+  m_LocalPosition: {x: 3.88, y: -2.21, z: 0}
   m_LocalScale: {x: 0.21334, y: 0.21648, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

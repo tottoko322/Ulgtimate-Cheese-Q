@@ -1,4 +1,5 @@
 using JetBrains.Annotations;
+//using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -73,11 +74,16 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
     [SerializeField] private float playerAttackDamage; //プレイヤーが与えるダメージの大きさ
     [SerializeField] private Vector2 playerGiveKnockBack; //プレイヤーが与えるノックバックの大きさ
     [SerializeField] private float playerAttackInvincibleTime; //
-    [SerializeField] private LayerMask enemyLayer; //
+    [SerializeField] private LayerMask enemyLayer;
+
+    [Header("Evasion")]
+    [SerializeField] private float evasionDistance;
+    [SerializeField] private float evasionSpeed;
 
     private int wallDirection = 0;
 
     private Vector2 moveInput;
+    private int moveInputX = 1; //アニメーション、回避で使用
 
     private bool jumpPressed;
     private bool jumpReleased;
@@ -104,6 +110,12 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
     private bool isAttack;
     private bool hasAttacked;
 
+    private bool isEvasion;
+    private bool canEvasion = true;
+    private bool reEvasion;
+    private float evasionRemaining;
+    private LocomotionState beforeEvasionState;
+
     [SerializeField] private LayerMask groundLayer;
     private Rigidbody2D rb;
 
@@ -120,6 +132,7 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
     private InputAction wallKick;
     private InputAction fastFall;
     private InputAction stopFastFall;
+    private InputAction evasion;
 
     private Animator anim;
 
@@ -140,6 +153,9 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
         wallKick = keyControl.FindAction("WallKick", true);
         fastFall = keyControl.FindAction("FastFall", true);
         stopFastFall = keyControl.FindAction("StopFastFall", true);
+        evasion = keyControl.FindAction("Evasion", true);
+
+        evasionRemaining = evasionDistance;
     }
 
     void Update()
@@ -171,8 +187,10 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
         HandleLedgeClimb();
         CompleteLedgeClimb();
         StartLedgeJump();
+        
+        Evasion();
         //Debug.Log($"isAttack: {isAttack}, ActionState: {CurrentActionState}");
-        Debug.Log(CurrentLocomotionState);
+        //Debug.Log(CurrentLocomotionState);
         //Debug.Log(CurrentActionState);
         //Debug.Log(previousState);
         //Debug.Log(wallDirection);
@@ -185,7 +203,7 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
 
     private void ReadInput() //入力取得
     {
-        if (CurrentActionState == ActionState.Dead || isKnockBack) //死亡orノックバックで入力できない
+        if (CurrentActionState == ActionState.Dead || isKnockBack || isEvasion) //死亡orノックバックor回避中で入力できない
         {
             return;
         }
@@ -202,10 +220,12 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
         if (moveRight.IsPressed())
         {
             moveInput.x += 1;
+            moveInputX = 1;
         }
         if (moveLeft.IsPressed())
         {
             moveInput.x -= 1;
+            moveInputX = -1;
         }
         if (wallUp.IsPressed())
         {
@@ -252,6 +272,13 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
         if (stopFastFall.WasPressedThisFrame() && isFastFalling)
         {
             stopFastFalling = true;
+        }
+
+        //回避の入力
+        if (evasion.WasPressedThisFrame() && canEvasion)
+        {
+            isEvasion = true;
+            beforeEvasionState = CurrentLocomotionState;
         }
     }
 
@@ -726,6 +753,53 @@ public class PlayerController : MonoBehaviour, IDamageReceiver
             rb.linearVelocity = knockBack;
 
             isKnockBack = true;
+        }
+    }
+
+    public void Evasion() //回避
+    {
+        //攻撃、被弾、死亡中、崖のぼり小ジャンプ中は使えない
+        if (isEvasion && CurrentLocomotionState != LocomotionState.ClimbingLedge && CurrentActionState == ActionState.Nomal)
+        {
+            canEvasion = false;
+
+            //回避の残りの距離
+            evasionRemaining -= evasionSpeed * Time.fixedDeltaTime;
+
+            rb.linearVelocity = new Vector2(moveInputX * evasionSpeed, 0f);
+
+            //指定のマス進むor壁に張り付きで回避終了
+            if (evasionRemaining <= 0f || CurrentLocomotionState == LocomotionState.WallCling)
+            {
+                Debug.Log("stop");
+
+                isEvasion = false;
+
+                evasionRemaining = evasionDistance;
+
+                rb.linearVelocityX = 0f;
+            }
+        }
+
+        //回避の再使用
+        if (canEvasion)
+        {
+            return;
+        }
+
+        if ((beforeEvasionState == LocomotionState.Airborne || beforeEvasionState == LocomotionState.WallCling) && CurrentLocomotionState == LocomotionState.Grounded)
+        {
+            canEvasion = true;
+        }
+        else if (beforeEvasionState == LocomotionState.Grounded && CurrentLocomotionState != LocomotionState.Grounded)
+        {
+            reEvasion = true;
+            Debug.Log("reEvasion");
+        }
+        else if (reEvasion && CurrentLocomotionState == LocomotionState.Grounded)
+        {
+            canEvasion = true;
+            Debug.Log("evasion復活");
         }
     }
 }
