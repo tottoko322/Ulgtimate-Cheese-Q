@@ -133,16 +133,11 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
                     EnemyCurrentStatus = EnemyStatusBox.Detect;
                     canChangeStatus = false;
                 }
-                else
+                else if(EnemyCurrentStatus == EnemyStatusBox.Detect)
                 {
                     EnemyCurrentStatus = EnemyStatusBox.Chase;
                     canChangeStatus = true;
                 }
-            }
-            else if(EnemyCurrentStatus == EnemyStatusBox.Detect)
-            {
-                EnemyCurrentStatus = EnemyStatusBox.Stay;
-                canChangeStatus = true;
             }
             if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemyAttackRange*dataofenemy.enemyAttackRange)
             {
