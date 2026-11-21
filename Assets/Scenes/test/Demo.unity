@@ -127,14 +127,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 34472840325801380, guid: e9425cbdf28fb994eb7ae1267f74266a, type: 3}
-      propertyPath: m_SortingOrder
-      value: 3
-      objectReference: {fileID: 0}
     - target: {fileID: 5228479328842022671, guid: e9425cbdf28fb994eb7ae1267f74266a, type: 3}
-      propertyPath: playertransform
+      propertyPath: debugenmy
       value: 
-      objectReference: {fileID: 177625274}
+      objectReference: {fileID: 0}
     - target: {fileID: 6202294442659869915, guid: e9425cbdf28fb994eb7ae1267f74266a, type: 3}
       propertyPath: m_LocalPosition.x
       value: 4.73
@@ -175,14 +171,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6844579080728337582, guid: e9425cbdf28fb994eb7ae1267f74266a, type: 3}
-      propertyPath: m_Size.y
-      value: 15.818784
-      objectReference: {fileID: 0}
-    - target: {fileID: 6844579080728337582, guid: e9425cbdf28fb994eb7ae1267f74266a, type: 3}
-      propertyPath: m_Offset.y
-      value: 0.030738354
-      objectReference: {fileID: 0}
     - target: {fileID: 7393284672050839887, guid: e9425cbdf28fb994eb7ae1267f74266a, type: 3}
       propertyPath: m_Name
       value: Enemy_red
@@ -203,6 +191,7 @@ GameObject:
   - component: {fileID: 177625274}
   - component: {fileID: 177625273}
   - component: {fileID: 177625272}
+  - component: {fileID: 177625277}
   - component: {fileID: 177625275}
   - component: {fileID: 177625276}
   m_Layer: 7
@@ -411,6 +400,18 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &177625277
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 177625271}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f707d39de94df6946b03a34ecdc9b7d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Damageable
 --- !u!1 &373213579
 GameObject:
   m_ObjectHideFlags: 0

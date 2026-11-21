@@ -85,7 +85,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 3
   m_MaskInteraction: 0
   m_Sprite: {fileID: 4808953464800377223, guid: 93c0b26440b7d4940997d5de485d8c1e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -156,7 +156,7 @@ MonoBehaviour:
   hasHitedEnemyAttack: 0
   debugenmy: {fileID: 7766888413270726590}
   damage: 1
-  knockBack: {x: 1, y: 2}
+  knockBack: {x: 10, y: 2}
   invincible: 1
 --- !u!114 &7766888413270726590
 MonoBehaviour:
@@ -231,7 +231,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: 0.030738354}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -241,7 +241,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 10.8, y: 19.2}
+  m_Size: {x: 10.8, y: 15.818784}
   m_EdgeRadius: 0
 --- !u!95 &1105258464008876880
 Animator:

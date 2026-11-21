@@ -133,11 +133,16 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
                     EnemyCurrentStatus = EnemyStatusBox.Detect;
                     canChangeStatus = false;
                 }
-                else if(EnemyCurrentStatus == EnemyStatusBox.Detect)
+                else
                 {
                     EnemyCurrentStatus = EnemyStatusBox.Chase;
                     canChangeStatus = true;
                 }
+            }
+            else if(EnemyCurrentStatus == EnemyStatusBox.Detect)
+            {
+                EnemyCurrentStatus = EnemyStatusBox.Chase;
+                canChangeStatus = true;
             }
             if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemyAttackRange*dataofenemy.enemyAttackRange)
             {
@@ -291,6 +296,7 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
                     if(target != null)
                     {
                         target.TakeDamage(dataofenemy.enemyAttack, dataofenemy.enemyGiveKnockBack*adjustFace,dataofenemy.enemyAttackInvincibleTime);
+                        Debug.Log("AttackSuccsess");
                     }
                 }
             }
