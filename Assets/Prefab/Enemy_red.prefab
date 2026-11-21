@@ -131,6 +131,9 @@ MonoBehaviour:
   enemyAttackActionInterval:
   - 0.5
   - 0
+  enemyAttackObj: []
+  enemyObjPopPosition: []
+  enemyObjPopTiming: []
 --- !u!114 &5228479328842022671
 MonoBehaviour:
   m_ObjectHideFlags: 0

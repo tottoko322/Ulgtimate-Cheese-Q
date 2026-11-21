@@ -31,8 +31,8 @@ public class EnemyData : MonoBehaviour
     public float[] enemyAttackActionInterval;
     [Header("出現オブジェクト設定")]
     public GameObject[] enemyAttackObj;
-    public Vector2[] enemyObjPopPosition;
-    public float[] enemyObjPopTiming;
+    public Vector3[] enemyObjPopPosition;
+    public float enemyObjPopTiming;
 
 
     //public float enemyFixedTimeAttack;

@@ -43,6 +43,7 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
     private float passTimeAfterAttackFixed;
     private float passTimeAfterAttackCool;
     private float passTimeAfterAttackHit;
+    private float passTimeAfterAttackPop;
 
     //被弾死亡制御。
     private float passTimeAfterHurtFixed;
@@ -299,6 +300,19 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
                         Debug.Log("AttackSuccsess");
                     }
                 }
+            }
+            if(dataofenemy.enemyAttackObj != null)return;
+            if(passTimeAfterAttackPop <= dataofenemy.enemyObjPopTiming)
+            {
+                passTimeAfterAttackPop += Time.deltaTime;
+            }
+            else
+            {
+                for(int i = 0; i < dataofenemy.enemyAttackObj.Length; i++)
+                {
+                    Instantiate(dataofenemy.enemyAttackObj[i], transform.position + dataofenemy.enemyObjPopPosition[i], Quaternion.identity);
+                }
+                hasHitedEnemyAttack = true;
             }
         }
     }
