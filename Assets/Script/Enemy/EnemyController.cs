@@ -144,7 +144,7 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
                 EnemyCurrentStatus = EnemyStatusBox.Chase;
                 canChangeStatus = true;
             }
-            if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemyAttackRange*dataofenemy.enemyAttackRange)
+            if(distanceX*distanceX + distanceY*distanceY < dataofenemy.enemyAttackRange*dataofenemy.enemyAttackRange && EnemyCurrentStatus != EnemyStatusBox.Stay && EnemyCurrentStatus != EnemyStatusBox.Detect)
             {
                 if(!isInCoolTime)
                 {
