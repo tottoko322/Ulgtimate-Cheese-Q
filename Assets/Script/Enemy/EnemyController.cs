@@ -295,7 +295,7 @@ public class EnemyController : MonoBehaviour, IDamageReceiver
                     Damageable target = hit.GetComponentInParent<Damageable>();
                     if(target != null)
                     {
-                        target.TakeDamage(dataofenemy.enemyAttack, dataofenemy.enemyGiveKnockBack*adjustFace,dataofenemy.enemyAttackInvincibleTime);
+                        target.TakeDamage(dataofenemy.enemyAttack, dataofenemy.enemyGiveKnockBack*new Vector2(adjustFace,1),dataofenemy.enemyAttackInvincibleTime);
                         Debug.Log("AttackSuccsess");
                     }
                 }
